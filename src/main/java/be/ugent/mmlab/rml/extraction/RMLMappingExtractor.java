@@ -1,4 +1,4 @@
-package be.ugent.mmlab.rml.extractor;
+package be.ugent.mmlab.rml.extraction;
 
 import be.ugent.mmlab.rml.model.GraphMap;
 import be.ugent.mmlab.rml.model.ObjectMap;
@@ -12,6 +12,7 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 
 /**
+ * RML - Mapping Document Handler
  *
  * @author andimou
  */
@@ -23,6 +24,11 @@ public interface RMLMappingExtractor {
      */
     public RMLSesameDataSet replaceShortcuts(RMLSesameDataSet rmlMappingGraph);
     
+    /**
+     *
+     * @param rmlMappingGraph
+     * @return
+     */
     public RMLSesameDataSet skolemizeStatements(RMLSesameDataSet rmlMappingGraph);
     
     /**
@@ -33,6 +39,12 @@ public interface RMLMappingExtractor {
     public Map<Resource, TriplesMap> extractTriplesMapResources(
             RMLSesameDataSet rmlMappingGraph);
     
+    /**
+     *
+     * @param rmlMappingGraph
+     * @param triplesMapSubject
+     * @param triplesMapResources
+     */
     public void extractTriplesMap(
             RMLSesameDataSet rmlMappingGraph, Resource triplesMapSubject, 
             Map<Resource, TriplesMap> triplesMapResources);
