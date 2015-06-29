@@ -1,15 +1,9 @@
 package be.ugent.mmlab.rml.extraction;
 
-import be.ugent.mmlab.rml.model.GraphMap;
-import be.ugent.mmlab.rml.model.ObjectMap;
-import be.ugent.mmlab.rml.model.PredicateMap;
-import be.ugent.mmlab.rml.model.PredicateObjectMap;
 import be.ugent.mmlab.rml.model.TriplesMap;
 import be.ugent.mmlab.rml.sesame.RMLSesameDataSet;
 import java.util.Map;
-import java.util.Set;
 import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
 
 /**
  * RML - Mapping Document Handler
@@ -45,9 +39,9 @@ public interface RMLMappingExtractor {
      * @param triplesMapSubject
      * @param triplesMapResources
      */
-    public void extractTriplesMap(
-            RMLSesameDataSet rmlMappingGraph, Resource triplesMapSubject, 
-            Map<Resource, TriplesMap> triplesMapResources);
+    //public void extractTriplesMap(
+    //        RMLSesameDataSet rmlMappingGraph, Resource triplesMapSubject, 
+    //        Map<Resource, TriplesMap> triplesMapResources);
     
     /**
      *
@@ -57,9 +51,9 @@ public interface RMLMappingExtractor {
      * @param triplesMap
      * @return
      */
-    public PredicateMap extractPredicateMap(
-            RMLSesameDataSet rmlMappingGraph, Statement object,
-            Set<GraphMap> graphMaps, TriplesMap triplesMap);
+    //public PredicateMap extractPredicateMap(
+    //        RMLSesameDataSet rmlMappingGraph, Statement object,
+    //        Set<GraphMap> graphMaps, TriplesMap triplesMap);
     
     /**
      *
@@ -69,8 +63,8 @@ public interface RMLMappingExtractor {
      * @param triplesMap
      * @return
      */
-    public ObjectMap extractObjectMap(RMLSesameDataSet rmlMappingGraph,
-            Resource object, Set<GraphMap> graphMaps, TriplesMap triplesMap);
+    //public ObjectMap extractObjectMap(RMLSesameDataSet rmlMappingGraph,
+    //        Resource object, Set<GraphMap> graphMaps, TriplesMap triplesMap);
     
     /**
      *
@@ -81,9 +75,9 @@ public interface RMLMappingExtractor {
      * @param triplesMapResources
      * @return
      */
-    public Set<PredicateObjectMap> extractPredicateObjectMaps(
-            RMLSesameDataSet rmlMappingGraph, Resource triplesMapSubject,
-            Set<GraphMap> graphMaps, TriplesMap result,
-            Map<Resource, TriplesMap> triplesMapResources);
+    //public Set<PredicateObjectMap> extractPredicateObjectMaps(
+    //        RMLSesameDataSet rmlMappingGraph, Resource triplesMapSubject,
+    //        Set<GraphMap> graphMaps, TriplesMap result,
+    //        Map<Resource, TriplesMap> triplesMapResources);
         
 }
