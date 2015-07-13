@@ -16,7 +16,8 @@ import be.ugent.mmlab.rml.sesame.RMLSesameDataSet;
 import be.ugent.mmlab.rml.vocabulary.QLVocabulary;
 import be.ugent.mmlab.rml.vocabulary.RMLVocabulary;
 import java.util.List;
-import org.apache.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
@@ -24,7 +25,7 @@ import org.openrdf.model.URI;
 public class LogicalSourceExtractor {
     
     // Log
-    private static final org.apache.log4j.Logger log = LogManager.getLogger(LogicalSourceExtractor.class);
+    static final Logger log = LoggerFactory.getLogger(LogicalSourceExtractor.class);
 
     public Resource extractLogicalSource(
             RMLSesameDataSet rmlMappingGraph, Resource triplesMapSubject, TriplesMap triplesMap) {

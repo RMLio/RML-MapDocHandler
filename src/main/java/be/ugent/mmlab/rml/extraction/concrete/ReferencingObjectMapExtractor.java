@@ -1,14 +1,3 @@
-/**
- * *************************************************************************
- *
- * RML - Mapping Document Handler : TermMapExtractor
- *
- *
- * @author andimou
- *
- ***************************************************************************
- */
-
 package be.ugent.mmlab.rml.extraction.concrete;
 
 import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
@@ -23,17 +12,28 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 
+/**
+ * *************************************************************************
+ *
+ * RML - Mapping Document Handler : ReferencingObjectMapExtractor
+ *
+ *
+ * @author andimou
+ *
+ ***************************************************************************
+ */
 public class ReferencingObjectMapExtractor {
     
     // Log
-    private static final org.apache.log4j.Logger log = LogManager.getLogger(ReferencingObjectMapExtractor.class);
+    static final Logger log = LoggerFactory.getLogger(ReferencingObjectMapExtractor.class);
     
-    protected Set<ReferencingObjectMap> processReferencingObjectMap(
+    public Set<ReferencingObjectMap> processReferencingObjectMap(
             RMLSesameDataSet rmlMappingGraph, List<Statement> object_statements, Set<GraphMap> savedGraphMaps,
             Map<Resource, TriplesMap> triplesMapResources, TriplesMap triplesMap, Resource triplesMapSubject, Resource predicateObject) {
         Set<ReferencingObjectMap> refObjectMaps = new HashSet<ReferencingObjectMap>();

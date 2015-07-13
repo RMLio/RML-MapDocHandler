@@ -1,3 +1,19 @@
+package be.ugent.mmlab.rml.extraction.concrete;
+
+import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
+import be.ugent.mmlab.rml.model.RDFTerm.ObjectMap;
+import be.ugent.mmlab.rml.model.TriplesMap;
+import be.ugent.mmlab.rml.model.std.StdObjectMap;
+import be.ugent.mmlab.rml.model.termMap.ReferenceMap;
+import be.ugent.mmlab.rml.sesame.RMLSesameDataSet;
+import be.ugent.mmlab.rml.vocabulary.R2RMLVocabulary;
+import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.openrdf.model.Resource;
+import org.openrdf.model.URI;
+import org.openrdf.model.Value;
+
 /**
  * *************************************************************************
  *
@@ -9,25 +25,10 @@
  ***************************************************************************
  */
 
-package be.ugent.mmlab.rml.extraction.concrete;
-
-import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
-import be.ugent.mmlab.rml.model.RDFTerm.ObjectMap;
-import be.ugent.mmlab.rml.model.TriplesMap;
-import be.ugent.mmlab.rml.model.std.StdObjectMap;
-import be.ugent.mmlab.rml.model.termMap.ReferenceMap;
-import be.ugent.mmlab.rml.sesame.RMLSesameDataSet;
-import be.ugent.mmlab.rml.vocabulary.R2RMLVocabulary;
-import java.util.Set;
-import org.apache.log4j.LogManager;
-import org.openrdf.model.Resource;
-import org.openrdf.model.URI;
-import org.openrdf.model.Value;
-
 public class ObjectMapExtractor {
     
     // Log
-    private static final org.apache.log4j.Logger log = LogManager.getLogger(ObjectMapExtractor.class);
+    static final Logger log = LoggerFactory.getLogger(ObjectMapExtractor.class);
     
     public ObjectMap extractObjectMap(RMLSesameDataSet rmlMappingGraph,
             Resource object, Set<GraphMap> graphMaps, TriplesMap triplesMap){

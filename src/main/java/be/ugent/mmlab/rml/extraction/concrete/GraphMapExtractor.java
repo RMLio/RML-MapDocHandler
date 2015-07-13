@@ -1,14 +1,3 @@
-/**
- * *************************************************************************
- *
- * RML - Mapping Document Handler : GraphMapExtractor
- *
- *
- * @author andimou
- *
- ***************************************************************************
- */
-
 package be.ugent.mmlab.rml.extraction.concrete;
 
 import be.ugent.mmlab.rml.extraction.RMLUnValidatedMappingExtractor;
@@ -21,15 +10,27 @@ import be.ugent.mmlab.rml.sesame.RMLSesameDataSet;
 import be.ugent.mmlab.rml.vocabulary.R2RMLVocabulary;
 import java.util.HashSet;
 import java.util.Set;
-import org.apache.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 
+/**
+ * *************************************************************************
+ *
+ * RML - Mapping Document Handler : GraphMapExtractor
+ *
+ *
+ * @author andimou
+ *
+ ***************************************************************************
+ */
+
 public class GraphMapExtractor {
     
     // Log
-    private static final org.apache.log4j.Logger log = LogManager.getLogger(GraphMapExtractor.class);
+    static final Logger log = LoggerFactory.getLogger(GraphMapExtractor.class);
     
     public Set<GraphMap> extractGraphMapValues(
             RMLSesameDataSet rmlMappingGraph, Set<Value> graphMapValues, 
@@ -90,7 +91,7 @@ public class GraphMapExtractor {
         return result;
     }
     
-    protected PredicateObjectMap processGraphMaps(
+    public PredicateObjectMap processGraphMaps(
             RMLSesameDataSet rmlMappingGraph, Resource predicateObject, TriplesMap triplesMap, 
             PredicateObjectMap predicateObjectMap, Set<GraphMap> savedGraphMaps) {
         // Add graphMaps

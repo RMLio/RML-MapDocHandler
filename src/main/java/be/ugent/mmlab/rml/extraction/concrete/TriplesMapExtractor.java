@@ -1,14 +1,3 @@
-/**
- * *************************************************************************
- *
- * RML - Mapping Document Handler : TriplesMapExtractor
- *
- *
- * @author andimou
- *
- ***************************************************************************
- */
-
 package be.ugent.mmlab.rml.extraction.concrete;
 
 import be.ugent.mmlab.rml.input.extractor.concrete.ConcreteInputFactory;
@@ -29,16 +18,27 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 
+/**
+ * *************************************************************************
+ *
+ * RML - Mapping Document Handler : TriplesMapExtractor
+ *
+ *
+ * @author andimou
+ *
+ ***************************************************************************
+ */
 public class TriplesMapExtractor {
     
-    private static final Logger log = LogManager.getLogger(TriplesMapExtractor.class);
-    
+    //Log
+    static final Logger log = LoggerFactory.getLogger(TriplesMapExtractor.class);
+       
     public void extractTriplesMap(
             RMLSesameDataSet rmlMappingGraph, Resource triplesMapSubject,
             Map<Resource, TriplesMap> triplesMapResources) {
@@ -109,30 +109,27 @@ public class TriplesMapExtractor {
         if (!sourceStatements.isEmpty()) {
             //Extract the file identifier
             for (Statement sourceStatement : sourceStatements) {
-                String source ;
+                String source;
                 Set<InputSource> inputSources;
 
-                //string input
-                //TODO: change to LocalInputFile
-                if(sourceStatement.getObject().getClass().getSimpleName().equals("MemLiteral")){
+                if (sourceStatement.getObject().getClass().getSimpleName().equals("MemLiteral")) {
+                    log.info("Literal-valued Input Source");
                     source = sourceStatement.getObject().stringValue();
                     LocalFileExtractor input = new LocalFileExtractor();
                     inputSources = input.extractInput(rmlMappingGraph, source);
-                }
-                //object input
-                else{
+                } //object input
+                else {
+                    log.info("Resource-valued Input Source");
                     ConcreteInputFactory inputFactory = new ConcreteInputFactory();
                     inputSources = inputFactory.chooseInput(
                             rmlMappingGraph, (Resource) sourceStatement.getObject());
                 }
-                
-                for (InputSource inputSource  : inputSources) {
-                        logicalSource = new StdLogicalSource(iterator, inputSource, referenceFormulation);
+
+                for (InputSource inputSource : inputSources) {
+                    logicalSource = new StdLogicalSource(iterator, inputSource, referenceFormulation);
                 }
             }
         }
-        //else
-          //  logicalSource = new StdLogicalSource(inputSource, referenceFormulation);
         
         log.debug(
                 Thread.currentThread().getStackTrace()[1].getMethodName() + ": "

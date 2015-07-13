@@ -1,14 +1,3 @@
-/**
- * *************************************************************************
- *
- * RML - Mapping Document Handler : TermMapExtractor
- *
- *
- * @author andimou
- *
- ***************************************************************************
- */
-
 package be.ugent.mmlab.rml.extraction.concrete;
 
 import be.ugent.mmlab.rml.model.TriplesMap;
@@ -20,21 +9,27 @@ import be.ugent.mmlab.rml.vocabulary.RMLVocabulary;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.apache.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 
 /**
- * RML Processor
+ * *************************************************************************
+ *
+ * RML - Mapping Document Handler : TermMapExtractor
+ *
  *
  * @author andimou
+ *
+ ***************************************************************************
  */
 public class TermMapExtractor {
     
     // Log
-    private static final org.apache.log4j.Logger log = LogManager.getLogger(TermMapExtractor.class);
+    static final Logger log = LoggerFactory.getLogger(TermMapExtractor.class);
     
     /**
      *

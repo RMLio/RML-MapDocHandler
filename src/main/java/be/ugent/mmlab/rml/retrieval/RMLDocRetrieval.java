@@ -6,21 +6,26 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 
 /**
- * RML - Mapping Document Handler
+ * *************************************************************************
+ *
+ * RML - Mapping Document Handler : RMLDocRetrieval
+ *
  *
  * @author andimou
+ *
+ ***************************************************************************
  */
 public class RMLDocRetrieval {
     
     // Log
-    private static final Logger log = LogManager.getLogger(RMLDocRetrieval.class);
+    static final Logger log = LoggerFactory.getLogger(RMLDocRetrieval.class);
     
     /**
      *
@@ -47,24 +52,24 @@ public class RMLDocRetrieval {
                     }
                 }
             } catch (MalformedURLException ex) {
-                log.error(ex);
+                log.error("MalformedURLException " + ex);
             } catch (IOException ex) {
-                log.error(ex);
+                log.error("IOException " + ex);
             }
         } 
         else {
             try {
                 rmlMappingGraph.loadDataFromFile(fileToRMLFile, RDFFormat.TURTLE);
             } catch (RepositoryException ex) {
-                log.error(ex);
+                log.error("RepositoryException " + ex);
             } catch (IOException ex) {
-                log.error(ex);
+                log.error("IOException " + ex);
             } catch (RDFParseException ex) {
-                log.error(ex);
+                log.error("RDFParseException " + ex);
             }
         }
         log.debug(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                + "Number of R2RML triples in file "
+                + "Number of RML triples in file "
                 + fileToRMLFile + " : " + rmlMappingGraph.getSize() + " from local file");
 
         return rmlMappingGraph;
@@ -77,6 +82,9 @@ public class RMLDocRetrieval {
      */
     public static boolean isLocalFile(String source) {
         try {
+            //TODO: Find a better way to check for file:/
+            if(source.startsWith("file:/"))
+                return true;
             new URL(source);
             return false;
         } catch (MalformedURLException e) {

@@ -1,14 +1,3 @@
-/**
- * *************************************************************************
- *
- * RML - Mapping Document Handler : PredicateObjectMapExtractor
- *
- *
- * @author andimou
- *
- ***************************************************************************
- */
-
 package be.ugent.mmlab.rml.extraction.concrete;
 
 import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
@@ -24,20 +13,26 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 
 /**
- * RML Processor
+ * *************************************************************************
+ *
+ * RML - Mapping Document Handler : PredicateObjectMapExtractor
+ *
  *
  * @author andimou
+ *
+ ***************************************************************************
  */
 public class PredicateObjectMapExtractor {
     
     // Log
-    private static final org.apache.log4j.Logger log = LogManager.getLogger(PredicateObjectMapExtractor.class);
+    static final Logger log = LoggerFactory.getLogger(PredicateObjectMapExtractor.class);
     
     public PredicateObjectMap extractPredicateObjectMap(
             RMLSesameDataSet rmlMappingGraph,
@@ -77,7 +72,6 @@ public class PredicateObjectMapExtractor {
                         (Resource) object_statement.getObject(), savedGraphMaps, triplesMap);
                 try {
                     objectMap.setOwnTriplesMap(triplesMapResources.get(triplesMapSubject));
-                //} catch (InvalidR2RMLStructureException ex) {
                 } catch (Exception ex) {    
                     log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": " + ex);
                 }
@@ -93,7 +87,6 @@ public class PredicateObjectMapExtractor {
                     + "Extract predicate-object map done.");
             return predicateObjectMap;
         }
-
         return null;
     }
 

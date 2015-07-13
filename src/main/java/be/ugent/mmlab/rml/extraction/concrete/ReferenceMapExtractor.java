@@ -1,14 +1,14 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package be.ugent.mmlab.rml.extraction.concrete;
 
 /**
- * RML Processor
+ * *************************************************************************
+ *
+ * RML - Mapping Document Handler : ReferenceMapExtractor
+ *
  *
  * @author andimou
+ *
+ ***************************************************************************
  */
 public class ReferenceMapExtractor {
 
