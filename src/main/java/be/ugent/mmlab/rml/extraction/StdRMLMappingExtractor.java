@@ -1,11 +1,10 @@
 package be.ugent.mmlab.rml.extraction;
 
-import be.ugent.mmlab.rml.sesame.RMLSesameDataSet;
 import be.ugent.mmlab.rml.skolemization.skolemizationFactory;
 import be.ugent.mmlab.rml.vocabulary.R2RMLVocabulary;
 import be.ugent.mmlab.rml.vocabulary.RMLVocabulary;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Resource;
@@ -14,6 +13,10 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.RepositoryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,165 +46,124 @@ public abstract class StdRMLMappingExtractor implements RMLMappingExtractor{
      * @param rmlMappingGraph
      */
     @Override
-    public RMLSesameDataSet replaceShortcuts(RMLSesameDataSet rmlMappingGraph) {
-        Map<URI, URI> shortcutPredicates = new HashMap<URI, URI>();
-        shortcutPredicates.put(
-                vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.SUBJECT),
-                vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.SUBJECT_MAP));
-        shortcutPredicates.put(
-                vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.PREDICATE),
-                vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.PREDICATE_MAP));
-        shortcutPredicates.put(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.OBJECT),
-                vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.OBJECT_MAP));
-        shortcutPredicates
-                .put(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.GRAPH),
-                vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.GRAPH_MAP));
+        public Repository replaceShortcuts(Repository mapDocRepo) {
+        try {
+            RepositoryConnection mapDocRepoCon = mapDocRepo.getConnection();
 
-        for (URI u : shortcutPredicates.keySet()) {
-            List<Statement> shortcutTriples = rmlMappingGraph.tuplePattern(
-                    null, u, null);
-            log.debug(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                    + "Number of RML shortcuts found "
-                    + "for "
-                    + u.getLocalName()
-                    + " : "
-                    + shortcutTriples.size());
+            Map<URI, URI> shortcutPredicates = new HashMap<URI, URI>();
+            shortcutPredicates.put(
+                    vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    + R2RMLVocabulary.R2RMLTerm.SUBJECT),
+                    vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    + R2RMLVocabulary.R2RMLTerm.SUBJECT_MAP));
+            shortcutPredicates.put(
+                    vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    + R2RMLVocabulary.R2RMLTerm.PREDICATE),
+                    vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    + R2RMLVocabulary.R2RMLTerm.PREDICATE_MAP));
+            shortcutPredicates.put(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    + R2RMLVocabulary.R2RMLTerm.OBJECT),
+                    vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    + R2RMLVocabulary.R2RMLTerm.OBJECT_MAP));
+            shortcutPredicates
+                    .put(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    + R2RMLVocabulary.R2RMLTerm.GRAPH),
+                    vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    + R2RMLVocabulary.R2RMLTerm.GRAPH_MAP));
 
-            for (Statement shortcutTriple : shortcutTriples) {
-                rmlMappingGraph.remove(shortcutTriple.getSubject(),
-                        shortcutTriple.getPredicate(),
-                        shortcutTriple.getObject());
-                BNode blankMap = vf.createBNode();
+            for (URI uri : shortcutPredicates.keySet()) {
+                RepositoryResult<Statement> shortcuts =
+                        mapDocRepoCon.getStatements(null, uri, null, true);
 
-                URI pMap = vf.createURI(shortcutPredicates.get(u).toString());
-                URI pConstant = vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                        + R2RMLVocabulary.R2RMLTerm.CONSTANT);
-                rmlMappingGraph.add(shortcutTriple.getSubject(), pMap,
-                        blankMap);
-                rmlMappingGraph.add(blankMap, pConstant,
-                        shortcutTriple.getObject());
+                while (shortcuts.hasNext()) {
+                    Statement st = shortcuts.next();
+                    mapDocRepoCon.remove(st);
+                    BNode blankMap = vf.createBNode();
+
+                    URI pMap = vf.createURI(shortcutPredicates.get(uri).toString());
+                    URI pConstant = vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                            + R2RMLVocabulary.R2RMLTerm.CONSTANT);
+                    mapDocRepoCon.add(st.getSubject(),pMap, blankMap);
+                    mapDocRepoCon.add(blankMap, pConstant,st.getObject());
+                }      
+                mapDocRepoCon.commit();
+                mapDocRepoCon.close();
             }
+        } catch (RepositoryException ex) {
+            log.error("RepositoryException " + ex);
         }
-
-        return rmlMappingGraph;
+        return mapDocRepo;
     }
     
-    @Override
-    public RMLSesameDataSet skolemizeStatements(RMLSesameDataSet rmlMappingGraph) {
-        Map<URI, URI> predicates = new HashMap<URI, URI>();
-        predicates.put(
-                vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.SUBJECT_MAP),
-                vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.SUBJECT_MAP));
-        predicates.put(
-                vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.PREDICATE_MAP),
-                vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.PREDICATE_MAP));
-        predicates.put(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.OBJECT_MAP),
-                vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.OBJECT_MAP));
-        predicates.put(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.PARENT_TRIPLES_MAP),
-                vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.PARENT_TRIPLES_MAP));
-        predicates.put(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.JOIN_CONDITION),
-                vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.JOIN_CONDITION));
-        predicates
-                .put(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.GRAPH_MAP),
-                vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.GRAPH_MAP));
-        predicates
-                .put(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.CLASS),
-                vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.CLASS));
-        predicates
-                .put(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.CONSTANT),
-                vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.CONSTANT));
+    public Repository skolemizeStatements(Repository mapDocRepo) {
+        try {
+            RepositoryConnection mapDocRepoCon = mapDocRepo.getConnection();
+            
+            // Create new ArrayList.
+            ArrayList<URI> elements = new ArrayList<>();
+            elements.add(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    + R2RMLVocabulary.R2RMLTerm.SUBJECT_MAP));
+            elements.add(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    + R2RMLVocabulary.R2RMLTerm.PREDICATE_MAP));
+            elements.add(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    + R2RMLVocabulary.R2RMLTerm.OBJECT_MAP));
+            elements.add(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    + R2RMLVocabulary.R2RMLTerm.PARENT_TRIPLES_MAP));
+            elements.add(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    + R2RMLVocabulary.R2RMLTerm.JOIN_CONDITION));
+            elements.add(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    + R2RMLVocabulary.R2RMLTerm.GRAPH_MAP));
+            elements.add(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    + R2RMLVocabulary.R2RMLTerm.CLASS));
+            elements.add(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    + R2RMLVocabulary.R2RMLTerm.CONSTANT));
+            elements.add(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    + R2RMLVocabulary.R2RMLTerm.TEMPLATE));
+            elements.add(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    + R2RMLVocabulary.R2RMLTerm.TERM_TYPE));
+            elements.add(vf.createURI(RMLVocabulary.RML_NAMESPACE
+                    + RMLVocabulary.RMLTerm.LOGICAL_SOURCE));
+            elements.add(vf.createURI(RMLVocabulary.RML_NAMESPACE
+                    + RMLVocabulary.RMLTerm.SOURCE));
+            elements.add(vf.createURI(RMLVocabulary.RML_NAMESPACE
+                    + RMLVocabulary.RMLTerm.REFERENCE_FORMULATION));
+            elements.add(vf.createURI(RMLVocabulary.RML_NAMESPACE
+                    + RMLVocabulary.RMLTerm.REFERENCE));
+            elements.add(vf.createURI(RMLVocabulary.RML_NAMESPACE
+                    + RMLVocabulary.RMLTerm.ITERATOR));
+            
+            for (URI uri : elements) {
+                RepositoryResult<Statement> statements =
+                        mapDocRepoCon.getStatements(null, uri, null, true);
 
-        predicates
-                .put(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.TEMPLATE),
-                vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.TEMPLATE));
-        predicates
-                .put(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.TERM_TYPE),
-                vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.TERM_TYPE));
-
-        predicates
-                .put(vf.createURI(RMLVocabulary.RML_NAMESPACE
-                + RMLVocabulary.RMLTerm.LOGICAL_SOURCE),
-                vf.createURI(RMLVocabulary.RML_NAMESPACE
-                + RMLVocabulary.RMLTerm.LOGICAL_SOURCE));
-        predicates
-                .put(vf.createURI(RMLVocabulary.RML_NAMESPACE
-                + RMLVocabulary.RMLTerm.SOURCE),
-                vf.createURI(RMLVocabulary.RML_NAMESPACE
-                + RMLVocabulary.RMLTerm.SOURCE));
-        predicates
-                .put(vf.createURI(RMLVocabulary.RML_NAMESPACE
-                + RMLVocabulary.RMLTerm.REFERENCE_FORMULATION),
-                vf.createURI(RMLVocabulary.RML_NAMESPACE
-                + RMLVocabulary.RMLTerm.REFERENCE_FORMULATION));
-        predicates
-                .put(vf.createURI(RMLVocabulary.RML_NAMESPACE
-                + RMLVocabulary.RMLTerm.REFERENCE),
-                vf.createURI(RMLVocabulary.RML_NAMESPACE
-                + RMLVocabulary.RMLTerm.REFERENCE));
-        predicates
-                .put(vf.createURI(RMLVocabulary.RML_NAMESPACE
-                + RMLVocabulary.RMLTerm.ITERATOR),
-                vf.createURI(RMLVocabulary.RML_NAMESPACE
-                + RMLVocabulary.RMLTerm.ITERATOR));
-        
-        for (URI u : predicates.keySet()) {
-            List<Statement> triples = rmlMappingGraph.tuplePattern(
-                    null, u, null);
-            log.debug(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                    + "Number of statements found "
-                    + "for "
-                    + u.getLocalName()
-                    + " : "
-                    + triples.size());
-
-            for (Statement triple : triples) {
-                Resource blankSubjectMap = triple.getSubject();
-                Resource skolemizedMap = skolemizationFactory.skolemizeBlankNode(blankSubjectMap);
-                if (triple.getSubject().toString().startsWith("_:")) {
-                    skolemizationFactory.skolemSubstitution(triple.getSubject(), skolemizedMap, rmlMappingGraph);
+                while (statements.hasNext()) {
+                    Statement st = statements.next();
+                    
+                    Resource blankSubjectMap = st.getSubject();
+                    Resource skolemizedSubjectMap = skolemizationFactory.skolemizeBlankNode(blankSubjectMap);
+                    if (st.getSubject().toString().startsWith("_:")) {
+                        skolemizationFactory.skolemSubstitution(
+                                st.getSubject(), skolemizedSubjectMap, mapDocRepo);
+                    }
+                    
+                    Value blankObjectMap = st.getObject();
+                    Resource skolemizedObjectMap = skolemizationFactory.skolemizeBlankNode(blankObjectMap);
+                    if (st.getObject().toString().startsWith("_:") && 
+                            (  st.getObject().getClass() == Resource.class
+                            || st.getObject().getClass() == Value.class
+                            || st.getObject().getClass() == org.openrdf.sail.memory.model.MemBNode.class) ) {
+                        skolemizationFactory.skolemSubstitution(
+                                st.getObject(), skolemizedObjectMap, mapDocRepo);
+                    }
                 }
+                mapDocRepoCon.commit();
+                mapDocRepoCon.close();
             }
-            for (Statement triple : triples) {
-                Value blankObjectMap = triple.getObject();
-                Resource skolemizedMap = skolemizationFactory.skolemizeBlankNode(blankObjectMap);
-                if (triple.getObject().toString().startsWith("_:") && 
-                        (  triple.getObject().getClass() == Resource.class
-                        || triple.getObject().getClass() == Value.class
-                        || triple.getObject().getClass() == org.openrdf.sail.memory.model.MemBNode.class) ) {
-                    skolemizationFactory.skolemSubstitution(triple.getObject(), skolemizedMap, rmlMappingGraph);
-                }
-
-            }
+            
+        } catch (RepositoryException ex) {
+            log.error("RepositoryException " + ex);
         }
-        return rmlMappingGraph;
+        return mapDocRepo;
     }
     
     

@@ -1,9 +1,9 @@
 package be.ugent.mmlab.rml.extraction;
 
 import be.ugent.mmlab.rml.model.TriplesMap;
-import be.ugent.mmlab.rml.sesame.RMLSesameDataSet;
 import java.util.Map;
 import org.openrdf.model.Resource;
+import org.openrdf.repository.Repository;
 
 /**
  * *************************************************************************
@@ -20,22 +20,22 @@ public interface RMLMappingExtractor {
     /**
      *
      * @param rmlMappingGraph
+     * @return Repository
      */
-    public RMLSesameDataSet replaceShortcuts(RMLSesameDataSet rmlMappingGraph);
+    public Repository replaceShortcuts(Repository repository);
     
     /**
      *
      * @param rmlMappingGraph
-     * @return
+     * @return Repository
      */
-    public RMLSesameDataSet skolemizeStatements(RMLSesameDataSet rmlMappingGraph);
+    public Repository skolemizeStatements(Repository repository);
     
     /**
      *
      * @param rmlMappingGraph
-     * @return
+     * @return Map<Resource, TriplesMap>
      */
-    public Map<Resource, TriplesMap> extractTriplesMapResources(
-            RMLSesameDataSet rmlMappingGraph);
+    public Map<Resource, TriplesMap> extractTriplesMapResources(Repository repository);
         
 }

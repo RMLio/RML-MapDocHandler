@@ -12,15 +12,18 @@
 package be.ugent.mmlab.rml.extraction.concrete;
 
 import be.ugent.mmlab.rml.model.TriplesMap;
-import be.ugent.mmlab.rml.sesame.RMLSesameDataSet;
 import be.ugent.mmlab.rml.vocabulary.QLVocabulary;
 import be.ugent.mmlab.rml.vocabulary.RMLVocabulary;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.ValueFactory;
+import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.RepositoryResult;
 
 public class LogicalSourceExtractor {
     
@@ -28,13 +31,24 @@ public class LogicalSourceExtractor {
     static final Logger log = LoggerFactory.getLogger(LogicalSourceExtractor.class);
 
     public Resource extractLogicalSource(
-            RMLSesameDataSet rmlMappingGraph, Resource triplesMapSubject, TriplesMap triplesMap) {
-
-        List<Statement> logicalSourceStatements = rmlMappingGraph.tuplePattern(triplesMapSubject,
-                RMLTermExtractor.getTermURI(rmlMappingGraph, RMLVocabulary.RMLTerm.LOGICAL_SOURCE), null);
+            Repository repository, Resource triplesMapSubject, TriplesMap triplesMap) {
         Resource blankLogicalSource = null;
-        if (!logicalSourceStatements.isEmpty()) {
-            blankLogicalSource = (Resource) logicalSourceStatements.get(0).getObject();
+        try {
+            RepositoryConnection connection = repository.getConnection();
+
+            RepositoryResult<Statement> logicalSourceStatements =
+                    connection.getStatements(triplesMapSubject,
+                    RMLTermExtractor.getTermURI(
+                    repository, RMLVocabulary.RMLTerm.LOGICAL_SOURCE), null, true);
+
+            blankLogicalSource = null;
+
+            if (logicalSourceStatements != null) {
+                blankLogicalSource = (Resource) logicalSourceStatements.next().getObject();
+            }
+            connection.close();
+        } catch (RepositoryException ex) {
+            log.error("RepositoryException " + ex);
         }
         return blankLogicalSource;
     }
@@ -48,32 +62,51 @@ public class LogicalSourceExtractor {
      * @return
      */
     public QLVocabulary.QLTerm getReferenceFormulation(
-            RMLSesameDataSet rmlMappingGraph, Resource triplesMapSubject,
+            Repository repository, Resource triplesMapSubject,
             Resource subject, TriplesMap triplesMap) {
-        URI logicalSource = rmlMappingGraph.URIref(
-                RMLVocabulary.RML_NAMESPACE + RMLVocabulary.RMLTerm.REFERENCE_FORMULATION);
+        RepositoryResult<Statement> statements;
+        QLVocabulary.QLTerm term = null;
+        try {
+            RepositoryConnection connection = repository.getConnection();
+            ValueFactory vf = connection.getValueFactory();
 
-        List<Statement> statements = rmlMappingGraph.tuplePattern(subject, logicalSource, null);
+            URI logicalSource = vf.createURI(
+                    RMLVocabulary.RML_NAMESPACE + RMLVocabulary.RMLTerm.REFERENCE_FORMULATION);
 
-        if (statements.isEmpty()) {
-            return null;
-        } else {
-            return QLVocabulary.getQLTerms(statements.get(0).getObject().stringValue());
+            statements = connection.getStatements(subject, logicalSource, null, true);
+
+            if (statements != null) {
+                connection.close();
+                return null;
+            } else {
+                term = QLVocabulary.getQLTerms(statements.next().getObject().stringValue());
+            }
+            connection.close();
+        } catch (RepositoryException ex) {
+            log.error("RepositoryException " + ex);
         }
+        return term;
     }
     
-   public String getIterator(
-            RMLSesameDataSet rmlMappingGraph, Resource triplesMapSubject,
+    public String getIterator(
+            Repository repository, Resource triplesMapSubject,
             Resource subject, TriplesMap triplesMap) {
-        URI logicalSource = rmlMappingGraph.URIref(
-                RMLVocabulary.RML_NAMESPACE + RMLVocabulary.RMLTerm.ITERATOR);
+        String term = null;
+        RepositoryResult<Statement> statements;
+        try {
+            RepositoryConnection connection = repository.getConnection();
+            ValueFactory vf = connection.getValueFactory();
 
-        List<Statement> statements = rmlMappingGraph.tuplePattern(subject, logicalSource, null);
+            URI logicalSource = vf.createURI(
+                    RMLVocabulary.RML_NAMESPACE + RMLVocabulary.RMLTerm.ITERATOR);
+            statements = connection.getStatements(subject, logicalSource, null, true);
 
-        if (statements.isEmpty()) {
-            return null;
-        } else {
-            return statements.get(0).getObject().stringValue();
+            term = statements.next().getObject().stringValue();
+            connection.close();
+
+        } catch (RepositoryException ex) {
+            log.error("RepositoryException " + ex);
         }
-    } 
+        return term;
+    }
 }

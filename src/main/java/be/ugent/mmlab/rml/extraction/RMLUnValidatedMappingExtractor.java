@@ -2,16 +2,20 @@ package be.ugent.mmlab.rml.extraction;
 
 import be.ugent.mmlab.rml.model.std.StdTriplesMap;
 import be.ugent.mmlab.rml.model.TriplesMap;
-import be.ugent.mmlab.rml.sesame.RMLSesameDataSet;
 import be.ugent.mmlab.rml.vocabulary.R2RMLVocabulary;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
+import org.openrdf.model.ValueFactory;
+import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.RepositoryResult;
 
 /**
  * *************************************************************************
@@ -38,10 +42,10 @@ public class RMLUnValidatedMappingExtractor extends StdRMLMappingExtractor imple
      */
     @Override
     public Map<Resource, TriplesMap> extractTriplesMapResources(
-            RMLSesameDataSet rmlMappingGraph) {
+            Repository repo) {
         Map<Resource, TriplesMap> triplesMapResources = new HashMap<Resource, TriplesMap>();
         
-        List<Statement> statements = getTriplesMapResources(rmlMappingGraph);
+        RepositoryResult<Statement> statements = getTriplesMapResources(repo);
 
         triplesMapResources = putTriplesMapResources(statements, triplesMapResources);
         
@@ -53,12 +57,22 @@ public class RMLUnValidatedMappingExtractor extends StdRMLMappingExtractor imple
      * @param rmlMappingGraph
      * @return
      */
-    protected List<Statement> getTriplesMapResources(RMLSesameDataSet rmlMappingGraph){
+    protected RepositoryResult<Statement> getTriplesMapResources(Repository repo){
+        RepositoryResult<Statement> statements = null;
         
-        URI o = rmlMappingGraph.URIref(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.TRIPLES_MAP_CLASS);
-        URI p = rmlMappingGraph.URIref("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
-        List<Statement> statements = rmlMappingGraph.tuplePattern(null, p, o);
+        try {
+            RepositoryConnection connection = repo.getConnection();
+            ValueFactory vf = connection.getValueFactory();
+            
+            URI o = vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    + R2RMLVocabulary.R2RMLTerm.TRIPLES_MAP_CLASS);
+            URI p = vf.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+            
+            statements = connection.getStatements(null,p, (Value) o, true);
+            //return statements;
+        } catch (RepositoryException ex) {
+            log.error("RepositoryException " + ex);
+        }
         return statements;
     }
     
@@ -69,10 +83,16 @@ public class RMLUnValidatedMappingExtractor extends StdRMLMappingExtractor imple
      * @return
      */
     protected Map<Resource, TriplesMap> putTriplesMapResources(
-            List<Statement> statements, Map<Resource, TriplesMap> triplesMapResources) {
-        for (Statement s : statements) {
-            triplesMapResources.put(s.getSubject(),
-                    new StdTriplesMap(null, null, null, s.getSubject().stringValue()));
+            RepositoryResult<Statement> statements, Map<Resource, TriplesMap> triplesMapResources) {
+        try {
+            while (statements.hasNext()) {
+                Statement statement = statements.next();
+                triplesMapResources.put(statement.getSubject(),
+                        new StdTriplesMap(null, null, null, statement.getSubject().stringValue()));
+            }
+            
+        } catch (RepositoryException ex) {
+            log.error("RepositoryException " + ex);
         }
         return triplesMapResources;
     }

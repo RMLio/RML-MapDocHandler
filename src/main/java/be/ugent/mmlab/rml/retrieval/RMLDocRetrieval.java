@@ -1,16 +1,19 @@
 package be.ugent.mmlab.rml.retrieval;
 
-import be.ugent.mmlab.rml.sesame.RMLSesameDataSet;
+import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-
+import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
+import org.openrdf.sail.memory.MemoryStore;
 
 /**
  * *************************************************************************
@@ -33,46 +36,53 @@ public class RMLDocRetrieval {
      * @param format
      * @return
      */
-    public RMLSesameDataSet getMappingDoc(String fileToRMLFile, RDFFormat format) {
-        RMLSesameDataSet rmlMappingGraph = new RMLSesameDataSet();
-        //RML document is a URI
-        if (!isLocalFile(fileToRMLFile)) {
-            try {
-                log.info(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                        + "file "
-                        + fileToRMLFile + " loaded from URI.");
-                HttpURLConnection con = (HttpURLConnection) new URL(fileToRMLFile).openConnection();
-                con.setRequestMethod("HEAD");
-                if (con.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    try {
-                        rmlMappingGraph.addURI(fileToRMLFile, RDFFormat.TURTLE);
-                    } catch (Exception e) {
-                        log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                                + "[RMLMapping Factory:extractRMLMapping] " + e);
-                    }
-                }
-            } catch (MalformedURLException ex) {
-                log.error("MalformedURLException " + ex);
-            } catch (IOException ex) {
-                log.error("IOException " + ex);
-            }
-        } 
-        else {
-            try {
-                rmlMappingGraph.loadDataFromFile(fileToRMLFile, RDFFormat.TURTLE);
-            } catch (RepositoryException ex) {
-                log.error("RepositoryException " + ex);
-            } catch (IOException ex) {
-                log.error("IOException " + ex);
-            } catch (RDFParseException ex) {
-                log.error("RDFParseException " + ex);
-            }
-        }
-        log.debug(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                + "Number of RML triples in file "
-                + fileToRMLFile + " : " + rmlMappingGraph.getSize() + " from local file");
+    public Repository getMappingDoc(String fileToRMLFile, RDFFormat format) {
+        Repository repo = new SailRepository(new MemoryStore());
+        try {
+            //RML document is a URI
+            repo.initialize();
+            RepositoryConnection con = repo.getConnection();
 
-        return rmlMappingGraph;
+            if (!isLocalFile(fileToRMLFile)) {
+                try {
+                    log.info("Mapping Document "
+                            + fileToRMLFile + " loaded from URI.");
+                    HttpURLConnection httpCon = (HttpURLConnection) new URL(fileToRMLFile).openConnection();
+                    httpCon.setRequestMethod("HEAD");
+                    if (httpCon.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                        try {
+                            //TODO: Fix the URL
+                            //TODO: Change null to base IRI
+                            con.add(new URL(fileToRMLFile), null, format);
+                            //rmlMappingGraph.addURI(fileToRMLFile, RDFFormat.TURTLE);
+                        } catch (Exception e) {
+                            log.error("Exception " + e);
+                        }
+                    }
+                } catch (MalformedURLException ex) {
+                    log.error("MalformedURLException " + ex);
+                } catch (IOException ex) {
+                    log.error("IOException " + ex);
+                }
+            } else {
+                try {
+                    con.add(new File(fileToRMLFile), null, format);
+                    //rmlMappingGraph.loadDataFromFile(fileToRMLFile, RDFFormat.TURTLE);
+                } catch (RepositoryException ex) {
+                    log.error("RepositoryException " + ex);
+                } catch (IOException ex) {
+                    log.error("IOException " + ex);
+                } catch (RDFParseException ex) {
+                    log.error("RDFParseException " + ex);
+                }
+            }
+            log.debug("Number of RML triples in the repository "
+                    + fileToRMLFile + " : " + con.size() + " from local file");
+            con.close();
+        } catch (RepositoryException ex) {
+            log.error("RepositoryException " + ex);
+        } 
+        return repo;
     }
     
     /**

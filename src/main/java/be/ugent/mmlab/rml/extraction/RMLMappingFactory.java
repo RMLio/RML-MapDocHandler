@@ -33,9 +33,4 @@ public interface RMLMappingFactory {
      */
     public RMLMapping extractRMLMapping(String fileToRMLFile);
 
-    /**
-     *
-     * @param rmlMappingGraph
-     */
-    //public void launchPreChecks(RMLSesameDataSet rmlMappingGraph);
 }

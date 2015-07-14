@@ -3,11 +3,9 @@ package be.ugent.mmlab.rml.extraction.concrete;
 import be.ugent.mmlab.rml.model.TriplesMap;
 import be.ugent.mmlab.rml.model.std.StdReferenceMap;
 import be.ugent.mmlab.rml.model.termMap.ReferenceMap;
-import be.ugent.mmlab.rml.sesame.RMLSesameDataSet;
 import be.ugent.mmlab.rml.vocabulary.R2RMLVocabulary;
 import be.ugent.mmlab.rml.vocabulary.RMLVocabulary;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +13,10 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
+import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.RepositoryResult;
 
 /**
  * *************************************************************************
@@ -40,86 +42,98 @@ public class TermMapExtractor {
      * @return
      */
     static protected Value extractValueFromTermMap(
-            RMLSesameDataSet rmlMappingGraph, Resource termType,
-            Enum term, TriplesMap triplesMap) {
-        
-        List<Statement> statements = rmlMappingGraph.tuplePattern(termType,
-                RMLTermExtractor.getTermURI(rmlMappingGraph, term), null);
-        
-        if (statements.isEmpty()) 
-            return null;
-        else{
-            log.debug(
-                Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                + "Extracted "
-                + term + " : " + statements.get(0).getObject().stringValue());
-            return statements.get(0).getObject();
+            Repository repository, Resource termType, Enum term, TriplesMap triplesMap) {
+        RepositoryResult<Statement> statements = null ;
+        Value object = null;
+        try {
+            RepositoryConnection connection = repository.getConnection();
+            
+            statements = connection.getStatements(
+                    termType, RMLTermExtractor.getTermURI(repository, term), null, true);
+            
+            if (statements == null) 
+                return null;
+            else{
+                log.debug(
+                    Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
+                    + "Extracted "
+                    + term + " : " + statements.next().getObject().stringValue());
+                object = statements.next().getObject();
+            }
+            connection.close();
+        } catch (RepositoryException ex) {
+            log.error("RepositoryException " + ex);
         }
-        
+        return object;
     }
     
     protected static Set<Value> extractValuesFromResource(
-            RMLSesameDataSet rmlMappingGraph,
-            Resource termType,
-            Enum term){
-            
-        URI p = RMLTermExtractor.getTermURI(rmlMappingGraph, term);
-
-        List<Statement> statements = rmlMappingGraph.tuplePattern(termType,
-                p, null);
-        if (statements.isEmpty()) {
-            return null;
-        }
+            Repository repository, Resource termType, Enum term){
+        RepositoryResult<Statement> statements ;
         Set<Value> values = new HashSet<Value>();
-        for (Statement statement : statements) {
-            Value value = statement.getObject();
-            log.debug(
-                    Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                    + "Extracted "
-                    + term + " : " + value.stringValue());
-            values.add(value);
+        try {
+            RepositoryConnection connection = repository.getConnection();
+            URI p = RMLTermExtractor.getTermURI(repository, term);
+            statements = connection.getStatements(termType, p, null, true);
+            
+            while (statements.hasNext()) {
+                Value value = statements.next().getObject();
+                log.debug(
+                        Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
+                        + "Extracted "
+                        + term + " : " + value.stringValue());
+                values.add(value);
+            }
+            connection.close();
+        } catch (RepositoryException ex) {
+            log.error("RepositoryException " + ex);
         }
         return values;
     }
     
     static protected String extractLiteralFromTermMap(
-            RMLSesameDataSet rmlMappingGraph, Resource termType, Enum term, TriplesMap triplesMap){
+            Repository repository, Resource termType, Enum term, TriplesMap triplesMap) {
+        RepositoryResult<Statement> statements;
+        String result = null;
+        try {
+            RepositoryConnection connection = repository.getConnection();
+            statements = connection.getStatements(
+                    termType, RMLTermExtractor.getTermURI(repository, term), null, true);
 
-        List<Statement> statements = rmlMappingGraph.tuplePattern(termType,
-                RMLTermExtractor.getTermURI(rmlMappingGraph, term), null);
-        
-        if (statements.isEmpty()) 
-            return null;
-        else {
-            String result = statements.get(0).getObject().stringValue();
-            if (log.isDebugEnabled()) 
+            result = statements.next().getObject().stringValue();
+            if (log.isDebugEnabled()) {
                 log.debug(
                         Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
                         + "Extracted "
                         + term + " : " + result);
-            return result;
+            }
+            connection.close();
+        } catch (RepositoryException ex) {
+            log.error("RepositoryException " + ex);
         }
+        return result;
     }
     
     
     
     protected static Set<URI> extractURIsFromTermMap(
-            RMLSesameDataSet rmlMappingGraph, Resource termType,
-            R2RMLVocabulary.R2RMLTerm term){
-            
-        URI p = RMLTermExtractor.getTermURI(rmlMappingGraph, term);
-
-        List<Statement> statements = rmlMappingGraph.tuplePattern(termType,
-                p, null);
-        if (statements.isEmpty()) {
-            return null;
-        }
+            Repository repository, Resource termType, R2RMLVocabulary.R2RMLTerm term){
         Set<URI> uris = new HashSet<URI>();
-        for (Statement statement : statements) {
-            URI uri = (URI) statement.getObject();
-            log.debug(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                    + term + " : " + uri.stringValue());
-            uris.add(uri);
+        RepositoryResult<Statement> statements;
+        try {
+            RepositoryConnection connection = repository.getConnection();    
+            URI p = RMLTermExtractor.getTermURI(repository, term);
+            statements = connection.getStatements(termType, p, null, true);
+            
+            while (statements.hasNext()) {
+                URI uri = (URI) statements.next().getObject();
+                log.debug(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
+                        + term + " : " + uri.stringValue());
+                uris.add(uri);
+            }
+            connection.close();
+        } catch (RepositoryException ex) {
+            log.error("RepositoryException " + ex);
         }
         return uris;
     } 
@@ -132,12 +146,12 @@ public class TermMapExtractor {
      * @return
      */
     protected ReferenceMap extractReferenceIdentifier(
-            RMLSesameDataSet rmlMappingGraph, Resource resource, TriplesMap triplesMap) {
+            Repository repository, Resource resource, TriplesMap triplesMap) {
 
         String columnValueStr = extractLiteralFromTermMap(
-                rmlMappingGraph, resource, R2RMLVocabulary.R2RMLTerm.COLUMN, triplesMap);
+                repository, resource, R2RMLVocabulary.R2RMLTerm.COLUMN, triplesMap);
         String referenceValueStr = extractLiteralFromTermMap(
-                rmlMappingGraph, resource, RMLVocabulary.RMLTerm.REFERENCE, triplesMap);
+                repository, resource, RMLVocabulary.RMLTerm.REFERENCE, triplesMap);
 
         if (columnValueStr != null && referenceValueStr != null) {
             log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "

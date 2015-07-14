@@ -1,11 +1,14 @@
 package be.ugent.mmlab.rml.extraction.concrete;
 
-import be.ugent.mmlab.rml.sesame.RMLSesameDataSet;
 import be.ugent.mmlab.rml.vocabulary.R2RMLVocabulary;
 import be.ugent.mmlab.rml.vocabulary.RMLVocabulary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.openrdf.model.URI;
+import org.openrdf.model.ValueFactory;
+import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
 
 /**
  * *************************************************************************
@@ -22,17 +25,27 @@ public class RMLTermExtractor {
     // Log
     static final Logger log = LoggerFactory.getLogger(RMLTermExtractor.class);
 
-    public static URI getTermURI(
-            RMLSesameDataSet rmlMappingGraph, Enum term) {
+    public static URI getTermURI(Repository repository, Enum term) {
         String namespace = R2RMLVocabulary.R2RML_NAMESPACE;
+        ValueFactory vf ;
+        URI uri = null;
+        try {
+            RepositoryConnection connection = repository.getConnection();
+            vf = connection.getValueFactory();
+            
 
-        if (term instanceof RMLVocabulary.RMLTerm) {
-            namespace = RMLVocabulary.RML_NAMESPACE;
-        } else if (!(term instanceof R2RMLVocabulary.R2RMLTerm)) {
-            log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                    + term + " is not valid.");
+            if (term instanceof RMLVocabulary.RMLTerm) {
+                namespace = RMLVocabulary.RML_NAMESPACE;
+            } else if (!(term instanceof R2RMLVocabulary.R2RMLTerm)) {
+                log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
+                        + term + " is not valid.");
+            }
+            uri = vf.createURI(namespace + term);
+
+            connection.close();
+        } catch (RepositoryException ex) {
+            log.error("RepositoryException " + ex);
         }
-        return rmlMappingGraph
-                .URIref(namespace + term);
+        return uri;
     }
 }

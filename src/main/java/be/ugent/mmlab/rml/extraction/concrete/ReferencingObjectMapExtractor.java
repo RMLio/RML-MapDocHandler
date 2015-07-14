@@ -6,10 +6,8 @@ import be.ugent.mmlab.rml.model.RDFTerm.ReferencingObjectMap;
 import be.ugent.mmlab.rml.model.TriplesMap;
 import be.ugent.mmlab.rml.model.std.StdJoinCondition;
 import be.ugent.mmlab.rml.model.std.StdReferencingObjectMap;
-import be.ugent.mmlab.rml.sesame.RMLSesameDataSet;
 import be.ugent.mmlab.rml.vocabulary.R2RMLVocabulary;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -17,6 +15,11 @@ import org.slf4j.LoggerFactory;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.ValueFactory;
+import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.RepositoryResult;
 
 /**
  * *************************************************************************
@@ -34,7 +37,7 @@ public class ReferencingObjectMapExtractor {
     static final Logger log = LoggerFactory.getLogger(ReferencingObjectMapExtractor.class);
     
     public Set<ReferencingObjectMap> processReferencingObjectMap(
-            RMLSesameDataSet rmlMappingGraph, List<Statement> object_statements, Set<GraphMap> savedGraphMaps,
+            Repository repository, RepositoryResult<Statement> object_statements, Set<GraphMap> savedGraphMaps,
             Map<Resource, TriplesMap> triplesMapResources, TriplesMap triplesMap, Resource triplesMapSubject, Resource predicateObject) {
         Set<ReferencingObjectMap> refObjectMaps = new HashSet<ReferencingObjectMap>();
         try {
@@ -42,7 +45,7 @@ public class ReferencingObjectMapExtractor {
                     Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
                     + "Try to extract object map..");
             ReferencingObjectMap refObjectMap = extractReferencingObjectMap(
-                    rmlMappingGraph, (Resource) object_statements.get(0).getObject(),
+                    repository, (Resource) object_statements.next().getObject(),
                     savedGraphMaps, triplesMapResources, triplesMap);
             if (refObjectMap != null) {
                 //refObjectMap.setOwnTriplesMap(triplesMapResources.get(triplesMapSubject));
@@ -53,6 +56,8 @@ public class ReferencingObjectMapExtractor {
             log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
                     +  "A resource was expected in object of objectMap of "
                     + predicateObject.stringValue());
+        } catch (RepositoryException ex) {
+            log.error("RepositoryException " + ex);
         } 
         return refObjectMaps;
     }
@@ -67,14 +72,14 @@ public class ReferencingObjectMapExtractor {
      * @return
      */
     protected ReferencingObjectMap extractReferencingObjectMap(
-            RMLSesameDataSet rmlMappingGraph, Resource object,
+            Repository repository, Resource object,
             Set<GraphMap> graphMaps,
             Map<Resource, TriplesMap> triplesMapResources, TriplesMap triplesMap){
         try {
-            URI parentTriplesMap = (URI) TermMapExtractor.extractValueFromTermMap(rmlMappingGraph,
+            URI parentTriplesMap = (URI) TermMapExtractor.extractValueFromTermMap(repository,
                     object, R2RMLVocabulary.R2RMLTerm.PARENT_TRIPLES_MAP, triplesMap);
             Set<JoinCondition> joinConditions = extractJoinConditions(
-                    rmlMappingGraph, object, triplesMap);
+                    repository, object, triplesMap);
             
             if (parentTriplesMap == null && !joinConditions.isEmpty()) {
                 log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
@@ -122,42 +127,52 @@ public class ReferencingObjectMapExtractor {
     }
     
     private Set<JoinCondition> extractJoinConditions(
-            RMLSesameDataSet rmlMappingGraph, Resource object, TriplesMap triplesMap){
-        log.debug(
-                Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                + "Extract join conditions..");
+            Repository repository, Resource object, TriplesMap triplesMap) {
+        RepositoryResult<Statement> statements ;
         Set<JoinCondition> result = new HashSet<JoinCondition>();
-        // Extract predicate-object maps
-        URI p = rmlMappingGraph.URIref(R2RMLVocabulary.R2RML_NAMESPACE
-                + R2RMLVocabulary.R2RMLTerm.JOIN_CONDITION);
-        List<Statement> statements = rmlMappingGraph.tuplePattern(object, p, null);
         try {
-            for (Statement statement : statements) {
-                Resource jc = (Resource) statement.getObject();
-                String child = TermMapExtractor.extractLiteralFromTermMap(rmlMappingGraph, jc,
-                        R2RMLVocabulary.R2RMLTerm.CHILD, triplesMap);
-                String parent = TermMapExtractor.extractLiteralFromTermMap(rmlMappingGraph,
-                        jc, R2RMLVocabulary.R2RMLTerm.PARENT, triplesMap);
-                if (parent == null || child == null) {
-                    log.error(
-                            Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                            +  object.stringValue()
-                            + " must have exactly two properties child and parent. ");
+            log.debug(
+                    Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
+                    + "Extract join conditions..");
+            
+            RepositoryConnection connection = repository.getConnection();
+            ValueFactory vf = connection.getValueFactory();
+
+            // Extract predicate-object maps
+            URI p = vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    + R2RMLVocabulary.R2RMLTerm.JOIN_CONDITION);
+            statements = connection.getStatements(object, p, null, true);
+
+            try {
+                while(statements.hasNext()) {
+                    Resource jc = (Resource) statements.next().getObject();
+                    String child = TermMapExtractor.extractLiteralFromTermMap(repository, jc,
+                            R2RMLVocabulary.R2RMLTerm.CHILD, triplesMap);
+                    String parent = TermMapExtractor.extractLiteralFromTermMap(repository,
+                            jc, R2RMLVocabulary.R2RMLTerm.PARENT, triplesMap);
+                    if (parent == null || child == null) {
+                        log.error(
+                                Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
+                                + object.stringValue()
+                                + " must have exactly two properties child and parent. ");
+                    }
+                    try {
+                        result.add(new StdJoinCondition(child, parent));
+                    } catch (Exception ex) {
+                        log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": " + ex);
+                    }
                 }
-                try {
-                    result.add(new StdJoinCondition(child, parent));
-                } catch (Exception ex) {
-                    log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": " + ex);
-                } 
+            } catch (ClassCastException e) {
+                log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
+                        + "A resource was expected in object of predicateMap of "
+                        + object.stringValue());
             }
-        } catch (ClassCastException e) {
-            log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                    + "A resource was expected in object of predicateMap of "
-                    + object.stringValue());
-        } 
-        log.debug(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
+            log.debug(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
                     + " Extract join conditions done.");
+            connection.close();
+        } catch (RepositoryException ex) {
+            log.error("RepositoryException " + ex);
+        }
         return result;
     }
-
 }
