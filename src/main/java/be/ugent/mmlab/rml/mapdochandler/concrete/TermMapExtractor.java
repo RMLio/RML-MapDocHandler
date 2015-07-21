@@ -1,4 +1,4 @@
-package be.ugent.mmlab.rml.extraction.concrete;
+package be.ugent.mmlab.rml.mapdochandler.concrete;
 
 import be.ugent.mmlab.rml.model.TriplesMap;
 import be.ugent.mmlab.rml.model.std.StdReferenceMap;
@@ -43,28 +43,27 @@ public class TermMapExtractor {
      */
     static protected Value extractValueFromTermMap(
             Repository repository, Resource termType, Enum term, TriplesMap triplesMap) {
-        RepositoryResult<Statement> statements = null ;
-        Value object = null;
+        RepositoryResult<Statement> statements ;
+        Value value = null;
         try {
             RepositoryConnection connection = repository.getConnection();
             
             statements = connection.getStatements(
                     termType, RMLTermExtractor.getTermURI(repository, term), null, true);
             
-            if (statements == null) 
+            if (!statements.hasNext()) 
                 return null;
             else{
-                log.debug(
-                    Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                    + "Extracted "
-                    + term + " : " + statements.next().getObject().stringValue());
-                object = statements.next().getObject();
+                Statement statement = statements.next();
+                log.debug("Extracted " + term + " : " 
+                        + statement.getObject().stringValue());
+                value = statement.getObject();
             }
             connection.close();
         } catch (RepositoryException ex) {
             log.error("RepositoryException " + ex);
         }
-        return object;
+        return value;
     }
     
     protected static Set<Value> extractValuesFromResource(
@@ -99,13 +98,15 @@ public class TermMapExtractor {
             RepositoryConnection connection = repository.getConnection();
             statements = connection.getStatements(
                     termType, RMLTermExtractor.getTermURI(repository, term), null, true);
-
-            result = statements.next().getObject().stringValue();
-            if (log.isDebugEnabled()) {
-                log.debug(
-                        Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                        + "Extracted "
-                        + term + " : " + result);
+            
+            if (statements.hasNext()) {
+                result = statements.next().getObject().stringValue();
+                if (log.isDebugEnabled()) {
+                    log.debug(
+                            Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
+                            + "Extracted "
+                            + term + " : " + result);
+                }
             }
             connection.close();
         } catch (RepositoryException ex) {
@@ -163,9 +164,10 @@ public class TermMapExtractor {
             ReferenceMap refMap = new StdReferenceMap(columnValueStr);
             return refMap.getReferenceValue(columnValueStr);
         }
-        
+        log.debug("referenceValueStr " + referenceValueStr);
         ReferenceMap refMap = new StdReferenceMap(referenceValueStr);
-        
+        log.debug("refMap.getReferenceValue(referenceValueStr) " 
+                + refMap.getReferenceValue(referenceValueStr));
         return refMap.getReferenceValue(referenceValueStr);
 
     }

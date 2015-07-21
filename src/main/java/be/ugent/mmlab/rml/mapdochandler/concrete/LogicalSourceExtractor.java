@@ -9,7 +9,7 @@
  ***************************************************************************
  */
 
-package be.ugent.mmlab.rml.extraction.concrete;
+package be.ugent.mmlab.rml.mapdochandler.concrete;
 
 import be.ugent.mmlab.rml.model.TriplesMap;
 import be.ugent.mmlab.rml.vocabulary.QLVocabulary;
@@ -74,13 +74,10 @@ public class LogicalSourceExtractor {
                     RMLVocabulary.RML_NAMESPACE + RMLVocabulary.RMLTerm.REFERENCE_FORMULATION);
 
             statements = connection.getStatements(subject, logicalSource, null, true);
-
-            if (statements != null) {
-                connection.close();
-                return null;
-            } else {
+            
+            if(statements.hasNext())
                 term = QLVocabulary.getQLTerms(statements.next().getObject().stringValue());
-            }
+
             connection.close();
         } catch (RepositoryException ex) {
             log.error("RepositoryException " + ex);

@@ -1,6 +1,8 @@
-package be.ugent.mmlab.rml.extraction;
+package be.ugent.mmlab.rml.mapdochandler.extraction;
 
-import be.ugent.mmlab.rml.skolemization.skolemizationFactory;
+import be.ugent.mmlab.rml.mapdochandler.skolemization.skolemizationFactory;
+import be.ugent.mmlab.rml.model.TriplesMap;
+import be.ugent.mmlab.rml.model.std.StdTriplesMap;
 import be.ugent.mmlab.rml.vocabulary.R2RMLVocabulary;
 import be.ugent.mmlab.rml.vocabulary.RMLVocabulary;
 import java.util.ArrayList;
@@ -30,12 +32,76 @@ import org.slf4j.LoggerFactory;
  *
  ***************************************************************************
  */
-public abstract class StdRMLMappingExtractor implements RMLMappingExtractor{
+public class StdRMLMappingExtractor implements RMLMappingExtractor{
     
     // Log
     private static final Logger log = LoggerFactory.getLogger(StdRMLMappingExtractor.class);
     // Value factory
     private static ValueFactory vf = new ValueFactoryImpl();
+    
+    /**
+     * Construct TriplesMap objects rule. A triples map is represented by a
+     * resource that references the following other resources : - It must have
+     * exactly one subject map * using the rr:subjectMap property.
+     *
+     * @param rmlMappingGraph
+     * @return
+     */
+    @Override
+    public Map<Resource, TriplesMap> extractTriplesMapResources(Repository repo) {
+        Map<Resource, TriplesMap> triplesMapResources = new HashMap<Resource, TriplesMap>();
+
+        RepositoryResult<Statement> statements = getTriplesMapResources(repo);
+
+        triplesMapResources = putTriplesMapResources(statements, triplesMapResources);
+
+        return triplesMapResources;
+    }
+    
+    /**
+     *
+     * @param rmlMappingGraph
+     * @return
+     */
+    protected RepositoryResult<Statement> getTriplesMapResources(Repository repo) {
+        RepositoryResult<Statement> statements = null;
+
+        try {
+            RepositoryConnection connection = repo.getConnection();
+
+            URI o = vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    + R2RMLVocabulary.R2RMLTerm.TRIPLES_MAP_CLASS);
+            URI p = vf.createURI(RMLVocabulary.RML_NAMESPACE
+                    + RMLVocabulary.RMLTerm.LOGICAL_SOURCE);
+
+            statements = connection.getStatements(null, p, null, true);
+            log.debug("Triples Map statements were retrieved: " + statements.hasNext());
+        } catch (RepositoryException ex) {
+            log.error("RepositoryException " + ex);
+        }
+        return statements;
+    }
+
+    /**
+     *
+     * @param statements
+     * @param triplesMapResources
+     * @return
+     */
+    protected Map<Resource, TriplesMap> putTriplesMapResources(
+            RepositoryResult<Statement> statements, Map<Resource, TriplesMap> triplesMapResources) {
+        try {
+            while (statements.hasNext()) {
+                Statement statement = statements.next();
+                triplesMapResources.put(statement.getSubject(),
+                        new StdTriplesMap(null, null, null, statement.getSubject().stringValue()));
+            }
+
+        } catch (RepositoryException ex) {
+            log.error("RepositoryException " + ex);
+        }
+        return triplesMapResources;
+    }
     
     /**
      * Constant-valued term maps can be expressed more concisely using the
@@ -47,10 +113,12 @@ public abstract class StdRMLMappingExtractor implements RMLMappingExtractor{
      */
     @Override
         public Repository replaceShortcuts(Repository mapDocRepo) {
+        Map<URI, URI> shortcutPredicates = new HashMap<URI, URI>();
+
         try {
+            mapDocRepo.initialize();
             RepositoryConnection mapDocRepoCon = mapDocRepo.getConnection();
 
-            Map<URI, URI> shortcutPredicates = new HashMap<URI, URI>();
             shortcutPredicates.put(
                     vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.SUBJECT),
@@ -83,18 +151,19 @@ public abstract class StdRMLMappingExtractor implements RMLMappingExtractor{
                     URI pMap = vf.createURI(shortcutPredicates.get(uri).toString());
                     URI pConstant = vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
                             + R2RMLVocabulary.R2RMLTerm.CONSTANT);
-                    mapDocRepoCon.add(st.getSubject(),pMap, blankMap);
-                    mapDocRepoCon.add(blankMap, pConstant,st.getObject());
-                }      
-                mapDocRepoCon.commit();
-                mapDocRepoCon.close();
+                    mapDocRepoCon.add(st.getSubject(), pMap, blankMap);
+                    mapDocRepoCon.add(blankMap, pConstant, st.getObject());
+                }
             }
+            mapDocRepoCon.commit();
+            mapDocRepoCon.close();
         } catch (RepositoryException ex) {
             log.error("RepositoryException " + ex);
         }
         return mapDocRepo;
     }
     
+    @Override
     public Repository skolemizeStatements(Repository mapDocRepo) {
         try {
             RepositoryConnection mapDocRepoCon = mapDocRepo.getConnection();

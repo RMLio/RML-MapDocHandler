@@ -1,4 +1,4 @@
-package be.ugent.mmlab.rml.extraction.concrete;
+package be.ugent.mmlab.rml.mapdochandler.concrete;
 
 import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
 import be.ugent.mmlab.rml.model.RDFTerm.ObjectMap;
@@ -53,6 +53,7 @@ public class ObjectMapExtractor {
             //MVS: Decide on ReferenceIdentifier
             ReferenceMap referenceValue = 
                     termMapExtractor.extractReferenceIdentifier(repository, object, triplesMap);
+            log.debug("reference value " + referenceValue);
             //TODO:add the following validator
             //validator.checkTermMap(constantValue, stringTemplate, referenceValue, o.stringValue());
 

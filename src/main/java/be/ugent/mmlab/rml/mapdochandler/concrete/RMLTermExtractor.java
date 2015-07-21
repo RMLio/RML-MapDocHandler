@@ -1,4 +1,4 @@
-package be.ugent.mmlab.rml.extraction.concrete;
+package be.ugent.mmlab.rml.mapdochandler.concrete;
 
 import be.ugent.mmlab.rml.vocabulary.R2RMLVocabulary;
 import be.ugent.mmlab.rml.vocabulary.RMLVocabulary;

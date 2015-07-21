@@ -1,4 +1,4 @@
-package be.ugent.mmlab.rml.skolemization;
+package be.ugent.mmlab.rml.mapdochandler.skolemization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

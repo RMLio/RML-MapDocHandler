@@ -1,9 +1,9 @@
-package be.ugent.mmlab.rml.extraction;
+package be.ugent.mmlab.rml.mapdochandler.extraction;
 
-import be.ugent.mmlab.rml.extraction.concrete.TriplesMapExtractor;
+import be.ugent.mmlab.rml.mapdochandler.concrete.TriplesMapExtractor;
 import be.ugent.mmlab.rml.model.RMLMapping;
 import be.ugent.mmlab.rml.model.TriplesMap;
-import be.ugent.mmlab.rml.retrieval.RMLDocRetrieval;
+import be.ugent.mmlab.rml.mapdochandler.retrieval.RMLDocRetrieval;
 import be.ugent.mmlab.rml.vocabulary.R2RMLVocabulary;
 import java.util.Map;
 import org.openrdf.model.Resource;
@@ -27,40 +27,34 @@ public class StdRMLMappingFactory {
     private RMLMappingExtractor extractor;
     
     public StdRMLMappingFactory(){
-        this.extractor = new RMLUnValidatedMappingExtractor();
+        this.extractor = new StdRMLMappingExtractor();
     }
     
-    public RMLMapping extractRMLMapping(String fileToRMLFile) {
+    public RMLMapping extractRMLMapping(Repository mapDocRepo) {
         RMLMapping result = null;
         try {
-
-            Repository mapDocRepo;
-
-            //Retrieve the Mapping Document
-            RMLDocRetrieval mapDocRetrieval = new RMLDocRetrieval();
-            mapDocRepo = mapDocRetrieval.getMappingDoc(fileToRMLFile, RDFFormat.TURTLE);
             RepositoryConnection mapDocRepoCon = mapDocRepo.getConnection();
-
-            log.debug(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                    + "Number of RML triples in file "
-                    + fileToRMLFile + " : " + mapDocRepoCon.size());
-
+            log.debug("Number of RML triples: " + mapDocRepoCon.size());
+            
             // Transform RDF with replacement shortcuts
+            log.info("Replacing Mapping Document shortcuts..");
             mapDocRepo = extractor.replaceShortcuts(mapDocRepo);
+            log.debug("Number of RML triples after expanding shortcuts: "
+                    + mapDocRepoCon.size());
+            mapDocRepoCon.close();
+            
             // Run few tests to help user in its RDF syntax
             //launchPreChecks(rmlMappingGraph);
-
+            
             // Construct RML Mapping object
             //TODO:Disambiguate which extractor (from which project to be used)
+            log.info("Extracting Triples Maps..");
             Map<Resource, TriplesMap> triplesMapResources =
                     extractor.extractTriplesMapResources(mapDocRepo);
-
-            log.debug(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                    + "Number of RML triples with "
-                    + " type "
+            log.debug("Number of RML triples with type "
                     + R2RMLVocabulary.R2RMLTerm.TRIPLES_MAP_CLASS
-                    + " in file "
-                    + fileToRMLFile + " : " + triplesMapResources.size());
+                    + " in file: " + triplesMapResources.size());
+            
             // Fill each triplesMap object
             for (Resource triplesMapResource : triplesMapResources.keySet()) // Extract each triplesMap
             {

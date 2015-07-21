@@ -1,4 +1,4 @@
-package be.ugent.mmlab.rml.extraction.concrete;
+package be.ugent.mmlab.rml.mapdochandler.concrete;
 
 import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
 import be.ugent.mmlab.rml.model.RDFTerm.PredicateMap;
@@ -34,6 +34,7 @@ public class PredicateMapExtractor {
             Repository repository, Statement statement,
             Set<GraphMap> graphMaps, TriplesMap triplesMap) {
         Resource object = (Resource) statement.getObject();
+
         try {
             // Extract object maps properties
             Value constantValue = TermMapExtractor.extractValueFromTermMap(repository,
@@ -52,12 +53,10 @@ public class PredicateMapExtractor {
 
             PredicateMap result = new StdPredicateMap(null, constantValue,
                     stringTemplate, inverseExpression, referenceValue, termType);
-            log.debug(
-                    Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                    + "Extract predicate map done.");
+            log.debug("Extracting predicate map done.");
             return result;
         } catch (Exception ex) {
-            log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": " + ex);
+            log.error("Exception: " + ex);
         }
         return null;
     }

@@ -1,4 +1,4 @@
-package be.ugent.mmlab.rml.extraction.concrete;
+package be.ugent.mmlab.rml.mapdochandler.concrete;
 
 import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
 import be.ugent.mmlab.rml.model.JoinCondition;
@@ -41,20 +41,19 @@ public class ReferencingObjectMapExtractor {
             Map<Resource, TriplesMap> triplesMapResources, TriplesMap triplesMap, Resource triplesMapSubject, Resource predicateObject) {
         Set<ReferencingObjectMap> refObjectMaps = new HashSet<ReferencingObjectMap>();
         try {
-           log.debug(
-                    Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                    + "Try to extract object map..");
-            ReferencingObjectMap refObjectMap = extractReferencingObjectMap(
-                    repository, (Resource) object_statements.next().getObject(),
-                    savedGraphMaps, triplesMapResources, triplesMap);
-            if (refObjectMap != null) {
-                //refObjectMap.setOwnTriplesMap(triplesMapResources.get(triplesMapSubject));
-                refObjectMaps.add(refObjectMap);
+            if (object_statements.hasNext()) {
+                Statement object_statement = object_statements.next();
+                log.debug("Trying to extract Referencing Object Map..");
+                ReferencingObjectMap refObjectMap = extractReferencingObjectMap(
+                        repository, (Resource) object_statement.getObject(),
+                        savedGraphMaps, triplesMapResources, triplesMap);
+                if (refObjectMap != null) {
+                    //refObjectMap.setOwnTriplesMap(triplesMapResources.get(triplesMapSubject));
+                    refObjectMaps.add(refObjectMap);
+                }
             }
-            
         } catch (ClassCastException e) {
-            log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                    +  "A resource was expected in object of objectMap of "
+            log.error("A resource was expected in object of objectMap of "
                     + predicateObject.stringValue());
         } catch (RepositoryException ex) {
             log.error("RepositoryException " + ex);

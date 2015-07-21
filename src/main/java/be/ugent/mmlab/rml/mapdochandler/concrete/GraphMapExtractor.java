@@ -1,6 +1,5 @@
-package be.ugent.mmlab.rml.extraction.concrete;
+package be.ugent.mmlab.rml.mapdochandler.concrete;
 
-import be.ugent.mmlab.rml.extraction.RMLUnValidatedMappingExtractor;
 import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
 import be.ugent.mmlab.rml.model.PredicateObjectMap;
 import be.ugent.mmlab.rml.model.TriplesMap;
@@ -85,7 +84,7 @@ public class GraphMapExtractor {
                 result = new StdGraphMap(constantValue, stringTemplate,
                         inverseExpression, referenceValue, termType);
             } catch (Exception ex) {
-                log.error(RMLUnValidatedMappingExtractor.class.getName() + ex);
+                log.error("Exception " + ex);
             }
 
             log.debug(

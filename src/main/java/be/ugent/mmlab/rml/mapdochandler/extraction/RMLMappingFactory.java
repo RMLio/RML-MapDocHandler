@@ -9,7 +9,7 @@
  *
  ***************************************************************************
  */
-package be.ugent.mmlab.rml.extraction;
+package be.ugent.mmlab.rml.mapdochandler.extraction;
 
 import be.ugent.mmlab.rml.model.RMLMapping;
 

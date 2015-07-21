@@ -1,4 +1,4 @@
-package be.ugent.mmlab.rml.retrieval;
+package be.ugent.mmlab.rml.mapdochandler.retrieval;
 
 import java.io.File;
 import java.io.IOException;
