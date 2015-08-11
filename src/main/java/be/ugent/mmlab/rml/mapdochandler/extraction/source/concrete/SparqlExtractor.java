@@ -1,8 +1,8 @@
 package be.ugent.mmlab.rml.mapdochandler.extraction.source.concrete;
 
-import be.ugent.mmlab.rml.model.InputSource;
+import be.ugent.mmlab.rml.model.Source;
 import be.ugent.mmlab.rml.mapdochandler.extraction.concrete.StdSourceExtractor;
-import be.ugent.mmlab.rml.input.model.std.SparqlSdInputSource;
+import be.ugent.mmlab.rml.model.source.SparqlSdSource;
 import be.ugent.mmlab.rml.vocabulary.SPARQLSDVocabulary;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,8 +29,8 @@ public class SparqlExtractor extends StdSourceExtractor {
     private static final Logger log = LoggerFactory.getLogger(SparqlExtractor.class);
 
     @Override
-    public Set<InputSource> extractSource(Repository repository, Value value) {
-        Set<InputSource> inputSources = new HashSet<InputSource>();
+    public Set<Source> extractSources(Repository repository, Value value) {
+        Set<Source> inputSources = new HashSet<Source>();
         try {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
@@ -42,7 +42,7 @@ public class SparqlExtractor extends StdSourceExtractor {
 
             while (statements.hasNext()) {
                 inputSources.add(
-                        new SparqlSdInputSource(
+                        new SparqlSdSource(
                         value.stringValue(), statements.next().getObject().stringValue()));
             }
             connection.close();

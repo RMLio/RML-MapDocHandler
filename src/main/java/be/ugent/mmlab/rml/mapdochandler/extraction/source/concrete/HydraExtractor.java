@@ -1,8 +1,8 @@
 package be.ugent.mmlab.rml.mapdochandler.extraction.source.concrete;
 
-import be.ugent.mmlab.rml.model.InputSource;
+import be.ugent.mmlab.rml.model.Source;
 import be.ugent.mmlab.rml.mapdochandler.extraction.concrete.StdSourceExtractor;
-import be.ugent.mmlab.rml.input.model.std.ApiInputSource;
+import be.ugent.mmlab.rml.model.source.std.StdApiSource;
 import be.ugent.mmlab.rml.vocabulary.HydraVocabulary;
 import java.util.HashSet;
 import java.util.Set;
@@ -33,26 +33,35 @@ public class HydraExtractor extends StdSourceExtractor {
 
 
     @Override
-    public Set<InputSource> extractSource(Repository repository, Value resource) {
-        Set<InputSource> inputSources = new HashSet<InputSource>();
+    public Set<Source> extractSources(Repository repository, Value resource) {
+        Set<Source> sources = new HashSet<Source>();
         try {
             RepositoryConnection connection = repository.getConnection();
-            ValueFactory vf = connection.getValueFactory();
+
             URI predicate = vf.createURI(
                     HydraVocabulary.HYDRA_NAMESPACE + HydraVocabulary.HydraTerm.TEMPLATE);
             RepositoryResult<Statement> statements =
-                    connection.getStatements((Resource) resource, predicate, resource, true);
+                    connection.getStatements((Resource) resource, predicate, null, true);
 
             while (statements.hasNext()) {
-                inputSources.add(
-                        new ApiInputSource(
-                        resource.stringValue(), statements.next().getObject().stringValue()));
+                Statement statement = statements.next();
+                Source inputSource = extractSource((Resource) resource, statement);
+                sources.add(inputSource);
             }
             connection.close();
         } catch (RepositoryException ex) {
             log.error("RepositoryException " + ex);
         }
-        return inputSources;
+        return sources;
+    }
+    
+    public Source extractSource(Resource resource, Statement statement) {
+        Value source = statement.getObject();
+        
+        Source inputSource = new StdApiSource(
+                resource.stringValue(), source.stringValue());
+        
+        return inputSource;
     }
     
 }

@@ -1,7 +1,8 @@
 package be.ugent.mmlab.rml.mapdochandler.extraction.source.concrete;
 
-import be.ugent.mmlab.rml.model.InputSource;
 import be.ugent.mmlab.rml.mapdochandler.extraction.concrete.StdSourceExtractor;
+import be.ugent.mmlab.rml.model.Source;
+import be.ugent.mmlab.rml.model.source.std.StdJdbcSource;
 import be.ugent.mmlab.rml.vocabulary.D2RQVocabulary;
 import be.ugent.mmlab.rml.vocabulary.D2RQVocabulary.D2RQTerm;
 import java.util.HashSet;
@@ -28,19 +29,28 @@ public class JdbcExtractor extends StdSourceExtractor {
     // Log
     private static final Logger log = LoggerFactory.getLogger(JdbcExtractor.class);
        
-    
+    //TODO: The following does not actually iterate - change
     @Override
-    public Set<InputSource> extractSource(Repository repository, Value value) {
-        Set<InputSource> inputSources = new HashSet<InputSource>();
+    public Set<Source> extractSources(Repository repository, Value value) {
+        Set<Source> inputSources = new HashSet<Source>();
 
         String jdbcDSN = extractJdbcTerm(repository, value, D2RQTerm.JDBCDSN);
         String jdbcDriver = extractJdbcTerm(repository, value, D2RQTerm.JDBCDRIVER);
         String username = extractJdbcTerm(repository, value, D2RQTerm.USERNAME);
         String password = extractJdbcTerm(repository, value, D2RQTerm.PASSWORD);
-        //InputSource source = new JdbcInputSource(jdbcDSN, jdbcDriver, username, password);
-        //inputSources.add(source);
+        Source source = extractSource (value, jdbcDSN, jdbcDriver, username, password);
+        
+        inputSources.add(source);
 
         return inputSources;
+    }
+    
+    public Source extractSource(Value value,
+            String jdbcDSN, String jdbcDriver, String username, String password) {
+        Source source = 
+                new StdJdbcSource(value.stringValue(), 
+                jdbcDSN, jdbcDriver, username, password);
+        return source;
     }
     
     private String extractJdbcTerm(Repository repository, Value resource, D2RQTerm term){

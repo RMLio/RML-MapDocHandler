@@ -1,8 +1,8 @@
 package be.ugent.mmlab.rml.mapdochandler.extraction.source.concrete;
 
-import be.ugent.mmlab.rml.input.model.std.ApiInputSource;
 import be.ugent.mmlab.rml.mapdochandler.extraction.concrete.StdSourceExtractor;
-import be.ugent.mmlab.rml.model.InputSource;
+import be.ugent.mmlab.rml.model.Source;
+import be.ugent.mmlab.rml.model.source.std.StdApiSource;
 import be.ugent.mmlab.rml.vocabularies.DCATVocabulary;
 import java.util.HashSet;
 import java.util.Set;
@@ -32,8 +32,8 @@ public class DcatExtractor extends StdSourceExtractor {
     }
 
     @Override
-    public Set<InputSource> extractSource(Repository repository, Value value) {
-        Set<InputSource> inputSources = new HashSet<InputSource>();
+    public Set<Source> extractSources(Repository repository, Value value) {
+        Set<Source> inputSources = new HashSet<Source>();
         try {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
@@ -44,15 +44,21 @@ public class DcatExtractor extends StdSourceExtractor {
                     connection.getStatements((Resource) value, predicate, value, true);
  
             while (statements.hasNext()) {
-                inputSources.add(
-                        new ApiInputSource(
-                        value.stringValue(), statements.next().getObject().stringValue()));
+                Statement statement = statements.next();
+                Source inputSource = extractSource((Resource) value, statement);
+                inputSources.add(inputSource);
             }
             connection.close();
         } catch (RepositoryException ex) {
             log.error("RepositoryException " + ex);
         }
         return inputSources;
+    }
+    
+    public Source extractSource(Resource resource, Statement statement) {
+        Source source = new StdApiSource(
+                resource.stringValue(), statement.getObject().stringValue());
+        return source;
     }
 
 }
