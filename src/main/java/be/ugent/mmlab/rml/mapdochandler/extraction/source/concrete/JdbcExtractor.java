@@ -32,21 +32,19 @@ public class JdbcExtractor extends StdSourceExtractor {
     //TODO: The following does not actually iterate - change
     @Override
     public Set<Source> extractSources(Repository repository, Value value) {
-        Set<Source> inputSources = new HashSet<Source>();
+            Set<Source> inputSources = new HashSet<Source>();
+            Source source = extractSource (repository, value);
+            
+            inputSources.add(source);
 
+            return inputSources;
+    }
+    
+    public Source extractSource(Repository repository, Value value) {
         String jdbcDSN = extractJdbcTerm(repository, value, D2RQTerm.JDBCDSN);
         String jdbcDriver = extractJdbcTerm(repository, value, D2RQTerm.JDBCDRIVER);
         String username = extractJdbcTerm(repository, value, D2RQTerm.USERNAME);
         String password = extractJdbcTerm(repository, value, D2RQTerm.PASSWORD);
-        Source source = extractSource (value, jdbcDSN, jdbcDriver, username, password);
-        
-        inputSources.add(source);
-
-        return inputSources;
-    }
-    
-    public Source extractSource(Value value,
-            String jdbcDSN, String jdbcDriver, String username, String password) {
         Source source = 
                 new StdJdbcSource(value.stringValue(), 
                 jdbcDSN, jdbcDriver, username, password);
