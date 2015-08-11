@@ -2,8 +2,9 @@ package be.ugent.mmlab.rml.mapdochandler.extraction.source.concrete;
 
 import be.ugent.mmlab.rml.model.Source;
 import be.ugent.mmlab.rml.mapdochandler.extraction.concrete.StdSourceExtractor;
-import be.ugent.mmlab.rml.model.source.SparqlSdSource;
-import be.ugent.mmlab.rml.vocabulary.SPARQLSDVocabulary;
+import be.ugent.mmlab.rml.model.source.std.StdSparqlEndpointSource;
+import be.ugent.mmlab.rml.vocabularies.SPARQLSDVocabulary;
+import be.ugent.mmlab.rml.vocabularies.SPARQLSDVocabulary.SparqlSdTerm;
 import java.util.HashSet;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -41,9 +42,10 @@ public class SparqlExtractor extends StdSourceExtractor {
                     connection.getStatements((Resource) value, predicate, null, true);
 
             while (statements.hasNext()) {
-                inputSources.add(
-                        new SparqlSdSource(
-                        value.stringValue(), statements.next().getObject().stringValue()));
+                Statement statement = statements.next();
+                Source source = 
+                        extractSource(repository, statement);
+                inputSources.add(source);
             }
             connection.close();
 
@@ -51,5 +53,80 @@ public class SparqlExtractor extends StdSourceExtractor {
             log.error("RepositoryException " + ex);
         }
         return inputSources;
+    }
+    
+    private Source extractSource(Repository repository, Statement statement){
+        Source source ;
+        String supportedLanguage = 
+                exportSupportedLanguage(repository, statement.getSubject());
+        String resultFormat = 
+                exportResultFormat(repository, statement.getSubject());
+        
+        source = new StdSparqlEndpointSource(statement.getSubject().stringValue(), 
+                statement.getObject().stringValue(),supportedLanguage, resultFormat);
+        
+        return source;
+    }
+    
+    private String exportSupportedLanguage(Repository repository, Resource resource) {
+        
+        try {
+            RepositoryConnection connection = repository.getConnection();
+            ValueFactory vf = connection.getValueFactory();
+
+            URI predicate = vf.createURI(SPARQLSDVocabulary.SPARQLSD_NAMESPACE
+                    + SPARQLSDVocabulary.SparqlSdTerm.SUPPORTEDLANGUAGE);
+            RepositoryResult<Statement> statements =
+                    connection.getStatements(resource, predicate, null, true);
+            if (statements.hasNext()) {
+                Statement statement = statements.next();
+                String supportedLanguage = statement.getObject().stringValue();
+                switch(supportedLanguage){
+                    case ("http://www.w3.org/ns/sparql-service-description#SPARQL10Query"):
+                        return SparqlSdTerm.SPARQL10QUERY.toString();
+                    case ("http://www.w3.org/ns/sparql-service-description#SPARQL11Query"):
+                        return SparqlSdTerm.SPARQL11QUERY.toString();
+                    case ("http://www.w3.org/ns/sparql-service-description#SPARQL11Update"):
+                        return SparqlSdTerm.SPARQL11UPDATE.toString();  
+                    default:
+                        return null;
+                }
+            }
+            
+        } catch (RepositoryException ex) {
+            log.error("Repository Exception " + ex);
+        }
+        return null;
+    }
+    
+    private String exportResultFormat(Repository repository, Resource resource) {
+        
+        try {
+            RepositoryConnection connection = repository.getConnection();
+            ValueFactory vf = connection.getValueFactory();
+
+            URI predicate = vf.createURI(SPARQLSDVocabulary.SPARQLSD_NAMESPACE
+                    + SPARQLSDVocabulary.SparqlSdTerm.RESULTFORMAT);
+            RepositoryResult<Statement> statements =
+                    connection.getStatements(resource, predicate, null, true);
+            if (statements.hasNext()) {
+                Statement statement = statements.next();
+                String resultFormat = statement.getObject().stringValue();
+                switch(resultFormat){
+                    case ("http://www.w3.org/ns/formats/data/SPARQL_Results_CSV"):
+                        return SparqlSdTerm.SPARQL_RESULTS_CSV.toString();
+                    case ("http://www.w3.org/ns/formats/data/SPARQL_Results_XML"):
+                        return SparqlSdTerm.SPARQL_RESULTS_XML.toString();
+                    case ("http://www.w3.org/ns/formats/data/SPARQL_Results_JSON"):
+                        return SparqlSdTerm.SPARQL_RESULTS_JSON.toString();  
+                    default:
+                        return null;
+                }
+            }
+            
+        } catch (RepositoryException ex) {
+            log.error("Repository Exception " + ex);
+        }
+        return null;
     }
 }
