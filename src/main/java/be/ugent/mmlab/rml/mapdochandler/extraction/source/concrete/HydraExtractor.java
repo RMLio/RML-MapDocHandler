@@ -3,8 +3,10 @@ package be.ugent.mmlab.rml.mapdochandler.extraction.source.concrete;
 import be.ugent.mmlab.rml.model.Source;
 import be.ugent.mmlab.rml.mapdochandler.extraction.concrete.StdSourceExtractor;
 import be.ugent.mmlab.rml.model.source.std.StdApiSource;
-import be.ugent.mmlab.rml.vocabulary.HydraVocabulary;
+import be.ugent.mmlab.rml.vocabularies.HydraVocabulary;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +47,8 @@ public class HydraExtractor extends StdSourceExtractor {
 
             while (statements.hasNext()) {
                 Statement statement = statements.next();
-                Source inputSource = extractSource((Resource) resource, statement);
+                Source inputSource = 
+                        extractSource(repository, (Resource) resource, statement);
                 sources.add(inputSource);
             }
             connection.close();
@@ -55,13 +58,87 @@ public class HydraExtractor extends StdSourceExtractor {
         return sources;
     }
     
-    public Source extractSource(Resource resource, Statement statement) {
-        Value source = statement.getObject();
+    public Source extractSource(
+            Repository repository, Resource resource, Statement statement) {
+        Value value = statement.getObject();
         
-        Source inputSource = new StdApiSource(
-                resource.stringValue(), source.stringValue());
+        List<Map<String, Boolean>> mapTemplates = 
+                extractMappingTemplates(repository, resource);
         
-        return inputSource;
+        Source source = new StdApiSource(
+                resource.stringValue(), value.stringValue(), mapTemplates);
+        
+        return source;
+    }
+    
+    private List<Map<String,Boolean>> extractMappingTemplates(
+            Repository repository, Resource resource){
+        List<Map<String,Boolean>> mapTemplates = null;
+        try {
+            RepositoryConnection connection = repository.getConnection();
+
+            URI predicate = vf.createURI(
+                    HydraVocabulary.HYDRA_NAMESPACE + HydraVocabulary.HydraTerm.MAPPING);
+            RepositoryResult<Statement> statements =
+                    connection.getStatements((Resource) resource, predicate, null, true);
+
+            while (statements.hasNext()) {
+                Statement statement = statements.next();
+                Map<String,Boolean> mapTemplate = 
+                        extractMappingTemplate(repository, statement);
+                
+                mapTemplates.add(mapTemplate);
+            }
+            connection.close();
+
+        } catch (RepositoryException ex) {
+            log.error("Repository Exception " + ex);
+        }
+        return mapTemplates;
+    }
+    
+    private Map<String,Boolean> extractMappingTemplate(
+            Repository repository, Statement statement){
+        Map<String, Boolean> mapTemplate = null;
+            String variable = null; 
+            Boolean required ;
+            
+        try {
+            RepositoryConnection connection = repository.getConnection();
+
+            //Extract the variable
+            URI predicate = vf.createURI(
+                    HydraVocabulary.HYDRA_NAMESPACE + HydraVocabulary.HydraTerm.VARIABLE);
+            RepositoryResult<Statement> statements =
+                    connection.getStatements(statement.getSubject(), predicate, null, true);
+            if (statements.hasNext()) {
+                Statement variableStatement = statements.next();
+                variable = variableStatement.getObject().stringValue();
+            }
+            
+            //Extract required
+            predicate = vf.createURI(
+                    HydraVocabulary.HYDRA_NAMESPACE + HydraVocabulary.HydraTerm.REQUIRED);
+            statements =
+                    connection.getStatements(statement.getSubject(), predicate, null, true);
+            if (statements.hasNext()) {
+                Statement requiredStatement = statements.next();
+                if (requiredStatement.getObject().stringValue().equals("true")) {
+                    required = true;
+                } else 
+                    required = false;
+            }
+            else {
+                required = false;
+            }
+            
+            mapTemplate.put(variable, required);
+            connection.close();
+            
+        } catch (RepositoryException ex) {
+            log.error("Repository Exception " + ex);
+        }
+        return mapTemplate;
     }
     
 }
