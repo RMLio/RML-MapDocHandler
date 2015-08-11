@@ -1,4 +1,4 @@
-package be.ugent.mmlab.rml.mapdochandler.concrete;
+package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
 
 import be.ugent.mmlab.rml.model.TriplesMap;
 import be.ugent.mmlab.rml.model.std.StdReferenceMap;

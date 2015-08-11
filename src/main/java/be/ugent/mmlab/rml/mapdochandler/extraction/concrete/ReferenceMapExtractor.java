@@ -1,4 +1,4 @@
-package be.ugent.mmlab.rml.mapdochandler.concrete;
+package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
 
 /**
  * *************************************************************************

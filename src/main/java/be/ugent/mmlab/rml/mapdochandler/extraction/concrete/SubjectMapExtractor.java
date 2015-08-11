@@ -1,4 +1,4 @@
-package be.ugent.mmlab.rml.mapdochandler.concrete;
+package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
 
 import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
 import be.ugent.mmlab.rml.model.RDFTerm.SubjectMap;

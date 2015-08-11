@@ -1,16 +1,14 @@
 package be.ugent.mmlab.rml.mapdochandler.extraction;
 
-import be.ugent.mmlab.rml.mapdochandler.concrete.TriplesMapExtractor;
+import be.ugent.mmlab.rml.mapdochandler.extraction.concrete.TriplesMapExtractor;
 import be.ugent.mmlab.rml.model.RMLMapping;
 import be.ugent.mmlab.rml.model.TriplesMap;
-import be.ugent.mmlab.rml.mapdochandler.retrieval.RMLDocRetrieval;
 import be.ugent.mmlab.rml.vocabulary.R2RMLVocabulary;
 import java.util.Map;
 import org.openrdf.model.Resource;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.rio.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

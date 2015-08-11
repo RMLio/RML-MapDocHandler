@@ -1,4 +1,4 @@
-package be.ugent.mmlab.rml.mapdochandler.concrete;
+package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
 
 import be.ugent.mmlab.rml.input.extractor.concrete.ConcreteInputFactory;
 import be.ugent.mmlab.rml.input.extractor.concrete.LocalFileExtractor;
@@ -123,6 +123,7 @@ public class TriplesMapExtractor {
                 Set<InputSource> inputSources;
                 Statement sourceStatement = sourceStatements.next();
 
+                //TODO:Align the following with ConcreteInputFactory
                 if (sourceStatement.getObject().getClass().getSimpleName().equals("MemLiteral")) {
                     log.info("Literal-valued Input Source");
                     source = sourceStatement.getObject().stringValue();
