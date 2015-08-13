@@ -37,12 +37,13 @@ public class ReferencingObjectMapExtractor {
     static final Logger log = LoggerFactory.getLogger(ReferencingObjectMapExtractor.class);
     
     public Set<ReferencingObjectMap> processReferencingObjectMap(
-            Repository repository, RepositoryResult<Statement> object_statements, Set<GraphMap> savedGraphMaps,
-            Map<Resource, TriplesMap> triplesMapResources, TriplesMap triplesMap, Resource triplesMapSubject, Resource predicateObject) {
+            Repository repository, Statement object_statement, 
+            Set<GraphMap> savedGraphMaps, Map<Resource, TriplesMap> triplesMapResources, 
+            TriplesMap triplesMap, Resource triplesMapSubject, Resource predicateObject) {
         Set<ReferencingObjectMap> refObjectMaps = new HashSet<ReferencingObjectMap>();
         try {
-            if (object_statements.hasNext()) {
-                Statement object_statement = object_statements.next();
+            //if (object_statements.hasNext()) {
+                //Statement object_statement = object_statements.next();
                 log.debug("Trying to extract Referencing Object Map..");
                 ReferencingObjectMap refObjectMap = extractReferencingObjectMap(
                         repository, (Resource) object_statement.getObject(),
@@ -51,12 +52,10 @@ public class ReferencingObjectMapExtractor {
                     //refObjectMap.setOwnTriplesMap(triplesMapResources.get(triplesMapSubject));
                     refObjectMaps.add(refObjectMap);
                 }
-            }
+            //}
         } catch (ClassCastException e) {
             log.error("A resource was expected in object of objectMap of "
                     + predicateObject.stringValue());
-        } catch (RepositoryException ex) {
-            log.error("RepositoryException " + ex);
         } 
         return refObjectMaps;
     }
@@ -77,13 +76,16 @@ public class ReferencingObjectMapExtractor {
         try {
             URI parentTriplesMap = (URI) TermMapExtractor.extractValueFromTermMap(repository,
                     object, R2RMLVocabulary.R2RMLTerm.PARENT_TRIPLES_MAP, triplesMap);
+            log.debug("Parent Triples Maps were found " + parentTriplesMap);
+            
             Set<JoinCondition> joinConditions = extractJoinConditions(
                     repository, object, triplesMap);
             
             if (parentTriplesMap == null && !joinConditions.isEmpty()) {
                 log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
                         + object.stringValue()
-                        + " has no parentTriplesMap map defined whereas one or more joinConditions exist"
+                        + " has no parentTriplesMap map defined"
+                        + " whereas one or more joinConditions exist"
                         + " : exactly one parentTripleMap is required.");
             }
             if (parentTriplesMap == null && joinConditions.isEmpty()) {
@@ -93,13 +95,12 @@ public class ReferencingObjectMapExtractor {
             boolean contains = false;
             TriplesMap parent = null;
             for (Resource triplesMapResource : triplesMapResources.keySet()) {
+                log.debug("Current Triples Map resource " + triplesMapResource.stringValue());
                 if (triplesMapResource.stringValue().equals(
                         parentTriplesMap.stringValue())) {
                     contains = true;
                     parent = triplesMapResources.get(triplesMapResource);
-                    log.debug(
-                            Thread.currentThread().getStackTrace()[1].getMethodName() + ": " 
-                            + "Parent triples map found : "
+                    log.debug("Parent triples map found : "
                             + triplesMapResource.stringValue());
                     break;
                 }
@@ -115,6 +116,7 @@ public class ReferencingObjectMapExtractor {
             // at the end f treatment.
             ReferencingObjectMap refObjectMap = new StdReferencingObjectMap(null,
                     parent, joinConditions);
+            log.debug("Referencing Object Map was generated.");
             log.debug(
                     Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
                     + "Extract referencing object map done.");

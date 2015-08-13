@@ -54,54 +54,61 @@ public class PredicateObjectMapExtractor {
         try {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
-            
+
             URI p = vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.PREDICATE_MAP);
             predicate_statements = connection.getStatements(predicateObject, p, null, true);
-            
+            log.debug("Predicate Map statements found: " + predicate_statements);
+
             while (predicate_statements.hasNext()) {
                 PredicateMapExtractor predMapExtractor = new PredicateMapExtractor();
                 PredicateMap predicateMap = predMapExtractor.extractPredicateMap(
                         repository, predicate_statements.next(),
                         savedGraphMaps, triplesMap);
                 predicateMaps.add(predicateMap);
-            
-            
-            URI o = vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
-                    + R2RMLVocabulary.R2RMLTerm.OBJECT_MAP);
-            // Extract object maps
-            object_statements = connection.getStatements(predicateObject, o, null, true);
-            
-            while (object_statements.hasNext()) {
-                Statement object_statement = object_statements.next();
 
-                ReferencingObjectMapExtractor refObjMapExtractor = new ReferencingObjectMapExtractor();
-                refObjectMaps = refObjMapExtractor.processReferencingObjectMap(
-                        repository, object_statements, savedGraphMaps,
-                        triplesMapResources, triplesMap, triplesMapSubject, predicateObject);
-                if (refObjectMaps.isEmpty()) {
-                    ObjectMapExtractor objMapExtractor = new ObjectMapExtractor();
+
+                URI o = vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                        + R2RMLVocabulary.R2RMLTerm.OBJECT_MAP);
+                // Extract object maps
+                object_statements = connection.getStatements(predicateObject, o, null, true);
+                log.debug("Object Map statements found: " + object_statements);
+
+                while (object_statements.hasNext()) {
+                    Statement object_statement = object_statements.next();
+
+                    //Extract Referencing Object Maps
+                    log.debug("Extracting Referencing Object Maps..");
+                    ReferencingObjectMapExtractor refObjMapExtractor = new ReferencingObjectMapExtractor();
+                    refObjectMaps = refObjMapExtractor.processReferencingObjectMap(
+                            repository, object_statement, savedGraphMaps,
+                            triplesMapResources, triplesMap, triplesMapSubject, predicateObject);
+                    log.debug("Referencing Object Map statements found: " + refObjectMaps);
                     
-                    ObjectMap objectMap = objMapExtractor.extractObjectMap(repository,
-                            (Resource) object_statement.getObject(), savedGraphMaps, triplesMap);
-                    try {
-                        objectMap.setOwnTriplesMap(triplesMapResources.get(triplesMapSubject));
-                    } catch (Exception ex) {
-                        log.error("Exception " + ": " + ex);
+                    if (refObjectMaps.isEmpty()) {
+                        ObjectMapExtractor objMapExtractor = new ObjectMapExtractor();
+
+                        ObjectMap objectMap = objMapExtractor.extractObjectMap(repository,
+                                (Resource) object_statement.getObject(), savedGraphMaps, triplesMap);
+                        try {
+                            objectMap.setOwnTriplesMap(triplesMapResources.get(triplesMapSubject));
+                        } catch (Exception ex) {
+                            log.error("Exception " + ": " + ex);
+                        }
+                        objectMaps.add(objectMap);
                     }
-                    objectMaps.add(objectMap);
+                    predicateObjectMap = new StdPredicateObjectMap(
+                            predicateMaps, objectMaps, refObjectMaps);
+                    GraphMapExtractor graphMapExtractor = new GraphMapExtractor();
+                    graphMapExtractor.processGraphMaps(
+                            repository, predicateObject, triplesMap, predicateObjectMap, savedGraphMaps);
+
+                    log.debug(
+                            Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
+                            + "Extract predicate-object map done.");
+
                 }
-                predicateObjectMap = new StdPredicateObjectMap(
-                        predicateMaps, objectMaps, refObjectMaps);
-                GraphMapExtractor graphMapExtractor = new GraphMapExtractor();
-                graphMapExtractor.processGraphMaps(
-                        repository, predicateObject, triplesMap, predicateObjectMap, savedGraphMaps);
-
-                log.debug(
-                        Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                        + "Extract predicate-object map done.");
-
-            }}
+            }
             connection.close();
         } catch (RepositoryException ex) {
             log.error("RepositoryException " + ex);

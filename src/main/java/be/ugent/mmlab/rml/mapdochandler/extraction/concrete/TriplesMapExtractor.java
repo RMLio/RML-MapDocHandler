@@ -1,17 +1,17 @@
 package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
 
-import be.ugent.mmlab.rml.input.extractor.concrete.ConcreteInputFactory;
-import be.ugent.mmlab.rml.input.extractor.concrete.LocalFileExtractor;
-import be.ugent.mmlab.rml.model.InputSource;
+import be.ugent.mmlab.rml.input.ConcreteSourceFactory;
+import be.ugent.mmlab.rml.mapdochandler.extraction.source.concrete.LocalFileExtractor;
 import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
 import be.ugent.mmlab.rml.model.LogicalSource;
 import be.ugent.mmlab.rml.model.PredicateObjectMap;
 import be.ugent.mmlab.rml.model.RDFTerm.SubjectMap;
+import be.ugent.mmlab.rml.model.Source;
 import be.ugent.mmlab.rml.model.TriplesMap;
 import be.ugent.mmlab.rml.model.std.StdLogicalSource;
-import be.ugent.mmlab.rml.vocabulary.QLVocabulary;
-import be.ugent.mmlab.rml.vocabulary.R2RMLVocabulary;
-import be.ugent.mmlab.rml.vocabulary.RMLVocabulary;
+import be.ugent.mmlab.rml.vocabularies.QLVocabulary.QLTerm;
+import be.ugent.mmlab.rml.vocabularies.R2RMLVocabulary;
+import be.ugent.mmlab.rml.vocabularies.RMLVocabulary;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -51,7 +51,7 @@ public class TriplesMapExtractor {
 
         // Extract TriplesMap properties
         //Extracts at least one LogicalSource
-        //TODO:check if it get more than one Logical Sources
+        //TODO:check if it gets more than one Logical Sources
         LogicalSource logicalSource =
                 extractLogicalSources(repository, triplesMapSubject, result);
         
@@ -100,13 +100,15 @@ public class TriplesMapExtractor {
             Resource blankLogicalSource =
                     logicalSourceExtractor.extractLogicalSource(repository, triplesMapSubject, triplesMap);
 
-            QLVocabulary.QLTerm referenceFormulation =
+            QLTerm referenceFormulation =
                     logicalSourceExtractor.getReferenceFormulation(
                     repository, triplesMapSubject, blankLogicalSource, triplesMap);
+            log.debug("Reference Formulation " + referenceFormulation);
 
             String iterator =
                     logicalSourceExtractor.getIterator(
                     repository, triplesMapSubject, blankLogicalSource, triplesMap);
+            log.debug("Iterator " + iterator);
 
             URI p = vf.createURI(RMLVocabulary.RML_NAMESPACE + RMLVocabulary.RMLTerm.SOURCE);
 
@@ -120,7 +122,7 @@ public class TriplesMapExtractor {
             while (sourceStatements.hasNext()) {
                 //Extract the file identifier
                 String source;
-                Set<InputSource> inputSources;
+                Set<Source> inputSources;
                 Statement sourceStatement = sourceStatements.next();
 
                 //TODO:Align the following with ConcreteInputFactory
@@ -128,16 +130,24 @@ public class TriplesMapExtractor {
                     log.info("Literal-valued Input Source");
                     source = sourceStatement.getObject().stringValue();
                     LocalFileExtractor input = new LocalFileExtractor();
+                    
                     inputSources = input.extractInput(repository, source);
                 } //object input
                 else {
                     log.info("Resource-valued Input Source");
-                    ConcreteInputFactory inputFactory = new ConcreteInputFactory();
-                    inputSources = inputFactory.chooseInput(
-                            repository, (Resource) sourceStatement.getObject());
+                    ConcreteSourceFactory inputFactory = new ConcreteSourceFactory();
+                    SourceExtractor sourceExtractor = inputFactory.createSourceExtractor(
+                                            repository, (Resource) sourceStatement.getObject());
+                    inputSources = sourceExtractor.extractSources(repository, p);
+                    log.debug(
+                            Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
+                            + "Source extracted : "
+                            + inputSources);
+                    //inputSources = logicalSourceExtractor.extractLogicalSource(repository, triplesMapSubject, triplesMap)
                 }
 
-                for (InputSource inputSource : inputSources) {
+                for (Source inputSource : inputSources) {
+                    log.info("input source " + inputSource);
                     logicalSource = new StdLogicalSource(iterator, inputSource, referenceFormulation);
                 }
             }

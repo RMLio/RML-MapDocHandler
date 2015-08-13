@@ -2,7 +2,6 @@ package be.ugent.mmlab.rml.mapdochandler.extraction.source.concrete;
 
 import be.ugent.mmlab.rml.model.Source;
 import be.ugent.mmlab.rml.mapdochandler.extraction.concrete.StdSourceExtractor;
-import be.ugent.mmlab.rml.model.source.LocalFileSource;
 import be.ugent.mmlab.rml.model.source.std.StdLocalFileSource;
 import java.util.HashSet;
 import java.util.Set;
