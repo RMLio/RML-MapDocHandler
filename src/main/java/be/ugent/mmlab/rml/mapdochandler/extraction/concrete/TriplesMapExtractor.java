@@ -1,6 +1,6 @@
 package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
 
-import be.ugent.mmlab.rml.input.ConcreteSourceFactory;
+import be.ugent.mmlab.rml.mapdochandler.extraction.ConcreteSourceFactory;
 import be.ugent.mmlab.rml.mapdochandler.extraction.source.concrete.LocalFileExtractor;
 import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
 import be.ugent.mmlab.rml.model.LogicalSource;
@@ -98,7 +98,8 @@ public class TriplesMapExtractor {
 
             LogicalSourceExtractor logicalSourceExtractor = new LogicalSourceExtractor();
             Resource blankLogicalSource =
-                    logicalSourceExtractor.extractLogicalSource(repository, triplesMapSubject, triplesMap);
+                    logicalSourceExtractor.
+                    extractLogicalSource(repository, triplesMapSubject, triplesMap);
 
             QLTerm referenceFormulation =
                     logicalSourceExtractor.getReferenceFormulation(
@@ -111,13 +112,7 @@ public class TriplesMapExtractor {
             log.debug("Iterator " + iterator);
 
             URI p = vf.createURI(RMLVocabulary.RML_NAMESPACE + RMLVocabulary.RMLTerm.SOURCE);
-
-            connection.getStatements(blankLogicalSource, p, null, true);
-
-            p = vf.createURI(RMLVocabulary.RML_NAMESPACE + RMLVocabulary.RMLTerm.SOURCE);
             sourceStatements = connection.getStatements(blankLogicalSource, p, null, true);
-
-            
 
             while (sourceStatements.hasNext()) {
                 //Extract the file identifier
@@ -138,7 +133,8 @@ public class TriplesMapExtractor {
                     ConcreteSourceFactory inputFactory = new ConcreteSourceFactory();
                     SourceExtractor sourceExtractor = inputFactory.createSourceExtractor(
                                             repository, (Resource) sourceStatement.getObject());
-                    inputSources = sourceExtractor.extractSources(repository, p);
+                    inputSources = sourceExtractor.
+                            extractSources(repository, sourceStatement.getObject());
                     log.debug(
                             Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
                             + "Source extracted : "

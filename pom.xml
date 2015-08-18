@@ -35,11 +35,6 @@
     <dependencies>
         <dependency>
             <groupId>be.ugent.mmlab.rml</groupId>
-            <artifactId>RML-DataRetrieval</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>be.ugent.mmlab.rml</groupId>
             <artifactId>RML-Model</artifactId>
             <version>1.0</version>
         </dependency>

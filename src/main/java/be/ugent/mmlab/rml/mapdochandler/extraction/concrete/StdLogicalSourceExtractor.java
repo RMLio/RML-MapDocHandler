@@ -1,8 +1,8 @@
 package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
 
-import be.ugent.mmlab.rml.model.InputSource;
-import be.ugent.mmlab.rml.input.std.StdInputSource;
+import be.ugent.mmlab.rml.model.Source;
 import be.ugent.mmlab.rml.model.TriplesMap;
+import be.ugent.mmlab.rml.model.source.std.StdSource;
 import be.ugent.mmlab.rml.model.std.StdTriplesMap;
 import be.ugent.mmlab.rml.vocabulary.R2RMLVocabulary;
 import be.ugent.mmlab.rml.vocabulary.RMLVocabulary;
@@ -37,8 +37,8 @@ public class StdLogicalSourceExtractor {
      * @param rmlMappingGraph
      * @return
      */
-    public Map<Resource, InputSource> extractInputResources(Repository repository) {
-        Map<Resource, InputSource> inputResources = new HashMap<Resource, InputSource>();
+    public Map<Resource, Source> extractInputResources(Repository repository) {
+        Map<Resource, Source> inputResources = new HashMap<Resource, Source>();
 
         RepositoryResult<Statement> statements = getInputResources(repository);
 
@@ -78,8 +78,8 @@ public class StdLogicalSourceExtractor {
      * @param inputResources
      * @return
      */
-    protected Map<Resource, InputSource> putInputResources(Repository repository,
-            RepositoryResult<Statement> statements, Map<Resource, InputSource> inputResources) {
+    protected Map<Resource, Source> putInputResources(Repository repository,
+            RepositoryResult<Statement> statements, Map<Resource, Source> inputResources) {
         try {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
@@ -97,7 +97,7 @@ public class StdLogicalSourceExtractor {
                                 //triplesMap resource
                                 triplesMapsStatements.next().getSubject(),
                                 //input source
-                                new StdInputSource(triplesMapsStatements.next().getObject().stringValue()));
+                                new StdSource(triplesMapsStatements.next().getObject().stringValue()));
                     } catch (Exception ex) {
                         log.error(StdLogicalSourceExtractor.class.getName() + ex);
                     }
@@ -117,12 +117,12 @@ public class StdLogicalSourceExtractor {
      */
     public void extractInputSource(
             Repository repository, Resource inputResource,
-            Map<Resource, InputSource> inputResources) {
+            Map<Resource, Source> inputResources) {
         log.debug(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
                 + "Extract Input Resource : "
                 + inputResource.stringValue());
 
-        InputSource result = inputResources.get(inputResource);
+        Source result = inputResources.get(inputResource);
 
         // Extract TriplesMap properties
         Set<TriplesMap> triplesMaps =
@@ -130,7 +130,7 @@ public class StdLogicalSourceExtractor {
 
         // Add triples maps
         for (TriplesMap triplesMap : triplesMaps) {
-            result.setTriplesMap(triplesMap);
+            //result.setTriplesMap(triplesMap);
         }
 
         log.info(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
