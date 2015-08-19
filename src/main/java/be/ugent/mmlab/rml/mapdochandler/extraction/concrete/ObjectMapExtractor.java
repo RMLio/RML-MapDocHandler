@@ -5,7 +5,7 @@ import be.ugent.mmlab.rml.model.RDFTerm.ObjectMap;
 import be.ugent.mmlab.rml.model.TriplesMap;
 import be.ugent.mmlab.rml.model.std.StdObjectMap;
 import be.ugent.mmlab.rml.model.termMap.ReferenceMap;
-import be.ugent.mmlab.rml.vocabulary.R2RMLVocabulary;
+import be.ugent.mmlab.rml.vocabularies.R2RMLVocabulary;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

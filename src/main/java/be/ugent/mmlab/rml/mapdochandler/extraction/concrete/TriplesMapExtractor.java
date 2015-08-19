@@ -6,6 +6,7 @@ import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
 import be.ugent.mmlab.rml.model.LogicalSource;
 import be.ugent.mmlab.rml.model.PredicateObjectMap;
 import be.ugent.mmlab.rml.model.RDFTerm.SubjectMap;
+import be.ugent.mmlab.rml.model.ReferenceFormulation;
 import be.ugent.mmlab.rml.model.Source;
 import be.ugent.mmlab.rml.model.TriplesMap;
 import be.ugent.mmlab.rml.model.std.StdLogicalSource;
@@ -92,6 +93,8 @@ public class TriplesMapExtractor {
             Repository repository, Resource triplesMapSubject, TriplesMap triplesMap) {
         RepositoryResult<Statement> sourceStatements;
         LogicalSource logicalSource = null;
+        SourceExtractor sourceExtractor = null;
+        ReferenceFormulation dialect = null;
         try {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
@@ -125,27 +128,39 @@ public class TriplesMapExtractor {
                     log.info("Literal-valued Input Source");
                     source = sourceStatement.getObject().stringValue();
                     LocalFileExtractor input = new LocalFileExtractor();
+                    inputSources = 
+                            input.extractSources(
+                            repository, sourceStatement.getObject());
                     
-                    inputSources = input.extractInput(repository, source);
                 } //object input
                 else {
                     log.info("Resource-valued Input Source");
                     ConcreteSourceFactory inputFactory = new ConcreteSourceFactory();
-                    SourceExtractor sourceExtractor = inputFactory.createSourceExtractor(
-                                            repository, (Resource) sourceStatement.getObject());
+                    sourceExtractor = inputFactory.createSourceExtractor(
+                            repository, (Resource) sourceStatement.getObject());
                     inputSources = sourceExtractor.
                             extractSources(repository, sourceStatement.getObject());
                     log.debug(
                             Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
                             + "Source extracted : "
                             + inputSources);
-                    //inputSources = logicalSourceExtractor.extractLogicalSource(repository, triplesMapSubject, triplesMap)
                 }
+                
+                if(sourceExtractor != null && 
+                        sourceExtractor.getClass().getSimpleName().equals("CsvwExtractor")){
+                    
+                    dialect = sourceExtractor.extractCustomReferenceFormulation(
+                            repository,sourceStatement.getObject());
+                }
+                
+                
 
                 for (Source inputSource : inputSources) {
                     log.info("input source " + inputSource);
-                    logicalSource = new StdLogicalSource(iterator, inputSource, referenceFormulation);
+                    logicalSource = new StdLogicalSource(
+                            iterator, inputSource, referenceFormulation, dialect);
                 }
+                log.debug("Triples Map extracted");
             }
 
             log.debug(

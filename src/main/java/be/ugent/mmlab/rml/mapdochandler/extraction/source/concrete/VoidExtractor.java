@@ -1,10 +1,10 @@
 package be.ugent.mmlab.rml.mapdochandler.extraction.source.concrete;
 
-import be.ugent.mmlab.rml.mapdochandler.extraction.concrete.StdSourceExtractor;
+import be.ugent.mmlab.rml.mapdochandler.extraction.std.StdSourceExtractor;
 import be.ugent.mmlab.rml.model.Source;
 import be.ugent.mmlab.rml.model.source.std.StdApiSource;
 import be.ugent.mmlab.rml.model.source.std.StdSparqlEndpointSource;
-import be.ugent.mmlab.rml.vocabulary.VoIDVocabulary;
+import be.ugent.mmlab.rml.vocabularies.VoIDVocabulary;
 import java.util.HashSet;
 import java.util.Set;
 import org.openrdf.model.Resource;

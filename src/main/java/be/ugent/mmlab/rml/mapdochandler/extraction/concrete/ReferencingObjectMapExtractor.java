@@ -6,7 +6,7 @@ import be.ugent.mmlab.rml.model.RDFTerm.ReferencingObjectMap;
 import be.ugent.mmlab.rml.model.TriplesMap;
 import be.ugent.mmlab.rml.model.std.StdJoinCondition;
 import be.ugent.mmlab.rml.model.std.StdReferencingObjectMap;
-import be.ugent.mmlab.rml.vocabulary.R2RMLVocabulary;
+import be.ugent.mmlab.rml.vocabularies.R2RMLVocabulary;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;

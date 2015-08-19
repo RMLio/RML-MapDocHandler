@@ -14,7 +14,7 @@ package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
 import be.ugent.mmlab.rml.model.TriplesMap;
 import be.ugent.mmlab.rml.vocabularies.QLVocabulary;
 import be.ugent.mmlab.rml.vocabularies.QLVocabulary.QLTerm;
-import be.ugent.mmlab.rml.vocabulary.RMLVocabulary;
+import be.ugent.mmlab.rml.vocabularies.RMLVocabulary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.openrdf.model.Resource;

@@ -1,13 +1,16 @@
-package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
+package be.ugent.mmlab.rml.mapdochandler.extraction.std;
 
+import be.ugent.mmlab.rml.mapdochandler.extraction.concrete.SourceExtractor;
+import be.ugent.mmlab.rml.model.ReferenceFormulation;
 import be.ugent.mmlab.rml.model.TriplesMap;
-import be.ugent.mmlab.rml.vocabulary.R2RMLVocabulary;
-import be.ugent.mmlab.rml.vocabulary.RMLVocabulary;
+import be.ugent.mmlab.rml.vocabularies.R2RMLVocabulary;
+import be.ugent.mmlab.rml.vocabularies.RMLVocabulary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
@@ -79,6 +82,17 @@ public abstract class StdSourceExtractor  implements SourceExtractor {
             log.error("RepositoryException " + ex);
         }
         return uri;
+    }
+    
+    /**
+     *
+     * @param repository
+     * @param value
+     * @return
+     */
+    public ReferenceFormulation extractCustomReferenceFormulation(
+            Repository repository, Value value){
+            return null;
     }
 
 }

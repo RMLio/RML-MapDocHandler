@@ -1,10 +1,11 @@
-package be.ugent.mmlab.rml.mapdochandler.extraction;
+package be.ugent.mmlab.rml.mapdochandler.extraction.std;
 
+import be.ugent.mmlab.rml.mapdochandler.extraction.RMLMappingExtractor;
 import be.ugent.mmlab.rml.mapdochandler.skolemization.skolemizationFactory;
 import be.ugent.mmlab.rml.model.TriplesMap;
 import be.ugent.mmlab.rml.model.std.StdTriplesMap;
-import be.ugent.mmlab.rml.vocabulary.R2RMLVocabulary;
-import be.ugent.mmlab.rml.vocabulary.RMLVocabulary;
+import be.ugent.mmlab.rml.vocabularies.R2RMLVocabulary;
+import be.ugent.mmlab.rml.vocabularies.RMLVocabulary;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;

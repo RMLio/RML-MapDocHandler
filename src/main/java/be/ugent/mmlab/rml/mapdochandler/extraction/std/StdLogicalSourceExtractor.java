@@ -1,11 +1,11 @@
-package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
+package be.ugent.mmlab.rml.mapdochandler.extraction.std;
 
 import be.ugent.mmlab.rml.model.Source;
 import be.ugent.mmlab.rml.model.TriplesMap;
 import be.ugent.mmlab.rml.model.source.std.StdSource;
 import be.ugent.mmlab.rml.model.std.StdTriplesMap;
-import be.ugent.mmlab.rml.vocabulary.R2RMLVocabulary;
-import be.ugent.mmlab.rml.vocabulary.RMLVocabulary;
+import be.ugent.mmlab.rml.vocabularies.R2RMLVocabulary;
+import be.ugent.mmlab.rml.vocabularies.RMLVocabulary;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -21,16 +21,16 @@ import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
 
-//TODO: Check if I still need that
 /**
- * RML - Data Retrieval Handler : StdInputExtractor
+ * RML - Mapping Document Handler : Std Logical Source Extractor
  *
  * @author andimou
  */
 public class StdLogicalSourceExtractor {
 
     // Log
-    private static final Logger log = LoggerFactory.getLogger(StdLogicalSourceExtractor.class);
+    private static final Logger log = 
+            LoggerFactory.getLogger(StdLogicalSourceExtractor.class);
 
     /**
      *

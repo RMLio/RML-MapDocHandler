@@ -1,7 +1,7 @@
 package be.ugent.mmlab.rml.mapdochandler.extraction.source.concrete;
 
 import be.ugent.mmlab.rml.model.Source;
-import be.ugent.mmlab.rml.mapdochandler.extraction.concrete.StdSourceExtractor;
+import be.ugent.mmlab.rml.mapdochandler.extraction.std.StdSourceExtractor;
 import be.ugent.mmlab.rml.model.source.std.StdLocalFileSource;
 import java.util.HashSet;
 import java.util.Set;
@@ -24,7 +24,7 @@ public class LocalFileExtractor extends StdSourceExtractor {
     public Set<Source> extractInput(Repository repository, String source) {
         Set<Source> inputSources = new HashSet<Source>();
         
-        inputSources.add(new StdLocalFileSource(source,source));
+        inputSources.add(new StdLocalFileSource(source, source));
         
         return inputSources;
     }

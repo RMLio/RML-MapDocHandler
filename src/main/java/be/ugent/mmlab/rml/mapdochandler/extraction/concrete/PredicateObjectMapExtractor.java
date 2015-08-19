@@ -7,7 +7,7 @@ import be.ugent.mmlab.rml.model.PredicateObjectMap;
 import be.ugent.mmlab.rml.model.RDFTerm.ReferencingObjectMap;
 import be.ugent.mmlab.rml.model.TriplesMap;
 import be.ugent.mmlab.rml.model.std.StdPredicateObjectMap;
-import be.ugent.mmlab.rml.vocabulary.R2RMLVocabulary;
+import be.ugent.mmlab.rml.vocabularies.R2RMLVocabulary;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
