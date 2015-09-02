@@ -1,5 +1,8 @@
 package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
 
+import be.ugent.mmlab.rml.condition.extractor.BindingConditionExtractor;
+import be.ugent.mmlab.rml.condition.model.BindingCondition;
+import be.ugent.mmlab.rml.condition.model.std.BindingReferencingObjectMap;
 import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
 import be.ugent.mmlab.rml.model.JoinCondition;
 import be.ugent.mmlab.rml.model.RDFTerm.ReferencingObjectMap;
@@ -42,21 +45,18 @@ public class ReferencingObjectMapExtractor {
             TriplesMap triplesMap, Resource triplesMapSubject, Resource predicateObject) {
         Set<ReferencingObjectMap> refObjectMaps = new HashSet<ReferencingObjectMap>();
         try {
-            //if (object_statements.hasNext()) {
-                //Statement object_statement = object_statements.next();
-                log.debug("Trying to extract Referencing Object Map..");
-                ReferencingObjectMap refObjectMap = extractReferencingObjectMap(
-                        repository, (Resource) object_statement.getObject(),
-                        savedGraphMaps, triplesMapResources, triplesMap);
-                if (refObjectMap != null) {
-                    //refObjectMap.setOwnTriplesMap(triplesMapResources.get(triplesMapSubject));
-                    refObjectMaps.add(refObjectMap);
-                }
-            //}
+            log.debug("Extracting Referencing Object Map..");
+            ReferencingObjectMap refObjectMap = extractReferencingObjectMap(
+                    repository, (Resource) object_statement.getObject(),
+                    savedGraphMaps, triplesMapResources, triplesMap);
+            if (refObjectMap != null) {
+                //refObjectMap.setOwnTriplesMap(triplesMapResources.get(triplesMapSubject));
+                refObjectMaps.add(refObjectMap);
+            }
         } catch (ClassCastException e) {
             log.error("A resource was expected in object of objectMap of "
                     + predicateObject.stringValue());
-        } 
+        }
         return refObjectMaps;
     }
     
@@ -70,32 +70,30 @@ public class ReferencingObjectMapExtractor {
      * @return
      */
     protected ReferencingObjectMap extractReferencingObjectMap(
-            Repository repository, Resource object,
-            Set<GraphMap> graphMaps,
-            Map<Resource, TriplesMap> triplesMapResources, TriplesMap triplesMap){
+            Repository repository, Resource object, Set<GraphMap> graphMaps,
+            Map<Resource, TriplesMap> triplesMapResources, TriplesMap triplesMap) {
+        boolean contains = false;
+        TriplesMap parent = null;
+        ReferencingObjectMap refObjectMap;
+
         try {
             URI parentTriplesMap = (URI) TermMapExtractor.extractValueFromTermMap(repository,
                     object, R2RMLVocabulary.R2RMLTerm.PARENT_TRIPLES_MAP, triplesMap);
             log.debug("Parent Triples Maps were found " + parentTriplesMap);
-            
+
             Set<JoinCondition> joinConditions = extractJoinConditions(
                     repository, object, triplesMap);
-            
-            if (parentTriplesMap == null && !joinConditions.isEmpty()) {
-                log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                        + object.stringValue()
-                        + " has no parentTriplesMap map defined"
-                        + " whereas one or more joinConditions exist"
-                        + " : exactly one parentTripleMap is required.");
-            }
-            if (parentTriplesMap == null && joinConditions.isEmpty()) {
-                return null;
-            }
+
+            BindingConditionExtractor bindingConditionsExtractor =
+                    new BindingConditionExtractor();
+            Set<BindingCondition> bindingConditions =
+                    bindingConditionsExtractor.extractBindCondition(
+                    repository, object);
+
             // Extract parent
-            boolean contains = false;
-            TriplesMap parent = null;
             for (Resource triplesMapResource : triplesMapResources.keySet()) {
-                log.debug("Current Triples Map resource " + triplesMapResource.stringValue());
+                log.debug("Current Triples Map resource "
+                        + triplesMapResource.stringValue());
                 if (triplesMapResource.stringValue().equals(
                         parentTriplesMap.stringValue())) {
                     contains = true;
@@ -107,22 +105,39 @@ public class ReferencingObjectMapExtractor {
             }
             if (!contains) {
                 log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                        +  object.stringValue()
+                        + object.stringValue()
                         + " reference to parent triples maps is broken : "
                         + parentTriplesMap.stringValue() + " not found.");
             }
-            // Link between this reerencing object and its triplesMap parent will be
-            // performed
-            // at the end f treatment.
-            ReferencingObjectMap refObjectMap = new StdReferencingObjectMap(null,
-                    parent, joinConditions);
-            log.debug("Referencing Object Map was generated.");
-            log.debug(
-                    Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                    + "Extract referencing object map done.");
+
+            if (parentTriplesMap == null && !joinConditions.isEmpty()
+                    && !bindingConditions.isEmpty()) {
+                log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
+                        + object.stringValue()
+                        + " has no parentTriplesMap map defined"
+                        + " whereas one or more joinConditions exist"
+                        + " : exactly one parentTripleMap is required.");
+            }
+            if (parentTriplesMap == null && joinConditions.isEmpty()) {
+                log.debug("Not a Referencing Object Map.");
+                return null;
+            }
+
+            if (!bindingConditions.isEmpty()) {
+                log.debug("Referencing Object Map "
+                        + "with Binding Condition is being extracted..");
+                refObjectMap = new BindingReferencingObjectMap(null,
+                        parent, joinConditions, bindingConditions);
+            } // Link between this reerencing object and its triplesMap parent will be
+            // performed at the end f treatment.
+            else {
+                refObjectMap = new StdReferencingObjectMap(null,
+                        parent, joinConditions);
+            }
+
             return refObjectMap;
         } catch (Exception ex) {
-            log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": " + ex);
+            log.error("Exception: " + ex);
         }
         return null;
     }
@@ -132,9 +147,7 @@ public class ReferencingObjectMapExtractor {
         RepositoryResult<Statement> statements ;
         Set<JoinCondition> result = new HashSet<JoinCondition>();
         try {
-            log.debug(
-                    Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                    + "Extract join conditions..");
+            log.debug("Extract join conditions..");
             
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
