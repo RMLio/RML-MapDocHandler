@@ -48,7 +48,7 @@ public class ConcreteSourceFactory implements SourceFactory {
                 log.debug("source type " + sourceType);
 
                 switch (sourceType) {
-                    case ("http://www.w3.org/ns/hydra/core#APIDocumentation"):
+                    case ("http://www.w3.org/ns/hydra/core#IriTemplate"):
                         log.debug("Source described with Hydra Core vocabulary.");
                         sourceExtractor = new HydraExtractor();
                         break;

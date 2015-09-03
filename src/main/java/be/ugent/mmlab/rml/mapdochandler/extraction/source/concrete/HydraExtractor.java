@@ -4,6 +4,8 @@ import be.ugent.mmlab.rml.model.Source;
 import be.ugent.mmlab.rml.mapdochandler.extraction.std.StdSourceExtractor;
 import be.ugent.mmlab.rml.model.source.std.StdApiSource;
 import be.ugent.mmlab.rml.vocabularies.HydraVocabulary;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -64,16 +66,17 @@ public class HydraExtractor extends StdSourceExtractor {
         
         List<Map<String, Boolean>> mapTemplates = 
                 extractMappingTemplates(repository, resource);
-        
+        //log.debug("Mapping templates were extracted.");
         Source source = new StdApiSource(
                 resource.stringValue(), value.stringValue(), mapTemplates);
-        
+        //log.debug("Source was extracted.");
         return source;
     }
     
     private List<Map<String,Boolean>> extractMappingTemplates(
             Repository repository, Resource resource){
-        List<Map<String,Boolean>> mapTemplates = null;
+        List<Map<String,Boolean>> mapTemplates = 
+                new ArrayList<Map<String,Boolean>>();
         try {
             RepositoryConnection connection = repository.getConnection();
 
@@ -97,44 +100,49 @@ public class HydraExtractor extends StdSourceExtractor {
         return mapTemplates;
     }
     
-    private Map<String,Boolean> extractMappingTemplate(
-            Repository repository, Statement statement){
-        Map<String, Boolean> mapTemplate = null;
-            String variable = null; 
-            Boolean required ;
-            
+    private Map<String, Boolean> extractMappingTemplate(
+            Repository repository, Statement statement) {
+        Map<String, Boolean> mapTemplate = new HashMap<String, Boolean>();
+        String variable = null;
+        Boolean required;
+
         try {
             RepositoryConnection connection = repository.getConnection();
 
             //Extract the variable
             URI predicate = vf.createURI(
-                    HydraVocabulary.HYDRA_NAMESPACE + HydraVocabulary.HydraTerm.VARIABLE);
+                    HydraVocabulary.HYDRA_NAMESPACE
+                    + HydraVocabulary.HydraTerm.VARIABLE);
             RepositoryResult<Statement> statements =
-                    connection.getStatements(statement.getSubject(), predicate, null, true);
+                    connection.getStatements(
+                    (Resource) statement.getObject(), predicate, null, true);
             if (statements.hasNext()) {
                 Statement variableStatement = statements.next();
                 variable = variableStatement.getObject().stringValue();
             }
-            
+
             //Extract required
             predicate = vf.createURI(
-                    HydraVocabulary.HYDRA_NAMESPACE + HydraVocabulary.HydraTerm.REQUIRED);
+                    HydraVocabulary.HYDRA_NAMESPACE
+                    + HydraVocabulary.HydraTerm.REQUIRED);
             statements =
-                    connection.getStatements(statement.getSubject(), predicate, null, true);
-            if (statements.hasNext()) {
+                    connection.getStatements(
+                    (Resource) statement.getObject(), predicate, null, true);
+
+            if (statements != null & statements.hasNext()) {
                 Statement requiredStatement = statements.next();
                 if (requiredStatement.getObject().stringValue().equals("true")) {
                     required = true;
-                } else 
+                } else {
                     required = false;
-            }
-            else {
+                }
+            } else {
                 required = false;
             }
-            
+
             mapTemplate.put(variable, required);
             connection.close();
-            
+
         } catch (RepositoryException ex) {
             log.error("Repository Exception " + ex);
         }
