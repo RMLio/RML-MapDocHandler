@@ -72,7 +72,6 @@ public class ReferencingObjectMapExtractor {
     protected ReferencingObjectMap extractReferencingObjectMap(
             Repository repository, Resource object, Set<GraphMap> graphMaps,
             Map<Resource, TriplesMap> triplesMapResources, TriplesMap triplesMap) {
-        boolean contains = false;
         TriplesMap parent = null;
         ReferencingObjectMap refObjectMap;
 
@@ -94,31 +93,31 @@ public class ReferencingObjectMapExtractor {
             for (Resource triplesMapResource : triplesMapResources.keySet()) {
                 log.debug("Current Triples Map resource "
                         + triplesMapResource.stringValue());
-                if (triplesMapResource.stringValue().equals(
+                if (parentTriplesMap != null && 
+                        triplesMapResource.stringValue().equals(
                         parentTriplesMap.stringValue())) {
-                    contains = true;
                     parent = triplesMapResources.get(triplesMapResource);
                     log.debug("Parent triples map found : "
                             + triplesMapResource.stringValue());
                     break;
                 }
             }
-            if (!contains) {
+            /*if (!contains) {
                 log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
                         + object.stringValue()
                         + " reference to parent triples maps is broken : "
                         + parentTriplesMap.stringValue() + " not found.");
-            }
+            }*/
 
             if (parentTriplesMap == null && !joinConditions.isEmpty()
                     && !bindingConditions.isEmpty()) {
-                log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                        + object.stringValue()
+                log.error(object.stringValue()
                         + " has no parentTriplesMap map defined"
                         + " whereas one or more joinConditions exist"
                         + " : exactly one parentTripleMap is required.");
             }
-            if (parentTriplesMap == null && joinConditions.isEmpty()) {
+            if (parentTriplesMap == null && joinConditions.isEmpty()
+                    && bindingConditions.isEmpty()) {
                 log.debug("Not a Referencing Object Map.");
                 return null;
             }

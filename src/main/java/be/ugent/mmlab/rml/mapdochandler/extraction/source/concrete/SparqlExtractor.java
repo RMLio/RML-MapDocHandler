@@ -37,7 +37,7 @@ public class SparqlExtractor extends StdSourceExtractor {
             ValueFactory vf = connection.getValueFactory();
 
             URI predicate = vf.createURI(SPARQLSDVocabulary.SPARQLSD_NAMESPACE
-                    + SPARQLSDVocabulary.SparqlSdTerm.SPARQL_QUERY_TEMPLATE);
+                    + SPARQLSDVocabulary.SparqlSdTerm.ENDPOINT);
             RepositoryResult<Statement> statements =
                     connection.getStatements((Resource) value, predicate, null, true);
 

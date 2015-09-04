@@ -63,8 +63,7 @@ public class LogicalSourceExtractor {
      * @return
      */
     public QLTerm getReferenceFormulation(
-            Repository repository, Resource triplesMapSubject,
-            Resource subject, TriplesMap triplesMap) {
+            Repository repository, Resource subject, TriplesMap triplesMap) {
         RepositoryResult<Statement> statements;
         QLTerm term = null;
         try {
@@ -87,8 +86,7 @@ public class LogicalSourceExtractor {
     }
     
     public String getIterator(
-            Repository repository, Resource triplesMapSubject,
-            Resource subject, TriplesMap triplesMap) {
+            Repository repository, Resource subject, TriplesMap triplesMap) {
         String term = null;
         RepositoryResult<Statement> statements;
         try {
@@ -107,5 +105,31 @@ public class LogicalSourceExtractor {
             log.error("RepositoryException " + ex);
         }
         return term;
+    }
+    
+    //TODO: Perhaps merge thoese three funcions
+    public String getQuery(
+            Repository repository, Resource subject, TriplesMap triplesMap){
+        String query = null;
+        
+        RepositoryResult<Statement> statements;
+        try {
+            RepositoryConnection connection = repository.getConnection();
+            ValueFactory vf = connection.getValueFactory();
+            
+            URI queryURI = vf.createURI(
+                    RMLVocabulary.RML_NAMESPACE + RMLVocabulary.RMLTerm.QUERY);
+            statements = 
+                    connection.getStatements(subject, queryURI, null, true);
+            
+            if(statements.hasNext())
+                query = statements.next().getObject().stringValue();
+            connection.close();
+
+        } catch (RepositoryException ex) {
+            log.error("RepositoryException " + ex);
+        }
+        
+        return query;
     }
 }

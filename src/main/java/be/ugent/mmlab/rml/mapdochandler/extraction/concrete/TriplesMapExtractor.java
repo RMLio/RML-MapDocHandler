@@ -106,27 +106,24 @@ public class TriplesMapExtractor {
 
             QLTerm referenceFormulation =
                     logicalSourceExtractor.getReferenceFormulation(
-                    repository, triplesMapSubject, blankLogicalSource, triplesMap);
+                    repository, blankLogicalSource, triplesMap);
             log.debug("Reference Formulation " + referenceFormulation);
 
             String iterator =
                     logicalSourceExtractor.getIterator(
-                    repository, triplesMapSubject, blankLogicalSource, triplesMap);
+                    repository, blankLogicalSource, triplesMap);
             log.debug("Iterator " + iterator);
-
+            
             URI p = vf.createURI(RMLVocabulary.RML_NAMESPACE + RMLVocabulary.RMLTerm.SOURCE);
             sourceStatements = connection.getStatements(blankLogicalSource, p, null, true);
 
             while (sourceStatements.hasNext()) {
-                //Extract the file identifier
-                String source;
                 Set<Source> inputSources;
                 Statement sourceStatement = sourceStatements.next();
 
                 //TODO:Align the following with ConcreteInputFactory
                 if (sourceStatement.getObject().getClass().getSimpleName().equals("MemLiteral")) {
                     log.info("Literal-valued Input Source");
-                    source = sourceStatement.getObject().stringValue();
                     LocalFileExtractor input = new LocalFileExtractor();
                     inputSources = 
                             input.extractSources(
@@ -153,12 +150,16 @@ public class TriplesMapExtractor {
                             repository,sourceStatement.getObject());
                 }
                 
-                
+                String query =
+                    logicalSourceExtractor.getQuery(
+                    repository, blankLogicalSource, triplesMap);
+                log.debug("Query " + query);
 
                 for (Source inputSource : inputSources) {
                     log.info("input source " + inputSource);
                     logicalSource = new StdLogicalSource(
-                            iterator, inputSource, referenceFormulation, dialect);
+                            iterator, inputSource, query, 
+                            referenceFormulation, dialect);
                 }
                 log.debug("Triples Map extracted");
             }
@@ -173,8 +174,8 @@ public class TriplesMapExtractor {
         }
         return logicalSource;
     }
-
     
+
     public Set<PredicateObjectMap> extractPredicateObjectMaps(
             Repository repository, Resource triplesMapSubject,
             Set<GraphMap> graphMaps, TriplesMap result,
