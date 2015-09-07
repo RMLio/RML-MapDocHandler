@@ -41,8 +41,8 @@ public class DcatExtractor extends StdSourceExtractor {
                     DCATVocabulary.DCAT_NAMESPACE + DCATVocabulary.DcatTerm.DOWNLOADURL);
             //TODO: Fix the following: sub and obj same value
             RepositoryResult<Statement> statements =
-                    connection.getStatements((Resource) value, predicate, value, true);
- 
+                    connection.getStatements((Resource) value, predicate, null, true);
+
             while (statements.hasNext()) {
                 Statement statement = statements.next();
                 Source inputSource = extractSource((Resource) value, statement);
