@@ -52,7 +52,7 @@ public class ConcreteSourceFactory implements SourceFactory {
                         log.debug("Source described with Hydra Core vocabulary.");
                         sourceExtractor = new HydraExtractor();
                         break;
-                case ("http://www.w3.org/ns/csvw#Table"):
+                    case ("http://www.w3.org/ns/csvw#Table"):
                         log.debug("Source described with CSVW Metadata vocabulary.");
                         sourceExtractor = new CsvwExtractor();
                         break;

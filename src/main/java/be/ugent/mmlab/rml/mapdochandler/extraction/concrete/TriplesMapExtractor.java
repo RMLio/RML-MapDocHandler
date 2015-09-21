@@ -66,12 +66,13 @@ public class TriplesMapExtractor {
         //SubjectMap subjectMap = extractSubjectMap(rmlMappingGraph, triplesMapSubject, graphMaps, result);
         SubjectMapExtractor sbjMapExtractor = new SubjectMapExtractor();
         SubjectMap subjectMap =
-                sbjMapExtractor.extractSubjectMap(repository, triplesMapSubject, graphMaps, result);
+                sbjMapExtractor.extractSubjectMap(
+                repository, triplesMapSubject, graphMaps, result);
         
         try {
             result.setSubjectMap(subjectMap);
             } catch (Exception ex) {
-                log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": " + ex);
+                log.error("Exception: " + ex);
         }
 
         // Extract PredicateObjectMaps
@@ -84,8 +85,7 @@ public class TriplesMapExtractor {
             result.setPredicateObjectMap(predicateObjectMap);
         }
 
-        log.debug(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                + "Extract of TriplesMap subject : "
+        log.debug("Extract of TriplesMap subject : "
                 + triplesMapSubject.stringValue() + " done.");
     }
     
@@ -137,10 +137,7 @@ public class TriplesMapExtractor {
                             repository, (Resource) sourceStatement.getObject());
                     inputSources = sourceExtractor.
                             extractSources(repository, sourceStatement.getObject());
-                    log.debug(
-                            Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                            + "Source extracted : "
-                            + inputSources);
+                    log.debug("Source extracted : " + inputSources);
                 }
                 
                 if(sourceExtractor != null && 
@@ -164,10 +161,7 @@ public class TriplesMapExtractor {
                 log.debug("Triples Map extracted");
             }
 
-            log.debug(
-                    Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                    + "Logical source extracted : "
-                    + logicalSource);
+            log.debug("Logical source extracted : " + logicalSource);
             connection.close();
         } catch (RepositoryException ex) {
             log.error("RepositoryException " + ex);
@@ -193,8 +187,10 @@ public class TriplesMapExtractor {
             predicateObjectMaps = new HashSet<PredicateObjectMap>();
             try {
                 while (statements.hasNext()) {
-                    PredicateObjectMapExtractor preObjMapExtractor = new PredicateObjectMapExtractor();
-                    PredicateObjectMap predicateObjectMap = preObjMapExtractor.extractPredicateObjectMap(
+                    PredicateObjectMapExtractor preObjMapExtractor = 
+                            new PredicateObjectMapExtractor();
+                    PredicateObjectMap predicateObjectMap = 
+                            preObjMapExtractor.extractPredicateObjectMap(
                             repository, triplesMapSubject,
                             (Resource) statements.next().getObject(),
                             graphMaps, triplesMapResources, result);
@@ -204,12 +200,10 @@ public class TriplesMapExtractor {
                     }
                 }
             } catch (ClassCastException e) {
-                log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                        + "A resource was expected in object of predicateObjectMap of "
+                log.error("A resource was expected in object of predicateObjectMap of "
                         + triplesMapSubject.stringValue());
             }
-            log.debug(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                    + "extractPredicateObjectMaps] Number of extracted predicate-object maps : "
+            log.debug("Number of extracted predicate-object maps : "
                     + predicateObjectMaps.size());
             connection.close();
         } catch (RepositoryException ex) {

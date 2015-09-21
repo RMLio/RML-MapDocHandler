@@ -58,7 +58,8 @@ public class PredicateObjectMapExtractor {
             URI p = vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.PREDICATE_MAP);
             predicate_statements = connection.getStatements(predicateObject, p, null, true);
-            log.debug("Predicate Map statements found: " + predicate_statements);
+            log.debug("More Predicate Map statements: " 
+                    + predicate_statements.hasNext());
 
             while (predicate_statements.hasNext()) {
                 PredicateMapExtractor predMapExtractor = new PredicateMapExtractor();
