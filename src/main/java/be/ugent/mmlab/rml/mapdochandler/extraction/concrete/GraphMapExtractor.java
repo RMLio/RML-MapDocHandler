@@ -62,9 +62,7 @@ public class GraphMapExtractor {
             Repository repository, Resource graphMap, TriplesMap triplesMap) {
         GraphMap result = null;
         try {
-            log.debug(
-                    Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                    + "Extract graph map...");
+            log.debug("Extract graph map...");
 
             RepositoryConnection connection = repository.getConnection();
 
@@ -108,9 +106,7 @@ public class GraphMapExtractor {
         if (graphMapValues != null) {
             graphMaps = extractGraphMapValues(
                     repository, graphMapValues, savedGraphMaps, triplesMap);
-            log.info(
-                    Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                    + "graph Maps returned " + graphMaps);
+            log.debug("Graph Maps returned " + graphMaps);
         }
 
         predicateObjectMap.setGraphMaps(graphMaps);

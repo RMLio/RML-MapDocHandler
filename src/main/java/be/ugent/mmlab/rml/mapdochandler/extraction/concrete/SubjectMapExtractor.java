@@ -88,9 +88,7 @@ public class SubjectMapExtractor {
                 GraphMapExtractor graphMapExtractor = new GraphMapExtractor();
                 graphMaps = graphMapExtractor.extractGraphMapValues(
                         repository, graphMapValues, savedGraphMaps, triplesMap);
-                log.info(
-                        Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                        + "graph Maps returned " + graphMaps);
+                log.debug("Graph Maps returned " + graphMaps);
             }
 
 
@@ -99,11 +97,9 @@ public class SubjectMapExtractor {
                         stringTemplate, termType, inverseExpression,
                         referenceValue, classIRIs, graphMaps);
             } catch (Exception ex) {
-                log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": " + ex);
+                log.error("Exception: " + ex);
             }
-            log.debug(
-                    Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                    + "Subject map extracted.");
+            log.debug("Subject map extracted.");
             connection.close();
         } catch (RepositoryException ex) {
             log.error("RepositoryException " + ex);
