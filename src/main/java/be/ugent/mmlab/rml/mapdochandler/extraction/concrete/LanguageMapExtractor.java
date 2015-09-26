@@ -28,8 +28,9 @@ public class LanguageMapExtractor {
     
     public static LanguageMap extractLanguageMap(
             Repository repository, Resource object, TriplesMap triplesMap){
-        String languageTag = TermMapExtractor.extractLiteralFromTermMap(repository,
-                    object, R2RMLVocabulary.R2RMLTerm.LANGUAGE, triplesMap);
+        String languageTag = 
+                TermMapExtractor.extractLiteralFromTermMap(repository,
+                object, R2RMLVocabulary.R2RMLTerm.LANGUAGE, triplesMap);
         LanguageMap languageMap = null;
         
         if (languageTag == null) {
@@ -38,11 +39,13 @@ public class LanguageMapExtractor {
                     object, RMLVocabulary.RMLTerm.LANGUAGE_MAP, triplesMap);
             if (languageValue != null) {
 
-                Value constantValue = TermMapExtractor.extractValueFromTermMap(
+                Value constantValue = 
+                        TermMapExtractor.extractValueFromTermMap(
                         repository, (Resource) languageValue,
                         R2RMLVocabulary.R2RMLTerm.CONSTANT, triplesMap);
                 
-                String stringTemplate = TermMapExtractor.extractLiteralFromTermMap(
+                String stringTemplate = 
+                        TermMapExtractor.extractLiteralFromTermMap(
                         repository, (Resource) languageValue,
                         R2RMLVocabulary.R2RMLTerm.TEMPLATE, triplesMap);
                 
