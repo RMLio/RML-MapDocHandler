@@ -123,7 +123,7 @@ public class TriplesMapExtractor {
 
                 //TODO:Align the following with ConcreteInputFactory
                 if (sourceStatement.getObject().getClass().getSimpleName().equals("MemLiteral")) {
-                    log.debug("Literal-valued Input Source");
+                    log.info("Literal-valued Input Source");
                     LocalFileExtractor input = new LocalFileExtractor();
                     inputSources = 
                             input.extractSources(
@@ -131,7 +131,7 @@ public class TriplesMapExtractor {
                     
                 } //object input
                 else {
-                    log.debug("Resource-valued Input Source");
+                    log.info("Resource-valued Input Source");
                     ConcreteSourceFactory inputFactory = new ConcreteSourceFactory();
                     sourceExtractor = inputFactory.createSourceExtractor(
                             repository, (Resource) sourceStatement.getObject());
@@ -153,6 +153,7 @@ public class TriplesMapExtractor {
                 log.debug("Query " + query);
 
                 for (Source inputSource : inputSources) {
+                    log.info("input source " + inputSource);
                     logicalSource = new StdLogicalSource(
                             iterator, inputSource, query, 
                             referenceFormulation, dialect);

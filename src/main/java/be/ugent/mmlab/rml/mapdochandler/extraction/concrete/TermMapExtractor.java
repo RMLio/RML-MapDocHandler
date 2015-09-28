@@ -61,7 +61,7 @@ public class TermMapExtractor {
             }
             connection.close();
         } catch (RepositoryException ex) {
-            log.error("Repository Exception " + ex);
+            log.error("RepositoryException " + ex);
         }
         return value;
     }
@@ -77,19 +77,21 @@ public class TermMapExtractor {
             
             while (statements.hasNext()) {
                 Value value = statements.next().getObject();
-                log.debug("Extracted "
+                log.debug(
+                        Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
+                        + "Extracted "
                         + term + " : " + value.stringValue());
                 values.add(value);
             }
             connection.close();
         } catch (RepositoryException ex) {
-            log.error("Repository Exception " + ex);
+            log.error("RepositoryException " + ex);
         }
         return values;
     }
     
-    static protected String extractLiteralFromTermMap(Repository repository, 
-            Resource termType, Enum term, TriplesMap triplesMap) {
+    static protected String extractLiteralFromTermMap(
+            Repository repository, Resource termType, Enum term, TriplesMap triplesMap) {
         RepositoryResult<Statement> statements;
         String result = null;
         try {
@@ -100,13 +102,15 @@ public class TermMapExtractor {
             if (statements.hasNext()) {
                 result = statements.next().getObject().stringValue();
                 if (log.isDebugEnabled()) {
-                    log.debug("Extracted "
+                    log.debug(
+                            Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
+                            + "Extracted "
                             + term + " : " + result);
                 }
             }
             connection.close();
         } catch (RepositoryException ex) {
-            log.error("Repository Exception " + ex);
+            log.error("RepositoryException " + ex);
         }
         return result;
     }
@@ -124,12 +128,13 @@ public class TermMapExtractor {
             
             while (statements.hasNext()) {
                 URI uri = (URI) statements.next().getObject();
-                log.debug(term + " : " + uri.stringValue());
+                log.debug(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
+                        + term + " : " + uri.stringValue());
                 uris.add(uri);
             }
             connection.close();
         } catch (RepositoryException ex) {
-            log.error("Repository Exception " + ex);
+            log.error("RepositoryException " + ex);
         }
         return uris;
     } 
@@ -141,7 +146,7 @@ public class TermMapExtractor {
      * @param triplesMap
      * @return
      */
-    protected static ReferenceMap extractReferenceIdentifier(
+    protected ReferenceMap extractReferenceIdentifier(
             Repository repository, Resource resource, TriplesMap triplesMap) {
 
         String columnValueStr = extractLiteralFromTermMap(
@@ -150,7 +155,8 @@ public class TermMapExtractor {
                 repository, resource, RMLVocabulary.RMLTerm.REFERENCE, triplesMap);
 
         if (columnValueStr != null && referenceValueStr != null) {
-            log.error(resource
+            log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
+                    + resource
                     + " has a reference and column defined.");
         }
         
@@ -158,8 +164,10 @@ public class TermMapExtractor {
             ReferenceMap refMap = new StdReferenceMap(columnValueStr);
             return refMap.getReferenceValue(columnValueStr);
         }
+        log.debug("referenceValueStr " + referenceValueStr);
         ReferenceMap refMap = new StdReferenceMap(referenceValueStr);
-
+        log.debug("refMap.getReferenceValue(referenceValueStr) " 
+                + refMap.getReferenceValue(referenceValueStr));
         return refMap.getReferenceValue(referenceValueStr);
 
     }
