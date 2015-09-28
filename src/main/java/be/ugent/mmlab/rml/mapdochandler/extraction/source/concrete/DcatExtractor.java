@@ -19,9 +19,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * RML - Data Retrieval Handler : DCAT Extractor
+ * *************************************************************************
+ *
+ * RML - Mapping Document Handler : DcatExtractor
+ *
  *
  * @author andimou
+ *
+ ***************************************************************************
  */
 public class DcatExtractor extends StdSourceExtractor {
     

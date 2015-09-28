@@ -21,10 +21,16 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
 
 /**
- * RML - Data Retrieval Handler : ConcreteInputFactory
+ * *************************************************************************
+ *
+ * RML - Mapping Document Handler : ConcreteSourceFactory
+ *
  *
  * @author andimou
+ *
+ ***************************************************************************
  */
+
 public class ConcreteSourceFactory implements SourceFactory {
     
     // Log

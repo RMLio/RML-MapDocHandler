@@ -22,9 +22,14 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
 
 /**
- * RML - Mapping Document Handler : Std Logical Source Extractor
+ * *************************************************************************
+ *
+ * RML - Mapping Document Handler : StdLogicalSourceExtractor
+ *
  *
  * @author andimou
+ *
+ ***************************************************************************
  */
 public class StdLogicalSourceExtractor {
 

@@ -20,9 +20,14 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
 
 /**
- * RML - Data Retrieval Handler : SparqlExtractor
+ * *************************************************************************
+ *
+ * RML - Mapping Document Handler : SparqlExtractor
+ *
  *
  * @author andimou
+ *
+ ***************************************************************************
  */
 public class SparqlExtractor extends StdSourceExtractor {
 

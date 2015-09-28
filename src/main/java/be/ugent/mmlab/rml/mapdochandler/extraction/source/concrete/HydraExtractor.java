@@ -24,9 +24,14 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
 
 /**
- * RML - Data Retrieval Handler : ApiExtractor
+ * *************************************************************************
+ *
+ * RML - Mapping Document Handler : HydraExtractor
+ *
  *
  * @author andimou
+ *
+ ***************************************************************************
  */
 public class HydraExtractor extends StdSourceExtractor {
     

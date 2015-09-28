@@ -7,9 +7,14 @@ import org.openrdf.model.Value;
 import org.openrdf.repository.Repository;
 
 /**
- * RML - Data Retrieval Handler : InputExtractor
+ * *************************************************************************
+ *
+ * RML - Mapping Document Handler : Source Extractor
+ *
  *
  * @author andimou
+ *
+ ***************************************************************************
  */
 public interface SourceExtractor {
 

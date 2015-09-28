@@ -20,14 +20,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * RML - Data Retrieval Handler : DbExtractor
+ * *************************************************************************
+ *
+ * RML - Mapping Document Handler : JdbcExtractor
+ *
  *
  * @author andimou
+ *
+ ***************************************************************************
  */
 public class JdbcExtractor extends StdSourceExtractor {
 
     // Log
-    private static final Logger log = LoggerFactory.getLogger(JdbcExtractor.class);
+    private static final Logger log = 
+            LoggerFactory.getLogger(JdbcExtractor.class);
        
     //TODO: The following does not actually iterate - change
     @Override

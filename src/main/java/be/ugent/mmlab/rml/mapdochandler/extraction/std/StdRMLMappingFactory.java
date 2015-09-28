@@ -15,9 +15,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * RML Mapping Document Handler : StdRMLMappingFactory
+ * *************************************************************************
+ *
+ * RML - Mapping Document Handler : StdRMLMappingFactory
+ *
  *
  * @author andimou
+ *
+ ***************************************************************************
  */
 public class StdRMLMappingFactory {
     

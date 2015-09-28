@@ -21,9 +21,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * RML - Data Retrieval Handler : CSVW Extractor
+ * *************************************************************************
+ *
+ * RML - Mapping Document Handler : CsvwExtractor
+ *
  *
  * @author andimou
+ *
+ ***************************************************************************
  */
 public class CsvwExtractor extends StdSourceExtractor {
     

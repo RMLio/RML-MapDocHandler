@@ -19,9 +19,14 @@ import org.openrdf.repository.RepositoryResult;
 
 
 /**
- * RML - Data Retrieval Handler : StdInputExtractor
+ * *************************************************************************
+ *
+ * RML - Mapping Document Handler : StdSourceExtractor
+ *
  *
  * @author andimou
+ *
+ ***************************************************************************
  */
 public abstract class StdSourceExtractor  implements SourceExtractor {
 

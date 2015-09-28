@@ -1,7 +1,7 @@
 /**
  * *************************************************************************
  *
- * RML : RML Mapping Factory
+ * RML - Mapping Document Handler : RML Mapping Factory
  *
  * Factory responsible of RML Mapping generation.
  *

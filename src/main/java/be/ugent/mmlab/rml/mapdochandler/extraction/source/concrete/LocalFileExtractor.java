@@ -11,9 +11,14 @@ import org.openrdf.model.Value;
 import org.openrdf.repository.Repository;
 
 /**
- * RML - Data Retrieval Handler : LocalFileExtractor
+ * *************************************************************************
+ *
+ * RML - Mapping Document Handler : LocalFileExtractor
+ *
  *
  * @author andimou
+ *
+ ***************************************************************************
  */
 public class LocalFileExtractor extends StdSourceExtractor {
     

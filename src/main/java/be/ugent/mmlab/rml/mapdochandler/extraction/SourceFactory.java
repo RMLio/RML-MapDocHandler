@@ -1,7 +1,7 @@
 package be.ugent.mmlab.rml.mapdochandler.extraction;
 
 /**
- * RML - Data Retrieval Handler : SourceFactory
+ * RML - Mapping Document Handler : SourceFactory
  *
  * @author andimou
  */

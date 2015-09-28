@@ -3,7 +3,7 @@ package be.ugent.mmlab.rml.mapdochandler.generation;
 /**
  * *************************************************************************
  *
- * RML - Mapping Document Handler : ObjectMapExtractor
+ * RML - Mapping Document Handler : ObjectMapGenerator
  *
  *
  * @author andimou

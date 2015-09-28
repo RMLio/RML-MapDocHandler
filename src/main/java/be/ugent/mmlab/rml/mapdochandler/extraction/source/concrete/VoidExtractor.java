@@ -20,9 +20,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * RML - Data Retrieval Handler : VoID Extractor
+ * *************************************************************************
+ *
+ * RML - Mapping Document Handler : VoidExtractor
+ *
  *
  * @author andimou
+ *
+ ***************************************************************************
  */
 public class VoidExtractor extends StdSourceExtractor {
     
