@@ -36,10 +36,20 @@ import org.slf4j.LoggerFactory;
 public class StdRMLMappingExtractor implements RMLMappingExtractor{
     
     // Log
-    private static final Logger log = LoggerFactory.getLogger(StdRMLMappingExtractor.class);
+    private static final Logger log = 
+            LoggerFactory.getLogger(StdRMLMappingExtractor.class);
     // Value factory
     private static ValueFactory vf = new ValueFactoryImpl();
+    private boolean skolemization = false;
     
+    public StdRMLMappingExtractor(){
+
+    }
+    
+    public StdRMLMappingExtractor(boolean skolemization){
+        this.skolemization = skolemization;
+    }
+   
     /**
      * Construct TriplesMap objects rule. A triples map is represented by a
      * resource that references the following other resources : - It must have
@@ -117,7 +127,6 @@ public class StdRMLMappingExtractor implements RMLMappingExtractor{
         Map<URI, URI> shortcutPredicates = new HashMap<URI, URI>();
 
         try {
-            mapDocRepo.initialize();
             RepositoryConnection mapDocRepoCon = mapDocRepo.getConnection();
 
             shortcutPredicates.put(
@@ -209,27 +218,33 @@ public class StdRMLMappingExtractor implements RMLMappingExtractor{
                 while (statements.hasNext()) {
                     Statement st = statements.next();
                     
+                    //Skolemize subject
                     Resource blankSubjectMap = st.getSubject();
-                    Resource skolemizedSubjectMap = skolemizationFactory.skolemizeBlankNode(blankSubjectMap);
+                    Resource skolemizedSubjectMap = 
+                            skolemizationFactory.skolemizeBlankNode(blankSubjectMap);
+                    
                     if (st.getSubject().toString().startsWith("_:")) {
                         skolemizationFactory.skolemSubstitution(
                                 st.getSubject(), skolemizedSubjectMap, mapDocRepo);
                     }
                     
+                    //skolemize object
                     Value blankObjectMap = st.getObject();
-                    Resource skolemizedObjectMap = skolemizationFactory.skolemizeBlankNode(blankObjectMap);
+                    Resource skolemizedObjectMap = 
+                            skolemizationFactory.skolemizeBlankNode(blankObjectMap);
+                    
                     if (st.getObject().toString().startsWith("_:") && 
                             (  st.getObject().getClass() == Resource.class
                             || st.getObject().getClass() == Value.class
-                            || st.getObject().getClass() == org.openrdf.sail.memory.model.MemBNode.class) ) {
+                            || st.getObject().getClass() == 
+                            org.openrdf.sail.memory.model.MemBNode.class) ) {
                         skolemizationFactory.skolemSubstitution(
                                 st.getObject(), skolemizedObjectMap, mapDocRepo);
                     }
                 }
-                mapDocRepoCon.commit();
-                mapDocRepoCon.close();
             }
-            
+            mapDocRepoCon.commit();
+            mapDocRepoCon.close();
         } catch (RepositoryException ex) {
             log.error("RepositoryException " + ex);
         }

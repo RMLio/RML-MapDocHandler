@@ -46,7 +46,7 @@ public class HydraExtractor extends StdSourceExtractor {
         Set<Source> sources = new HashSet<Source>();
         try {
             RepositoryConnection connection = repository.getConnection();
-
+            
             URI predicate = vf.createURI(
                     HydraVocabulary.HYDRA_NAMESPACE + HydraVocabulary.HydraTerm.TEMPLATE);
             RepositoryResult<Statement> statements =

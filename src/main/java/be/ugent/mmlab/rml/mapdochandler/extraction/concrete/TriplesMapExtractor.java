@@ -45,8 +45,7 @@ public class TriplesMapExtractor {
     public void extractTriplesMap(
             Repository repository, Resource triplesMapSubject,
             Map<Resource, TriplesMap> triplesMapResources) {
-        log.debug(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                + "Extract TriplesMap subject : "
+        log.debug("Extract TriplesMap subject : "
                 + triplesMapSubject.stringValue());
         TriplesMap result = triplesMapResources.get(triplesMapSubject);
 
@@ -99,10 +98,12 @@ public class TriplesMapExtractor {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
 
-            LogicalSourceExtractor logicalSourceExtractor = new LogicalSourceExtractor();
+            LogicalSourceExtractor logicalSourceExtractor = 
+                    new LogicalSourceExtractor();
             Resource blankLogicalSource =
                     logicalSourceExtractor.
-                    extractLogicalSource(repository, triplesMapSubject, triplesMap);
+                    extractLogicalSource(
+                    repository, triplesMapSubject, triplesMap);
 
             QLTerm referenceFormulation =
                     logicalSourceExtractor.getReferenceFormulation(
@@ -114,8 +115,12 @@ public class TriplesMapExtractor {
                     repository, blankLogicalSource, triplesMap);
             log.debug("Iterator " + iterator);
             
-            URI p = vf.createURI(RMLVocabulary.RML_NAMESPACE + RMLVocabulary.RMLTerm.SOURCE);
-            sourceStatements = connection.getStatements(blankLogicalSource, p, null, true);
+            URI p = vf.createURI(
+                    RMLVocabulary.RML_NAMESPACE 
+                    + RMLVocabulary.RMLTerm.SOURCE);
+            sourceStatements = 
+                    connection.getStatements(
+                    blankLogicalSource, p, null, true);
 
             while (sourceStatements.hasNext()) {
                 Set<Source> inputSources;
