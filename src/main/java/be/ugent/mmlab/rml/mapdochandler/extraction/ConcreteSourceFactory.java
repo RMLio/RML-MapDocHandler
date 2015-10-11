@@ -49,9 +49,11 @@ public class ConcreteSourceFactory implements SourceFactory {
                 log.debug("Resource-valued Input Source");
                 
                 RepositoryResult<Statement> inputStatements =
-                        connection.getStatements((Resource) value, RDF.TYPE, null, true);
-                
-                String sourceType = inputStatements.next().getObject().stringValue().toString();
+                        connection.getStatements(
+                        (Resource) value, RDF.TYPE, null, true);
+
+                String sourceType = 
+                        inputStatements.next().getObject().stringValue().toString();
                 log.debug("source type " + sourceType);
 
                 switch (sourceType) {

@@ -76,8 +76,8 @@ public class ReferencingObjectMapExtractor {
         ReferencingObjectMap refObjectMap;
 
         try {
-            URI parentTriplesMap = (URI) TermMapExtractor.extractValueFromTermMap(repository,
-                    object, R2RMLVocabulary.R2RMLTerm.PARENT_TRIPLES_MAP, triplesMap);
+            URI parentTriplesMap = (URI) TermMapExtractor.extractValueFromTermMap(
+                    repository, object, R2RMLVocabulary.R2RMLTerm.PARENT_TRIPLES_MAP, triplesMap);
             log.debug("Parent Triples Maps were found " + parentTriplesMap);
 
             Set<JoinCondition> joinConditions = extractJoinConditions(
@@ -164,24 +164,20 @@ public class ReferencingObjectMapExtractor {
                     String parent = TermMapExtractor.extractLiteralFromTermMap(repository,
                             jc, R2RMLVocabulary.R2RMLTerm.PARENT, triplesMap);
                     if (parent == null || child == null) {
-                        log.error(
-                                Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                                + object.stringValue()
+                        log.error(object.stringValue()
                                 + " must have exactly two properties child and parent. ");
                     }
                     try {
                         result.add(new StdJoinCondition(child, parent));
                     } catch (Exception ex) {
-                        log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": " + ex);
+                        log.error("Exception: " + ex);
                     }
                 }
             } catch (ClassCastException e) {
-                log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                        + "A resource was expected in object of predicateMap of "
+                log.error("A resource was expected in object of predicateMap of "
                         + object.stringValue());
             }
-            log.debug(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                    + " Extract join conditions done.");
+            log.debug("Extract join conditions done.");
             connection.close();
         } catch (RepositoryException ex) {
             log.error("RepositoryException " + ex);
