@@ -5,6 +5,7 @@ import be.ugent.mmlab.rml.mapdochandler.extraction.concrete.SourceExtractor;
 import be.ugent.mmlab.rml.mapdochandler.extraction.source.concrete.CsvwExtractor;
 import be.ugent.mmlab.rml.mapdochandler.extraction.source.concrete.DcatExtractor;
 import be.ugent.mmlab.rml.mapdochandler.extraction.source.concrete.HydraExtractor;
+import be.ugent.mmlab.rml.mapdochandler.extraction.source.concrete.HydraPagedCollectionExtractor;
 //import be.ugent.mmlab.rml.mapdochandler.extraction.source.concrete.HydraPagedCollectionExtractor;
 import be.ugent.mmlab.rml.mapdochandler.extraction.source.concrete.JdbcExtractor;
 import be.ugent.mmlab.rml.mapdochandler.extraction.source.concrete.LocalFileExtractor;
@@ -61,10 +62,10 @@ public class ConcreteSourceFactory implements SourceFactory {
                         log.debug("Source described with Hydra Core vocabulary.");
                         sourceExtractor = new HydraExtractor();
                         break;
-                    /*case ("http://www.w3.org/ns/hydra/core#PagedCollection"):
+                    case ("http://www.w3.org/ns/hydra/core#PagedCollection"):
                         log.debug("Source described with Hydra Paged Collection vocabulary.");
                         sourceExtractor = new HydraPagedCollectionExtractor();
-                        break;*/
+                        break;
                     case ("http://www.w3.org/ns/csvw#Table"):
                         log.debug("Source described with CSVW Metadata vocabulary.");
                         sourceExtractor = new CsvwExtractor();

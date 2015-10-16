@@ -29,7 +29,8 @@ import org.openrdf.repository.RepositoryResult;
 public class LogicalSourceExtractor {
     
     // Log
-    static final Logger log = LoggerFactory.getLogger(LogicalSourceExtractor.class);
+    static final Logger log = 
+            LoggerFactory.getLogger(LogicalSourceExtractor.class);
 
     public Resource extractLogicalSource(
             Repository repository, Resource triplesMapSubject, TriplesMap triplesMap) {
