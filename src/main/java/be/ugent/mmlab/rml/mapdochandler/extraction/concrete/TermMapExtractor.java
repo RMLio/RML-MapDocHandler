@@ -77,9 +77,7 @@ public class TermMapExtractor {
             
             while (statements.hasNext()) {
                 Value value = statements.next().getObject();
-                log.debug(
-                        Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                        + "Extracted "
+                log.debug("Extracted "
                         + term + " : " + value.stringValue());
                 values.add(value);
             }

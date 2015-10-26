@@ -33,9 +33,7 @@ public class ObjectMapExtractor {
     public ObjectMap extractObjectMap(Repository repository,
             Resource object, Set<GraphMap> graphMaps, TriplesMap triplesMap){
         try {
-            log.debug(
-                    Thread.currentThread().getStackTrace()[1].getMethodName() + ": " 
-                    + "Extract object map..");
+            log.debug("Extract object map..");
             // Extract object maps properties
             Value constantValue = TermMapExtractor.extractValueFromTermMap(repository,
                     object, R2RMLVocabulary.R2RMLTerm.CONSTANT, triplesMap);
@@ -64,7 +62,7 @@ public class ObjectMapExtractor {
 
             return result;
         } catch (Exception ex) {
-            log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": " + ex);
+            log.error("Exception: " + ex);
         } 
         return null;
     }

@@ -40,9 +40,7 @@ public class SubjectMapExtractor {
         SubjectMap result = null;
         RepositoryResult<Statement> statements;
         try {
-            log.debug(
-                    Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                    + "Extract subject map...");
+            log.debug("Extract subject map...");
             RepositoryConnection connection = repository.getConnection();
             // Extract subject map
             statements = connection.getStatements(triplesMapSubject, RMLTermExtractor.getTermURI(
@@ -51,9 +49,7 @@ public class SubjectMapExtractor {
             Resource subjectMap = (Resource) statements.next().getObject();
 
 
-            log.debug(
-                    Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                    + "Found subject map : "
+            log.debug("Found subject map : "
                     + subjectMap.stringValue());
 
             Value constantValue = TermMapExtractor.extractValueFromTermMap(repository,
@@ -88,22 +84,17 @@ public class SubjectMapExtractor {
                 GraphMapExtractor graphMapExtractor = new GraphMapExtractor();
                 graphMaps = graphMapExtractor.extractGraphMapValues(
                         repository, graphMapValues, savedGraphMaps, triplesMap);
-                log.info(
-                        Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                        + "graph Maps returned " + graphMaps);
+                log.debug("Graph Maps returned " + graphMaps);
             }
-
 
             try {
                 result = new StdSubjectMap(triplesMap, constantValue,
                         stringTemplate, termType, inverseExpression,
                         referenceValue, classIRIs, graphMaps);
             } catch (Exception ex) {
-                log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": " + ex);
+                log.error("Exception: " + ex);
             }
-            log.debug(
-                    Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                    + "Subject map extracted.");
+            log.debug("Subject map extracted.");
             connection.close();
         } catch (RepositoryException ex) {
             log.error("RepositoryException " + ex);

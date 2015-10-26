@@ -104,9 +104,7 @@ public class PredicateObjectMapExtractor {
                     graphMapExtractor.processGraphMaps(
                             repository, predicateObject, triplesMap, predicateObjectMap, savedGraphMaps);
 
-                    log.debug(
-                            Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                            + "Extract predicate-object map done.");
+                    log.debug("Extract predicate-object map done.");
 
                 }
             }

@@ -37,8 +37,7 @@ public class RMLTermExtractor {
             if (term instanceof RMLVocabulary.RMLTerm) {
                 namespace = RMLVocabulary.RML_NAMESPACE;
             } else if (!(term instanceof R2RMLVocabulary.R2RMLTerm)) {
-                log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                        + term + " is not valid.");
+                log.error(term + " is not valid.");
             }
             uri = vf.createURI(namespace + term);
 

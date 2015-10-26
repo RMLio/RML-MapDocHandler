@@ -158,7 +158,6 @@ public class TriplesMapExtractor {
                 log.debug("Query " + query);
 
                 for (Source inputSource : inputSources) {
-                    log.info("input source " + inputSource);
                     logicalSource = new StdLogicalSource(
                             iterator, inputSource, query, 
                             referenceFormulation, dialect);
