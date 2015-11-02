@@ -51,7 +51,7 @@ public class PredicateMapExtractor {
             ReferenceMap referenceValue = 
                     termMapExtractor.extractReferenceIdentifier(repository, object, triplesMap);
 
-            PredicateMap result = new StdPredicateMap(null, constantValue,
+            PredicateMap result = new StdPredicateMap(triplesMap, null, constantValue,
                     stringTemplate, inverseExpression, referenceValue, termType);
             log.debug("Extracting predicate map done.");
             return result;

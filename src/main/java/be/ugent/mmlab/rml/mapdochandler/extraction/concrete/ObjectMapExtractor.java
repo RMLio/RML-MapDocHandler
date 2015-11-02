@@ -55,9 +55,9 @@ public class ObjectMapExtractor {
             //TODO:add the following validator
             //validator.checkTermMap(constantValue, stringTemplate, referenceValue, o.stringValue());
 
-            StdObjectMap result = new StdObjectMap(null, constantValue, dataType,
-                    languageTag, stringTemplate, termType, inverseExpression,
-                    referenceValue);// split, process, replace,
+            StdObjectMap result = new StdObjectMap(triplesMap, null, 
+                    constantValue, dataType, languageTag, stringTemplate, 
+                    termType, inverseExpression, referenceValue);// split, process, replace,
                     //equalCondition, processCondition, splitCondition, bindCondition);
 
             return result;
