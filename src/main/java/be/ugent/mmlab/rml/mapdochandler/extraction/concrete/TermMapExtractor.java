@@ -153,8 +153,7 @@ public class TermMapExtractor {
                 repository, resource, RMLVocabulary.RMLTerm.REFERENCE, triplesMap);
 
         if (columnValueStr != null && referenceValueStr != null) {
-            log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                    + resource
+            log.error(resource
                     + " has a reference and column defined.");
         }
         

@@ -78,6 +78,8 @@ public class RMLDocRetrieval {
             }
             log.debug("Number of RML triples in the repository "
                     + fileToRMLFile + " : " + con.size() + " from local file");
+            if(con.size() == 0)
+                return null;
             con.close();
         } catch (RepositoryException ex) {
             log.error("RepositoryException " + ex);

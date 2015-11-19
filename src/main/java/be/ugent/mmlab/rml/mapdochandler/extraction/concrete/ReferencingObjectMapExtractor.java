@@ -37,7 +37,8 @@ import org.openrdf.repository.RepositoryResult;
 public class ReferencingObjectMapExtractor {
     
     // Log
-    static final Logger log = LoggerFactory.getLogger(ReferencingObjectMapExtractor.class);
+    static final Logger log = 
+            LoggerFactory.getLogger(ReferencingObjectMapExtractor.class);
     
     public Set<ReferencingObjectMap> processReferencingObjectMap(
             Repository repository, Statement object_statement, 
