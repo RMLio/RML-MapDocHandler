@@ -77,7 +77,7 @@ public class ReferencingObjectMapExtractor {
         ReferencingObjectMap refObjectMap;
 
         try {
-            URI parentTriplesMap = (URI) TermMapExtractor.extractValueFromTermMap(
+            URI parentTriplesMap = (URI) TermExtractor.extractValueFromTermMap(
                     repository, object, R2RMLVocabulary.R2RMLTerm.PARENT_TRIPLES_MAP, triplesMap);
             log.debug("Parent Triples Maps were found " + parentTriplesMap);
 
@@ -103,13 +103,8 @@ public class ReferencingObjectMapExtractor {
                     break;
                 }
             }
-            /*if (!contains) {
-                log.error(Thread.currentThread().getStackTrace()[1].getMethodName() + ": "
-                        + object.stringValue()
-                        + " reference to parent triples maps is broken : "
-                        + parentTriplesMap.stringValue() + " not found.");
-            }*/
 
+            //TODO: Move error checking elsewhere
             if (parentTriplesMap == null && !joinConditions.isEmpty()
                     && !bindingConditions.isEmpty()) {
                 log.error(object.stringValue()
@@ -160,9 +155,9 @@ public class ReferencingObjectMapExtractor {
             try {
                 while(statements.hasNext()) {
                     Resource jc = (Resource) statements.next().getObject();
-                    String child = TermMapExtractor.extractLiteralFromTermMap(repository, jc,
+                    String child = TermExtractor.extractLiteralFromTermMap(repository, jc,
                             R2RMLVocabulary.R2RMLTerm.CHILD, triplesMap);
-                    String parent = TermMapExtractor.extractLiteralFromTermMap(repository,
+                    String parent = TermExtractor.extractLiteralFromTermMap(repository,
                             jc, R2RMLVocabulary.R2RMLTerm.PARENT, triplesMap);
                     if (parent == null || child == null) {
                         log.error(object.stringValue()

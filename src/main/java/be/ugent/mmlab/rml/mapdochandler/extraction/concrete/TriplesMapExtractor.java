@@ -55,14 +55,13 @@ public class TriplesMapExtractor {
         LogicalSource logicalSource =
                 extractLogicalSources(repository, triplesMapSubject, result);
         
-        //String input = extractInput(rmlMappingGraph,triplesMapSubject);
-        
         result.setLogicalSource(logicalSource);
         // Create a graph maps storage to save all met graph uri during parsing.
         Set<GraphMap> graphMaps = new HashSet<GraphMap>();
 
         // Extract exactly one SubjectMap
-        //SubjectMap subjectMap = extractSubjectMap(rmlMappingGraph, triplesMapSubject, graphMaps, result);
+        //SubjectMap subjectMap = extractSubjectMap(
+        //rmlMappingGraph, triplesMapSubject, graphMaps, result);
         SubjectMapExtractor sbjMapExtractor = new SubjectMapExtractor();
         SubjectMap subjectMap =
                 sbjMapExtractor.extractSubjectMap(

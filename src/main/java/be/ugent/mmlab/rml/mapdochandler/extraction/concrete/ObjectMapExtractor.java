@@ -3,15 +3,14 @@ package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
 import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
 import be.ugent.mmlab.rml.model.RDFTerm.ObjectMap;
 import be.ugent.mmlab.rml.model.TriplesMap;
+import be.ugent.mmlab.rml.model.std.StdConditionObjectMap;
 import be.ugent.mmlab.rml.model.std.StdObjectMap;
-import be.ugent.mmlab.rml.model.termMap.ReferenceMap;
 import be.ugent.mmlab.rml.vocabularies.R2RMLVocabulary;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
-import org.openrdf.model.Value;
 import org.openrdf.repository.Repository;
 
 /**
@@ -25,40 +24,37 @@ import org.openrdf.repository.Repository;
  ***************************************************************************
  */
 
-public class ObjectMapExtractor {
+public class ObjectMapExtractor extends StdTermMapExtractor {
     
     // Log
     static final Logger log = LoggerFactory.getLogger(ObjectMapExtractor.class);
     
     public ObjectMap extractObjectMap(Repository repository,
             Resource object, Set<GraphMap> graphMaps, TriplesMap triplesMap){
+        ObjectMap result ;
+        log.debug("Extracting Object Map..");
+        
         try {
-            log.debug("Extract object map..");
-            // Extract object maps properties
-            Value constantValue = TermMapExtractor.extractValueFromTermMap(repository,
-                    object, R2RMLVocabulary.R2RMLTerm.CONSTANT, triplesMap);
-            String stringTemplate = TermMapExtractor.extractLiteralFromTermMap(repository,
-                    object, R2RMLVocabulary.R2RMLTerm.TEMPLATE, triplesMap);
-            String languageTag = TermMapExtractor.extractLiteralFromTermMap(repository,
-                    object, R2RMLVocabulary.R2RMLTerm.LANGUAGE, triplesMap);
-            URI termType = (URI) TermMapExtractor.extractValueFromTermMap(repository, object,
-                    R2RMLVocabulary.R2RMLTerm.TERM_TYPE, triplesMap);
-            URI dataType = (URI) TermMapExtractor.extractValueFromTermMap(repository, object,
-                    R2RMLVocabulary.R2RMLTerm.DATATYPE, triplesMap);
-            String inverseExpression = TermMapExtractor.extractLiteralFromTermMap(repository,
-                    object, R2RMLVocabulary.R2RMLTerm.INVERSE_EXPRESSION, triplesMap);
-            TermMapExtractor termMapExtractor = new TermMapExtractor();
-            //MVS: Decide on ReferenceIdentifier
-            ReferenceMap referenceValue = 
-                    termMapExtractor.extractReferenceIdentifier(repository, object, triplesMap);
-            log.debug("reference value " + referenceValue);
-            //TODO:add the following validator
-            //validator.checkTermMap(constantValue, stringTemplate, referenceValue, o.stringValue());
+            extractProperties(repository, triplesMap, object);
 
-            StdObjectMap result = new StdObjectMap(triplesMap, null, 
+            //Extract additional properties for Object Map
+            String languageTag = TermExtractor.extractLiteralFromTermMap(repository,
+                    object, R2RMLVocabulary.R2RMLTerm.LANGUAGE, triplesMap);
+            URI dataType = (URI) TermExtractor.extractValueFromTermMap(repository, object,
+                    R2RMLVocabulary.R2RMLTerm.DATATYPE, triplesMap);
+            
+            if(conditions != null && conditions.size() > 0){
+                log.debug("Boolean Object Map");
+                result = new StdConditionObjectMap(triplesMap, null, 
                     constantValue, dataType, languageTag, stringTemplate, 
-                    termType, inverseExpression, referenceValue);// split, process, replace,
-                    //equalCondition, processCondition, splitCondition, bindCondition);
+                    termType, inverseExpression, referenceValue, conditions);
+            }
+            else{
+                log.debug("Simple Object Map");
+                result = new StdObjectMap(triplesMap, null, 
+                    constantValue, dataType, languageTag, stringTemplate, 
+                    termType, inverseExpression, referenceValue);
+            }
 
             return result;
         } catch (Exception ex) {
