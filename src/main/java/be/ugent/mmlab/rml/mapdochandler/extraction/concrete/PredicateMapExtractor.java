@@ -25,7 +25,8 @@ import org.openrdf.repository.Repository;
 public class PredicateMapExtractor extends StdTermMapExtractor {
     
     // Log
-    static final Logger log = LoggerFactory.getLogger(PredicateMapExtractor.class);
+    static final Logger log = 
+            LoggerFactory.getLogger(PredicateMapExtractor.class);
     
     public PredicateMap extractPredicateMap(
             Repository repository, Statement statement,

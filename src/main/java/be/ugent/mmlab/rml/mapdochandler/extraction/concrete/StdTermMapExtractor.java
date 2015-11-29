@@ -36,7 +36,8 @@ public class StdTermMapExtractor implements TermMapExtractor {
     protected Set<GraphMap> graphMaps = null;
     
     // Log
-    static final Logger log = LoggerFactory.getLogger(StdTermMapExtractor.class);
+    static final Logger log = 
+            LoggerFactory.getLogger(StdTermMapExtractor.class);
     
     //TODO: Spring it!
     public void extractProperties(

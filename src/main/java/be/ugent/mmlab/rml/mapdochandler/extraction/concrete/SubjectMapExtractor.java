@@ -54,7 +54,7 @@ public class SubjectMapExtractor extends StdTermMapExtractor {
             Set<URI> classIRIs = TermExtractor.extractURIsFromTermMap(
                     repository, subjectMap, R2RMLVocabulary.R2RMLTerm.CLASS);
 
-            if (graphMapValues != null) {
+            if (graphMapValues != null && graphMapValues.size() > 0) {
                 GraphMapExtractor graphMapExtractor = new GraphMapExtractor();
                 graphMaps = graphMapExtractor.extractGraphMapValues(
                         repository, graphMapValues, savedGraphMaps, triplesMap);
@@ -68,7 +68,6 @@ public class SubjectMapExtractor extends StdTermMapExtractor {
             } catch (Exception ex) {
                 log.error("Exception: " + ex);
             }
-            log.debug("Subject map extracted.");
             connection.close();
         } catch (RepositoryException ex) {
             log.error("RepositoryException " + ex);

@@ -80,7 +80,8 @@ public class PredicateObjectMapExtractor {
 
                     //Extract Referencing Object Maps
                     log.debug("Extracting Referencing Object Maps..");
-                    ReferencingObjectMapExtractor refObjMapExtractor = new ReferencingObjectMapExtractor();
+                    ReferencingObjectMapExtractor refObjMapExtractor = 
+                            new ReferencingObjectMapExtractor();
                     refObjectMaps = refObjMapExtractor.processReferencingObjectMap(
                             repository, object_statement, savedGraphMaps,
                             triplesMapResources, triplesMap, triplesMapSubject, predicateObject);
