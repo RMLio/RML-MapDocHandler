@@ -66,7 +66,7 @@ public class StdTermMapExtractor implements TermMapExtractor {
         //TODO: Generalize the following for every condition
         AbstractConditionExtractor conditionsExtractor =
                 new AbstractConditionExtractor();
-        conditions = conditionsExtractor.extractCondition(repository, object);
+        conditions = conditionsExtractor.extractConditions(repository, object);
 
     }
 

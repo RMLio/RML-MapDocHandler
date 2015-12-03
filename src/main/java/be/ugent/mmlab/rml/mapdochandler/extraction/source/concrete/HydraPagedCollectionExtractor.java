@@ -5,8 +5,6 @@ import be.ugent.mmlab.rml.model.Source;
 import be.ugent.mmlab.rml.model.source.std.StdApiSource;
 import be.ugent.mmlab.rml.vocabularies.HydraVocabulary;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
