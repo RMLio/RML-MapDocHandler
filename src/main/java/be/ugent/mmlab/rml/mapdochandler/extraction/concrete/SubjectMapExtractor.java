@@ -3,6 +3,7 @@ package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
 import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
 import be.ugent.mmlab.rml.model.RDFTerm.SubjectMap;
 import be.ugent.mmlab.rml.model.TriplesMap;
+import be.ugent.mmlab.rml.model.std.StdConditionSubjectMap;
 import be.ugent.mmlab.rml.model.std.StdSubjectMap;
 import be.ugent.mmlab.rml.vocabularies.R2RMLVocabulary;
 import java.util.Set;
@@ -48,7 +49,7 @@ public class SubjectMapExtractor extends StdTermMapExtractor {
             Resource subjectMap = (Resource) statements.next().getObject();
             
             extractProperties(repository, triplesMap, subjectMap);
-
+            
             //AD: The values of the rr:class property must be IRIs. 
             //AD: Would that mean that it can not be a reference to an extract of the input or a template?
             Set<URI> classIRIs = TermExtractor.extractURIsFromTermMap(
@@ -62,9 +63,19 @@ public class SubjectMapExtractor extends StdTermMapExtractor {
             }
 
             try {
-                result = new StdSubjectMap(triplesMap, constantValue,
-                        stringTemplate, termType, inverseExpression,
-                        referenceValue, classIRIs, graphMaps);
+                
+                if (conditions != null && conditions.size() > 0) {
+                    log.debug("Conditional Predicate Map");
+                    result = new StdConditionSubjectMap(triplesMap, constantValue, 
+                            stringTemplate, termType, inverseExpression,
+                            referenceValue, classIRIs, graphMaps, conditions);
+                } else {
+                    log.debug("Simple Predicate Map");
+                    result = new StdSubjectMap(triplesMap, constantValue,
+                            stringTemplate, termType, inverseExpression, 
+                            referenceValue, classIRIs, graphMaps);
+                }
+
             } catch (Exception ex) {
                 log.error("Exception: " + ex);
             }

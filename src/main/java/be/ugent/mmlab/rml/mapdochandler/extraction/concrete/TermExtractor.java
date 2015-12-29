@@ -66,6 +66,30 @@ public class TermExtractor {
         return value;
     }
     
+    static protected Value extractValueFromTermMap(
+            Repository repository, Resource termType, URI uri, TriplesMap triplesMap) {
+        RepositoryResult<Statement> statements ;
+        Value value = null;
+        try {
+            RepositoryConnection connection = repository.getConnection();
+            
+            statements = connection.getStatements(
+                    termType, uri, null, true);
+            
+            if (!statements.hasNext()) 
+                return null;
+            else{
+                Statement statement = statements.next();
+                log.debug("Extracted " + uri.stringValue() );
+                value = statement.getObject();
+            }
+            connection.close();
+        } catch (RepositoryException ex) {
+            log.error("Repository Exception " + ex);
+        }
+        return value;
+    }
+    
     protected static Set<Value> extractValuesFromResource(
             Repository repository, Resource termType, Enum term){
         RepositoryResult<Statement> statements ;
@@ -154,7 +178,6 @@ public class TermExtractor {
         
         if (columnValueStr != null) {
             ReferenceMap refMap = new StdReferenceMap(columnValueStr);
-            log.debug("referenceValueStr " + referenceValueStr);
             return refMap.getReferenceValue(columnValueStr);
         }
         ReferenceMap refMap = new StdReferenceMap(referenceValueStr);

@@ -1,14 +1,16 @@
 package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
 
-import be.ugent.mmlab.rml.condition.extractor.BindingConditionExtractor;
-import be.ugent.mmlab.rml.condition.model.BindingCondition;
-import be.ugent.mmlab.rml.condition.model.std.BindingReferencingObjectMap;
+import be.ugent.mmlab.rml.condition.extractor.AbstractConditionExtractor;
+import be.ugent.mmlab.rml.condition.model.Condition;
+import be.ugent.mmlab.rml.condition.model.std.StdJoinConditionMetric;
 import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
 import be.ugent.mmlab.rml.model.JoinCondition;
 import be.ugent.mmlab.rml.model.RDFTerm.ReferencingObjectMap;
 import be.ugent.mmlab.rml.model.TriplesMap;
+import be.ugent.mmlab.rml.model.std.ConditionReferencingObjectMap;
 import be.ugent.mmlab.rml.model.std.StdJoinCondition;
 import be.ugent.mmlab.rml.model.std.StdReferencingObjectMap;
+import be.ugent.mmlab.rml.vocabularies.CRMLVocabulary;
 import be.ugent.mmlab.rml.vocabularies.R2RMLVocabulary;
 import java.util.HashSet;
 import java.util.Map;
@@ -18,7 +20,9 @@ import org.slf4j.LoggerFactory;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.URIImpl;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -35,6 +39,7 @@ import org.openrdf.repository.RepositoryResult;
  ***************************************************************************
  */
 public class ReferencingObjectMapExtractor {
+    protected Set<Condition> conditions = null;
     
     // Log
     static final Logger log = 
@@ -80,15 +85,16 @@ public class ReferencingObjectMapExtractor {
             URI parentTriplesMap = (URI) TermExtractor.extractValueFromTermMap(
                     repository, object, R2RMLVocabulary.R2RMLTerm.PARENT_TRIPLES_MAP, triplesMap);
             log.debug("Parent Triples Maps were found " + parentTriplesMap);
+            
+            if(parentTriplesMap == null)
+                return null;
 
             Set<JoinCondition> joinConditions = extractJoinConditions(
                     repository, object, triplesMap);
 
-            BindingConditionExtractor bindingConditionsExtractor =
-                    new BindingConditionExtractor();
-            Set<BindingCondition> bindingConditions =
-                    bindingConditionsExtractor.extractBindCondition(
-                    repository, object);
+            AbstractConditionExtractor conditionsExtractor =
+                new AbstractConditionExtractor();
+            conditions = conditionsExtractor.extractConditions(repository, object);
 
             // Extract parent
             for (Resource triplesMapResource : triplesMapResources.keySet()) {
@@ -106,26 +112,30 @@ public class ReferencingObjectMapExtractor {
 
             //TODO: Move error checking elsewhere
             if (parentTriplesMap == null && !joinConditions.isEmpty()
-                    && !bindingConditions.isEmpty()) {
+                    && !conditions.isEmpty()) {
                 log.error(object.stringValue()
                         + " has no parentTriplesMap map defined"
                         + " whereas one or more joinConditions exist"
                         + " : exactly one parentTripleMap is required.");
             }
             if (parentTriplesMap == null && joinConditions.isEmpty()
-                    && bindingConditions.isEmpty()) {
+                    && conditions.isEmpty()) {
                 log.debug("Not a Referencing Object Map.");
                 return null;
             }
 
-            if (!bindingConditions.isEmpty()) {
+            if (!conditions.isEmpty() && conditions != null && conditions.size() > 0) {
                 log.debug("Referencing Object Map "
-                        + "with Binding Condition is being extracted..");
-                refObjectMap = new BindingReferencingObjectMap(null,
-                        parent, joinConditions, bindingConditions);
+                        + "with Conditions is being extracted..");
+                //if (conditions != null && conditions.size() > 0) {
+                    refObjectMap = new ConditionReferencingObjectMap(null,
+                            parent, joinConditions, conditions);
+
             } // Link between this reerencing object and its triplesMap parent will be
             // performed at the end f treatment.
             else {
+                log.debug("Referencing Object Map "
+                        + "without Conditions is being extracted..");
                 refObjectMap = new StdReferencingObjectMap(null,
                         parent, joinConditions);
             }
@@ -159,15 +169,29 @@ public class ReferencingObjectMapExtractor {
                             R2RMLVocabulary.R2RMLTerm.CHILD, triplesMap);
                     String parent = TermExtractor.extractLiteralFromTermMap(repository,
                             jc, R2RMLVocabulary.R2RMLTerm.PARENT, triplesMap);
+                    Value metric = TermExtractor.extractValueFromTermMap(repository, jc, 
+                            new URIImpl(CRMLVocabulary.CRML_NAMESPACE + 
+                            CRMLVocabulary.cRMLTerm.METRIC) , triplesMap);
+                    log.debug("Metric " + metric + " was extracted.");
                     if (parent == null || child == null) {
                         log.error(object.stringValue()
                                 + " must have exactly two properties child and parent. ");
                     }
-                    try {
-                        result.add(new StdJoinCondition(child, parent));
-                    } catch (Exception ex) {
-                        log.error("Exception: " + ex);
+                    if (metric != null) {
+                        try {
+                            result.add(new StdJoinConditionMetric(
+                                    child, parent, (Resource) metric));
+                            log.debug("Join Condition with Metric was extracted.");
+                        } catch (Exception ex) {
+                            log.error("Exception: " + ex);
+                        }
                     }
+                    else
+                        try {
+                            result.add(new StdJoinCondition(child, parent));
+                        } catch (Exception ex) {
+                            log.error("Exception: " + ex);
+                        }
                 }
             } catch (ClassCastException e) {
                 log.error("A resource was expected in object of predicateMap of "
