@@ -65,12 +65,12 @@ public class SubjectMapExtractor extends StdTermMapExtractor {
             try {
                 
                 if (conditions != null && conditions.size() > 0) {
-                    log.debug("Conditional Predicate Map");
+                    log.debug("Conditional Subject Map extracted");
                     result = new StdConditionSubjectMap(triplesMap, constantValue, 
                             stringTemplate, termType, inverseExpression,
                             referenceValue, classIRIs, graphMaps, conditions);
                 } else {
-                    log.debug("Simple Predicate Map");
+                    log.debug("Simple Subject Map extracted");
                     result = new StdSubjectMap(triplesMap, constantValue,
                             stringTemplate, termType, inverseExpression, 
                             referenceValue, classIRIs, graphMaps);

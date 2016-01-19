@@ -38,13 +38,13 @@ public class PredicateMapExtractor extends StdTermMapExtractor {
             extractProperties(repository, triplesMap, object);
             
             if(conditions != null && conditions.size() > 0){
-                log.debug("Conditional Predicate Map");
+                log.debug("Conditional Predicate Map extracted");
                 result = new StdConditionPredicateMap(triplesMap, null, 
                     constantValue, stringTemplate, inverseExpression, 
                         referenceValue, termType, conditions);
             }
             else{
-                log.debug("Simple Predicate Map");
+                log.debug("Simple Predicate Map extracted");
                 result = new StdPredicateMap(triplesMap, null, constantValue, 
                         stringTemplate, inverseExpression, referenceValue, termType);
             }

@@ -44,13 +44,13 @@ public class ObjectMapExtractor extends StdTermMapExtractor {
                     R2RMLVocabulary.R2RMLTerm.DATATYPE, triplesMap);
             
             if(conditions != null && conditions.size() > 0){
-                log.debug("Boolean Object Map");
+                log.debug("Conditional Object Map extracted.");
                 result = new StdConditionObjectMap(triplesMap, null, 
                     constantValue, dataType, languageTag, stringTemplate, 
                     termType, inverseExpression, referenceValue, conditions);
             }
             else{
-                log.debug("Simple Object Map");
+                log.debug("Simple Object Map extracted.");
                 result = new StdObjectMap(triplesMap, null, 
                     constantValue, dataType, languageTag, stringTemplate, 
                     termType, inverseExpression, referenceValue);
