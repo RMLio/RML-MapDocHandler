@@ -35,7 +35,8 @@ import org.openrdf.repository.RepositoryResult;
 public class PredicateObjectMapExtractor {
     
     // Log
-    static final Logger log = LoggerFactory.getLogger(PredicateObjectMapExtractor.class);
+    static final Logger log = LoggerFactory.getLogger(
+            PredicateObjectMapExtractor.class.getSimpleName());
     
     public PredicateObjectMap extractPredicateObjectMap(
             Repository repository,
@@ -62,12 +63,13 @@ public class PredicateObjectMapExtractor {
                     + predicate_statements.hasNext());
 
             while (predicate_statements.hasNext()) {
+                Statement predicate_statement = predicate_statements.next();
                 PredicateMapExtractor predMapExtractor = new PredicateMapExtractor();
                 PredicateMap predicateMap = predMapExtractor.extractPredicateMap(
-                        repository, predicate_statements.next(),
+                        repository, predicate_statement,
                         savedGraphMaps, triplesMap);
                 predicateMaps.add(predicateMap);
-
+                
 
                 URI o = vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
                         + R2RMLVocabulary.R2RMLTerm.OBJECT_MAP);
@@ -92,6 +94,24 @@ public class PredicateObjectMapExtractor {
 
                         ObjectMap objectMap = objMapExtractor.extractObjectMap(repository,
                                 (Resource) object_statement.getObject(), savedGraphMaps, triplesMap);
+                        
+                        //COMBUST specific annotation
+                        CombustExtractor combustExtractor = new CombustExtractor();
+                        boolean valueComplete = combustExtractor.exrtactComplete(
+                                (Resource) object_statement.getObject(), repository);
+                        if (valueComplete) {
+                            objectMap.setCompletion();
+                        }
+                        log.debug("to be completed " + predicateMap.getCompletion());
+
+                        //COMBUST specific annotation to validate an object value
+                        combustExtractor = new CombustExtractor();
+                        boolean valueValidate = combustExtractor.exrtactValidate(
+                                (Resource) object_statement.getObject(), repository);
+                        if (valueValidate) {
+                            objectMap.setValidation();
+                        }
+
                         try {
                             objectMap.setOwnTriplesMap(triplesMapResources.get(triplesMapSubject));
                         } catch (Exception ex) {

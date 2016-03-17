@@ -29,7 +29,8 @@ import org.openrdf.repository.RepositoryException;
 public class GraphMapExtractor extends StdTermMapExtractor {
     
     // Log
-    static final Logger log = LoggerFactory.getLogger(GraphMapExtractor.class);
+    static final Logger log = LoggerFactory.getLogger(
+            GraphMapExtractor.class.getSimpleName());
     
     public Set<GraphMap> extractGraphMapValues(
             Repository repository, Set<Value> graphMapValues,
@@ -91,7 +92,7 @@ public class GraphMapExtractor extends StdTermMapExtractor {
         if (graphMapValues != null) {
             graphMaps = extractGraphMapValues(
                     repository, graphMapValues, savedGraphMaps, triplesMap);
-            log.debug("Gtraph Maps returned " + graphMaps);
+            log.debug("Graph Maps returned " + graphMaps);
         }
 
         predicateObjectMap.setGraphMaps(graphMaps);

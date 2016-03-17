@@ -26,7 +26,8 @@ public class StdRMLMappingFactory {
     
     // Log
     private static final Logger log = 
-            LoggerFactory.getLogger(RMLMappingFactory.class);
+            LoggerFactory.getLogger(
+            RMLMappingFactory.class.getSimpleName());
     
     private RMLMappingExtractor extractor;
     private boolean skolemization = false;

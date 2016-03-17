@@ -33,7 +33,8 @@ import org.slf4j.LoggerFactory;
 public class CsvwExtractor extends StdSourceExtractor {
     
     // Log
-    private static final Logger log = LoggerFactory.getLogger(CsvwExtractor.class);
+    private static final Logger log = 
+            LoggerFactory.getLogger(CsvwExtractor.class.getSimpleName());
 
     public CsvwExtractor() {
     }

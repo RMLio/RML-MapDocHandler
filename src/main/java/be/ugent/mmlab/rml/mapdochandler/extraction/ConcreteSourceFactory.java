@@ -36,7 +36,9 @@ import org.openrdf.repository.RepositoryResult;
 public class ConcreteSourceFactory implements SourceFactory {
     
     // Log
-    private static final Logger log = LoggerFactory.getLogger(ConcreteSourceFactory.class);
+    private static final Logger log = 
+            LoggerFactory.getLogger(
+            ConcreteSourceFactory.class.getSimpleName());
     
     public SourceExtractor createSourceExtractor(Repository repository, Value value) {
         SourceExtractor sourceExtractor = null;

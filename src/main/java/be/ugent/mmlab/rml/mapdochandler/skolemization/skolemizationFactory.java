@@ -28,7 +28,9 @@ import org.openrdf.sail.memory.MemoryStore;
  */
 public class skolemizationFactory {
     // Log
-    private static final Logger log = LoggerFactory.getLogger(skolemizationFactory.class);
+    private static final Logger log = 
+            LoggerFactory.getLogger(
+            skolemizationFactory.class.getSimpleName());
     
     private static ValueFactory vf = new ValueFactoryImpl();
 

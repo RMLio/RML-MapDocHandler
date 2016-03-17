@@ -43,7 +43,8 @@ public class ReferencingObjectMapExtractor {
     
     // Log
     static final Logger log = 
-            LoggerFactory.getLogger(ReferencingObjectMapExtractor.class);
+            LoggerFactory.getLogger(
+            ReferencingObjectMapExtractor.class.getSimpleName());
     
     public Set<ReferencingObjectMap> processReferencingObjectMap(
             Repository repository, Statement object_statement, 

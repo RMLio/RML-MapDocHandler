@@ -28,7 +28,9 @@ import org.openrdf.sail.memory.MemoryStore;
 public class RMLDocRetrieval {
     
     // Log
-    static final Logger log = LoggerFactory.getLogger(RMLDocRetrieval.class);
+    static final Logger log = 
+            LoggerFactory.getLogger(
+            RMLDocRetrieval.class.getSimpleName());
     
     /**
      *

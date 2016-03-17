@@ -20,7 +20,8 @@ import org.openrdf.repository.Repository;
 public class ReferenceFormulationExtractor {
     
     // Log
-    static final Logger log = LoggerFactory.getLogger(ReferenceFormulationExtractor.class);
+    static final Logger log = LoggerFactory.getLogger(
+            ReferenceFormulationExtractor.class.getSimpleName());
     
     /**
      *

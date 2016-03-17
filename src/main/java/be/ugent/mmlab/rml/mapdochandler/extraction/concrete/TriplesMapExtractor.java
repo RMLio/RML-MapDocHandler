@@ -40,7 +40,8 @@ import org.openrdf.repository.RepositoryResult;
 public class TriplesMapExtractor {
     
     //Log
-    static final Logger log = LoggerFactory.getLogger(TriplesMapExtractor.class);
+    static final Logger log = LoggerFactory.getLogger(
+            TriplesMapExtractor.class.getSimpleName());
        
     public void extractTriplesMap(
             Repository repository, Resource triplesMapSubject,

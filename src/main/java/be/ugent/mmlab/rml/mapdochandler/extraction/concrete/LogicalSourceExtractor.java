@@ -30,7 +30,8 @@ public class LogicalSourceExtractor {
     
     // Log
     static final Logger log = 
-            LoggerFactory.getLogger(LogicalSourceExtractor.class);
+            LoggerFactory.getLogger(
+            LogicalSourceExtractor.class.getSimpleName());
 
     public Resource extractLogicalSource(
             Repository repository, Resource triplesMapSubject, TriplesMap triplesMap) {
