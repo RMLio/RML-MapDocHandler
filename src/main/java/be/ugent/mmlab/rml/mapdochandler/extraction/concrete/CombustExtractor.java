@@ -31,7 +31,7 @@ public class CombustExtractor {
             URI uri = vf.createURI(CoVocabulary.CO_NAMESPACE
                     + CoVocabulary.COTerm.REQUIRES);
             URI obj = vf.createURI(CoVocabulary.CO_NAMESPACE
-                    + CoVocabulary.COTerm.VALIDATION_CLASS);
+                    + CoVocabulary.COTerm.VERIFICATION_CLASS);
 
             RepositoryResult<Statement> validation_statements =
                     connection.getStatements(term, uri, obj, true);
