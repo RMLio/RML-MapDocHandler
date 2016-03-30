@@ -31,7 +31,9 @@ import org.slf4j.LoggerFactory;
 public class DcatExtractor extends StdSourceExtractor {
     
     // Log
-    private static final Logger log = LoggerFactory.getLogger(DcatExtractor.class);
+    private static final Logger log = 
+            LoggerFactory.getLogger(
+            DcatExtractor.class.getSimpleName());
 
     public DcatExtractor() {
     }

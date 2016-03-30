@@ -32,7 +32,9 @@ import org.openrdf.repository.RepositoryResult;
 public class SparqlExtractor extends StdSourceExtractor {
 
     // Log
-    private static final Logger log = LoggerFactory.getLogger(SparqlExtractor.class);
+    private static final Logger log = 
+            LoggerFactory.getLogger(
+            SparqlExtractor.class.getSimpleName());
 
     @Override
     public Set<Source> extractSources(Repository repository, Value value) {

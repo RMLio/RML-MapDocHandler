@@ -23,7 +23,9 @@ import org.openrdf.repository.Repository;
 public class LocalFileExtractor extends StdSourceExtractor {
     
     // Log
-    private static final Logger log = LoggerFactory.getLogger(LocalFileExtractor.class);
+    private static final Logger log = 
+            LoggerFactory.getLogger(
+            LocalFileExtractor.class.getSimpleName());
     
     //TODO: Change extractInput to Value instead of Resource
     public Set<Source> extractInput(Repository repository, String source) {

@@ -26,7 +26,8 @@ public class PredicateMapExtractor extends StdTermMapExtractor {
     
     // Log
     static final Logger log = 
-            LoggerFactory.getLogger(PredicateMapExtractor.class);
+            LoggerFactory.getLogger(
+            PredicateMapExtractor.class.getSimpleName());
     
     public PredicateMap extractPredicateMap(
             Repository repository, Statement statement,

@@ -23,7 +23,9 @@ import org.openrdf.repository.RepositoryException;
 public class RMLTermExtractor {
 
     // Log
-    static final Logger log = LoggerFactory.getLogger(RMLTermExtractor.class);
+    static final Logger log = 
+            LoggerFactory.getLogger(
+            RMLTermExtractor.class.getSimpleName());
 
     public static URI getTermURI(Repository repository, Enum term) {
         String namespace = R2RMLVocabulary.R2RML_NAMESPACE;

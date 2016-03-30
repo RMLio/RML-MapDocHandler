@@ -31,7 +31,9 @@ import org.openrdf.repository.RepositoryResult;
 public abstract class StdSourceExtractor  implements SourceExtractor {
 
     // Log
-    private static final Logger log = LoggerFactory.getLogger(StdSourceExtractor.class);
+    private static final Logger log = 
+            LoggerFactory.getLogger(
+            StdSourceExtractor.class.getSimpleName());
 
     
 
@@ -95,6 +97,7 @@ public abstract class StdSourceExtractor  implements SourceExtractor {
      * @param value
      * @return
      */
+    @Override
     public ReferenceFormulation extractCustomReferenceFormulation(
             Repository repository, Value value){
             return null;

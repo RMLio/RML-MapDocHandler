@@ -40,7 +40,9 @@ import org.openrdf.repository.RepositoryResult;
 public class TriplesMapExtractor {
     
     //Log
-    static final Logger log = LoggerFactory.getLogger(TriplesMapExtractor.class);
+    static final Logger log = 
+            LoggerFactory.getLogger(
+            TriplesMapExtractor.class.getSimpleName());
        
     public void extractTriplesMap(
             Repository repository, Resource triplesMapSubject,
@@ -114,6 +116,11 @@ public class TriplesMapExtractor {
                     repository, blankLogicalSource, triplesMap);
             log.debug("Iterator " + iterator);
             
+            String table =
+                    logicalSourceExtractor.getTableName(
+                    repository, blankLogicalSource, triplesMap);
+            log.debug("Table " + table);
+            
             URI p = vf.createURI(
                     RMLVocabulary.RML_NAMESPACE 
                     + RMLVocabulary.RMLTerm.SOURCE);
@@ -158,7 +165,7 @@ public class TriplesMapExtractor {
 
                 for (Source inputSource : inputSources) {
                     logicalSource = new StdLogicalSource(
-                            iterator, inputSource, query, 
+                            iterator, inputSource, query, table,
                             referenceFormulation, dialect);
                 }
                 log.debug("Triples Map extracted");

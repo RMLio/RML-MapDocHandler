@@ -37,7 +37,8 @@ public class StdTermMapExtractor implements TermMapExtractor {
     
     // Log
     static final Logger log = 
-            LoggerFactory.getLogger(StdTermMapExtractor.class);
+            LoggerFactory.getLogger(
+            StdTermMapExtractor.class.getSimpleName());
     
     //TODO: Spring it!
     public void extractProperties(

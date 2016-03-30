@@ -14,6 +14,7 @@ package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
 import be.ugent.mmlab.rml.model.TriplesMap;
 import be.ugent.mmlab.rml.vocabularies.QLVocabulary;
 import be.ugent.mmlab.rml.vocabularies.QLVocabulary.QLTerm;
+import be.ugent.mmlab.rml.vocabularies.R2RMLVocabulary;
 import be.ugent.mmlab.rml.vocabularies.RMLVocabulary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,8 @@ public class LogicalSourceExtractor {
     
     // Log
     static final Logger log = 
-            LoggerFactory.getLogger(LogicalSourceExtractor.class);
+            LoggerFactory.getLogger(
+            LogicalSourceExtractor.class.getSimpleName());
 
     public Resource extractLogicalSource(
             Repository repository, Resource triplesMapSubject, TriplesMap triplesMap) {
@@ -132,5 +134,29 @@ public class LogicalSourceExtractor {
         }
         
         return query;
+    }
+    
+    public String getTableName(
+            Repository repository, Resource subject, TriplesMap triplesMap){
+        RepositoryResult<Statement> statements;
+        String table = null;
+        try {
+            RepositoryConnection connection = repository.getConnection();
+            ValueFactory vf = connection.getValueFactory();
+            
+            URI queryURI = vf.createURI(
+                    R2RMLVocabulary.R2RML_NAMESPACE + 
+                    R2RMLVocabulary.R2RMLTerm.TABLE_NAME);
+            statements = 
+                    connection.getStatements(subject, queryURI, null, true);
+            
+            if(statements.hasNext())
+                table = statements.next().getObject().stringValue();
+            connection.close();
+
+        } catch (RepositoryException ex) {
+            log.error("RepositoryException " + ex);
+        }
+        return table;
     }
 }

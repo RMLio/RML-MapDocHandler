@@ -29,7 +29,9 @@ import org.openrdf.repository.RepositoryException;
 public class GraphMapExtractor extends StdTermMapExtractor {
     
     // Log
-    static final Logger log = LoggerFactory.getLogger(GraphMapExtractor.class);
+    static final Logger log = 
+            LoggerFactory.getLogger(
+            GraphMapExtractor.class.getSimpleName());
     
     public Set<GraphMap> extractGraphMapValues(
             Repository repository, Set<Value> graphMapValues,

@@ -31,7 +31,9 @@ import org.openrdf.repository.RepositoryResult;
 public class TermExtractor {
     
     // Log
-    static final Logger log = LoggerFactory.getLogger(TermExtractor.class);
+    static final Logger log = 
+            LoggerFactory.getLogger(
+            TermExtractor.class.getSimpleName());
     
     /**
      *

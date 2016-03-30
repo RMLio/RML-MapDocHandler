@@ -27,7 +27,9 @@ import org.openrdf.repository.Repository;
 public class ObjectMapExtractor extends StdTermMapExtractor {
     
     // Log
-    static final Logger log = LoggerFactory.getLogger(ObjectMapExtractor.class);
+    static final Logger log = 
+            LoggerFactory.getLogger(
+            ObjectMapExtractor.class.getSimpleName());
     
     public ObjectMap extractObjectMap(Repository repository,
             Resource object, Set<GraphMap> graphMaps, TriplesMap triplesMap){

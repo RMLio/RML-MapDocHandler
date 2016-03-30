@@ -33,7 +33,8 @@ public class HydraPagedCollectionExtractor  extends StdSourceExtractor {
     
     // Log
     private static final Logger log = 
-            LoggerFactory.getLogger(HydraPagedCollectionExtractor.class);
+            LoggerFactory.getLogger(
+            HydraPagedCollectionExtractor.class.getSimpleName());
     // Value factory
     private static ValueFactory vf = new ValueFactoryImpl();
 

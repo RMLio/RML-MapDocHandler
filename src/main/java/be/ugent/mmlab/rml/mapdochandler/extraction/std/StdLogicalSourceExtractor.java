@@ -35,7 +35,8 @@ public class StdLogicalSourceExtractor {
 
     // Log
     private static final Logger log = 
-            LoggerFactory.getLogger(StdLogicalSourceExtractor.class);
+            LoggerFactory.getLogger(
+            StdLogicalSourceExtractor.class.getSimpleName());
 
     /**
      *

@@ -30,7 +30,9 @@ import org.openrdf.repository.RepositoryResult;
 public class SubjectMapExtractor extends StdTermMapExtractor {
     
     // Log
-    static final Logger log = LoggerFactory.getLogger(SubjectMapExtractor.class);
+    static final Logger log = 
+            LoggerFactory.getLogger(
+            SubjectMapExtractor.class.getSimpleName());
     
     public SubjectMap extractSubjectMap(
             Repository repository, Resource triplesMapSubject,

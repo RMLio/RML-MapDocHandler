@@ -35,7 +35,9 @@ import org.openrdf.repository.RepositoryResult;
 public class PredicateObjectMapExtractor {
     
     // Log
-    static final Logger log = LoggerFactory.getLogger(PredicateObjectMapExtractor.class);
+    static final Logger log = 
+            LoggerFactory.getLogger(
+            PredicateObjectMapExtractor.class.getSimpleName());
     
     public PredicateObjectMap extractPredicateObjectMap(
             Repository repository,

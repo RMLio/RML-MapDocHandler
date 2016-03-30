@@ -32,7 +32,9 @@ import org.slf4j.LoggerFactory;
 public class VoidExtractor extends StdSourceExtractor {
     
     // Log
-    private static final Logger log = LoggerFactory.getLogger(VoidExtractor.class);
+    private static final Logger log = 
+            LoggerFactory.getLogger(
+            VoidExtractor.class.getSimpleName());
 
     public VoidExtractor() {
     }

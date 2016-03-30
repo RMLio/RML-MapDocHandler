@@ -37,7 +37,8 @@ public class StdRMLMappingExtractor implements RMLMappingExtractor{
     
     // Log
     private static final Logger log = 
-            LoggerFactory.getLogger(StdRMLMappingExtractor.class);
+            LoggerFactory.getLogger(
+            StdRMLMappingExtractor.class.getSimpleName());
     // Value factory
     private static ValueFactory vf = new ValueFactoryImpl();
     private boolean skolemization = false;
