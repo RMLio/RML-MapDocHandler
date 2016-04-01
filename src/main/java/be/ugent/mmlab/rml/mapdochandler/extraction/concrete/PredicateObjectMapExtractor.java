@@ -117,5 +117,5 @@ public class PredicateObjectMapExtractor {
         }
         return predicateObjectMap;
     }
-
+    
 }

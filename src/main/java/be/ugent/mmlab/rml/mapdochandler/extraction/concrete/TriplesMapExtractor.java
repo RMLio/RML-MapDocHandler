@@ -1,6 +1,7 @@
 package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
 
 import be.ugent.mmlab.rml.mapdochandler.extraction.ConcreteSourceFactory;
+import be.ugent.mmlab.rml.mapdochandler.extraction.condition.ConditionPredicateObjectMapExtractor;
 import be.ugent.mmlab.rml.mapdochandler.extraction.source.concrete.LocalFileExtractor;
 import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
 import be.ugent.mmlab.rml.model.LogicalSource;
@@ -10,6 +11,7 @@ import be.ugent.mmlab.rml.model.ReferenceFormulation;
 import be.ugent.mmlab.rml.model.Source;
 import be.ugent.mmlab.rml.model.TriplesMap;
 import be.ugent.mmlab.rml.model.std.StdLogicalSource;
+import be.ugent.mmlab.rml.vocabularies.CRMLVocabulary;
 import be.ugent.mmlab.rml.vocabularies.QLVocabulary.QLTerm;
 import be.ugent.mmlab.rml.vocabularies.R2RMLVocabulary;
 import be.ugent.mmlab.rml.vocabularies.RMLVocabulary;
@@ -197,12 +199,25 @@ public class TriplesMapExtractor {
             predicateObjectMaps = new HashSet<PredicateObjectMap>();
             try {
                 while (statements.hasNext()) {
-                    PredicateObjectMapExtractor preObjMapExtractor = 
-                            new PredicateObjectMapExtractor();
-                    PredicateObjectMap predicateObjectMap = 
+                    PredicateObjectMapExtractor preObjMapExtractor ;
+                    Statement statement = statements.next();
+
+                    if(connection.hasStatement(
+                            (Resource) statement.getObject(), 
+                            vf.createURI(CRMLVocabulary.CRML_NAMESPACE + 
+                            CRMLVocabulary.cRMLTerm.BOOLEAN_CONDITION), 
+                            null, true)){
+                        log.debug("Condition Predicate Object Map Extractor");
+                        preObjMapExtractor = new ConditionPredicateObjectMapExtractor();
+                    }
+                    else{
+                        log.debug("Simple Predicate Object Map Extractor");
+                        preObjMapExtractor = new PredicateObjectMapExtractor();
+                    }
+                    PredicateObjectMap predicateObjectMap =
                             preObjMapExtractor.extractPredicateObjectMap(
                             repository, triplesMapSubject,
-                            (Resource) statements.next().getObject(),
+                            (Resource) statement.getObject(),
                             graphMaps, triplesMapResources, result);
                     if (predicateObjectMap != null) {
                         predicateObjectMap.setOwnTriplesMap(result);
@@ -210,7 +225,8 @@ public class TriplesMapExtractor {
                     }
                 }
             } catch (ClassCastException e) {
-                log.error("A resource was expected in object of predicateObjectMap of "
+                log.error("ClassCastException " + e 
+                        + " A resource was expected in object of predicateObjectMap of "
                         + triplesMapSubject.stringValue());
             }
             log.debug("Number of extracted predicate-object maps : "
