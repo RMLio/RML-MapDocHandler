@@ -46,14 +46,36 @@ public class DcatExtractor extends StdSourceExtractor {
             ValueFactory vf = connection.getValueFactory();
             URI predicate = vf.createURI(
                     DCATVocabulary.DCAT_NAMESPACE + DCATVocabulary.DcatTerm.DOWNLOADURL);
-            //TODO: Fix the following: sub and obj same value
+            
+            //Extract DCAT Distribution
             RepositoryResult<Statement> statements =
                     connection.getStatements((Resource) value, predicate, null, true);
-
-            while (statements.hasNext()) {
-                Statement statement = statements.next();
-                Source inputSource = extractSource((Resource) value, statement);
-                inputSources.add(inputSource);
+            log.debug("Distribution statements " + statements.hasNext());
+            
+            if(!statements.hasNext()){
+                predicate = vf.createURI(
+                    DCATVocabulary.DCAT_NAMESPACE + DCATVocabulary.DcatTerm.DISTRIBUTION);
+                statements = connection.getStatements((Resource) value, predicate, null, true);
+                
+                log.debug("Dataset statements " + statements.hasNext());
+                while(statements.hasNext()){
+                    Statement statement = statements.next();
+                    predicate = vf.createURI(
+                            DCATVocabulary.DCAT_NAMESPACE + DCATVocabulary.DcatTerm.DOWNLOADURL);
+                    RepositoryResult<Statement> distributions = connection.getStatements(
+                            (Resource) statement.getObject(), predicate, null, true);
+                    while (distributions.hasNext()) {
+                        Statement distribution = distributions.next();
+                        Source inputSource = extractSource((Resource) value, distribution);
+                        inputSources.add(inputSource);
+                    }
+                }
+            } else {
+                while (statements.hasNext()) {
+                    Statement statement = statements.next();
+                    Source inputSource = extractSource((Resource) value, statement);
+                    inputSources.add(inputSource);
+                }
             }
             connection.close();
         } catch (RepositoryException ex) {

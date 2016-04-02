@@ -71,6 +71,7 @@ public class ConcreteSourceFactory implements SourceFactory {
                         sourceExtractor = new CsvwExtractor();
                         break;
                     case ("http://www.w3.org/ns/dcat#Distribution"):
+                    case ("http://www.w3.org/ns/dcat#Dataset"):    
                         log.debug("Source described with DCAT vocabulary.");
                         sourceExtractor = new DcatExtractor();
                         break;
