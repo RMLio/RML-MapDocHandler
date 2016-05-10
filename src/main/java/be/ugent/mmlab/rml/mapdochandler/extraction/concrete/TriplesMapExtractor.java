@@ -202,17 +202,25 @@ public class TriplesMapExtractor {
                     PredicateObjectMapExtractor preObjMapExtractor ;
                     Statement statement = statements.next();
 
-                    if(connection.hasStatement(
-                            (Resource) statement.getObject(), 
-                            vf.createURI(CRMLVocabulary.CRML_NAMESPACE + 
-                            CRMLVocabulary.cRMLTerm.BOOLEAN_CONDITION), 
-                            null, true)){
+                    if (connection.hasStatement(
+                            (Resource) statement.getObject(),
+                            vf.createURI(CRMLVocabulary.CRML_NAMESPACE
+                            + CRMLVocabulary.cRMLTerm.BOOLEAN_CONDITION), null, true)) {
                         log.debug("Condition Predicate Object Map Extractor");
                         preObjMapExtractor = new ConditionPredicateObjectMapExtractor();
                     }
-                    else{
-                        log.debug("Simple Predicate Object Map Extractor");
-                        preObjMapExtractor = new PredicateObjectMapExtractor();
+                    else {
+                        if (connection.hasStatement(
+                                (Resource) statement.getObject(),
+                                vf.createURI(CRMLVocabulary.CRML_NAMESPACE
+                                + CRMLVocabulary.cRMLTerm.FALLBACK),
+                                null, true)) {
+                            log.debug("Predicate Object Map with fallback POM");
+                            preObjMapExtractor = new ConditionPredicateObjectMapExtractor();
+                        } else {
+                            log.debug("Simple Predicate Object Map Extractor");
+                            preObjMapExtractor = new PredicateObjectMapExtractor();
+                        }
                     }
                     PredicateObjectMap predicateObjectMap =
                             preObjMapExtractor.extractPredicateObjectMap(

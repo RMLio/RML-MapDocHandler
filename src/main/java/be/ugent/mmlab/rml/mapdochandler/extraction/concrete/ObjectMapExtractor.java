@@ -38,7 +38,7 @@ public class ObjectMapExtractor extends StdTermMapExtractor {
         
         try {
             extractProperties(repository, triplesMap, object);
-
+            
             //Extract additional properties for Object Map
             String languageTag = TermExtractor.extractLiteralFromTermMap(repository,
                     object, R2RMLVocabulary.R2RMLTerm.LANGUAGE, triplesMap);
