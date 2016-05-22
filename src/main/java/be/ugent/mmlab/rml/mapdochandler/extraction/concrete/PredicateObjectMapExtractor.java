@@ -1,5 +1,7 @@
 package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
 
+import be.ugent.mmlab.rml.condition.model.Condition;
+import be.ugent.mmlab.rml.mapdochandler.extraction.condition.ConditionPredicateObjectMapExtractor;
 import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
 import be.ugent.mmlab.rml.model.RDFTerm.ObjectMap;
 import be.ugent.mmlab.rml.model.RDFTerm.PredicateMap;
@@ -7,6 +9,7 @@ import be.ugent.mmlab.rml.model.PredicateObjectMap;
 import be.ugent.mmlab.rml.model.RDFTerm.ReferencingObjectMap;
 import be.ugent.mmlab.rml.model.TriplesMap;
 import be.ugent.mmlab.rml.model.std.StdPredicateObjectMap;
+import be.ugent.mmlab.rml.vocabularies.CRMLVocabulary;
 import be.ugent.mmlab.rml.vocabularies.R2RMLVocabulary;
 import java.util.HashSet;
 import java.util.Map;
@@ -56,6 +59,19 @@ public class PredicateObjectMapExtractor {
         try {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
+            
+            if (connection.hasStatement(
+                    predicateObject, vf.createURI(CRMLVocabulary.CRML_NAMESPACE
+                    + CRMLVocabulary.cRMLTerm.BOOLEAN_CONDITION), null, true)) {
+                log.debug("Conditional POM extracted.");
+                ConditionPredicateObjectMapExtractor preObjMapExtractor =
+                        new ConditionPredicateObjectMapExtractor();
+                Set<Condition> conditions = preObjMapExtractor.extractConditions(
+                                       repository, predicateObject);
+                log.debug(conditions.size() + " conditions were found");
+            } else {
+                log.debug("Simple POM extracted.");
+            }
 
             URI p = vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.PREDICATE_MAP);

@@ -90,10 +90,10 @@ public class ConditionPredicateObjectMapExtractor extends PredicateObjectMapExtr
                             conditionsExtractor.extractBooleanCondition(
                             repository, conditionResource);
 
-                    log.debug("Extracting fallbacks");
+                    log.debug("Extracting fallback Maps...");
                     List<Value> fallbackTerms = conditionsExtractor.extractFallback(
                             repository, conditionResource);
-                    log.debug("found " + fallbackTerms.size());
+                    log.debug("found " + fallbackTerms.size() + " fallback Maps");
 
                     //Extract the fallbackTerms
                     for (Value fallbackTerm : fallbackTerms) {

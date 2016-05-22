@@ -1,16 +1,20 @@
 package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
 
+import be.ugent.mmlab.rml.mapdochandler.extraction.condition.ConditionPredicateObjectMapExtractor;
 import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
 import be.ugent.mmlab.rml.model.RDFTerm.PredicateMap;
 import be.ugent.mmlab.rml.model.TriplesMap;
 import be.ugent.mmlab.rml.model.std.StdConditionPredicateMap;
 import be.ugent.mmlab.rml.model.std.StdPredicateMap;
+import be.ugent.mmlab.rml.vocabularies.CRMLVocabulary;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
+import org.openrdf.model.ValueFactory;
 import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryConnection;
 
 /**
  * *************************************************************************
@@ -36,24 +40,34 @@ public class PredicateMapExtractor extends StdTermMapExtractor {
         PredicateMap result;
         log.debug("Extracting Predicate Map..");
         try {
+            RepositoryConnection connection = repository.getConnection();
+            ValueFactory vf = connection.getValueFactory();
+            
             extractProperties(repository, triplesMap, object);
             
-            if(conditions != null && conditions.size() > 0){
+            if (connection.hasStatement(
+                    object, vf.createURI(CRMLVocabulary.CRML_NAMESPACE
+                    + CRMLVocabulary.cRMLTerm.BOOLEAN_CONDITION), null, true)) {
                 log.debug("Conditional Predicate Map extracted");
+                ConditionPredicateObjectMapExtractor preObjMapExtractor =
+                        new ConditionPredicateObjectMapExtractor();
+                conditions = preObjMapExtractor.extractConditions(
+                        repository, object);
+                log.debug("In the end " + conditions.size()
+                        + " conditions were found");
                 result = new StdConditionPredicateMap(triplesMap, null, 
                     constantValue, stringTemplate, inverseExpression, 
                         referenceValue, termType, conditions);
-            }
-            else{
+            } else {
                 log.debug("Simple Predicate Map extracted");
                 result = new StdPredicateMap(triplesMap, null, constantValue, 
                         stringTemplate, inverseExpression, referenceValue, termType);
             }
-
+            connection.close();
             return result;
         } catch (Exception ex) {
             log.error("Exception: " + ex);
-        }
+        } 
         return null;
     }
 
