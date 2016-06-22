@@ -36,34 +36,34 @@ public class ConditionPredicateObjectMapExtractor extends PredicateObjectMapExtr
             Repository repository,
             Resource triplesMapSubject,
             Resource predicateObject,
-            Set<GraphMap> savedGraphMaps,
+            GraphMap graphMap,
             Map<Resource, TriplesMap> triplesMapResources,
             TriplesMap triplesMap){
+        PredicateObjectMap predicateObjectMap = null;
         log.debug("Extracting Predicate Object Map with conditions....");
         PredicateObjectMap pom =
                 super.extractPredicateObjectMap(
                 repository, triplesMapSubject, predicateObject,
-                savedGraphMaps, triplesMapResources, triplesMap);
+                graphMap, triplesMapResources, triplesMap);
+        if (pom != null) {
+            Set<Condition> conditions =
+                    extractConditions(repository, predicateObject);
+            log.debug("Found " + conditions.size() + " conditions.");
+            Set<PredicateObjectMap> fallbackPOMs =
+                    extractFallback(repository, predicateObject,triplesMapResources,triplesMap);
+            log.debug("Found " + fallbackPOMs.size() + " Fallback POMs.");
 
-        Set<Condition> conditions = 
-                extractConditions(repository, predicateObject);
-        log.debug("Found " + conditions.size() + " conditions.");
-        Set<PredicateObjectMap> fallbackPOMs = 
-                extractFallback(repository, predicateObject);
-        log.debug("Found " + fallbackPOMs.size() + " fallback POMs.");
-        
-        PredicateObjectMap predicateObjectMap = null ;
-        if(conditions.size() > 0 || fallbackPOMs.size() > 0){
-            log.debug("Conditional Predicate Object Map was extracted!!!");
-            //predicateObjectMap = (StdConditionPredicateObjectMap) pom;
-            predicateObjectMap = new StdConditionPredicateObjectMap(
-                    pom.getPredicateMaps(), pom.getObjectMaps(), 
-                    pom.getReferencingObjectMaps(), conditions, fallbackPOMs);
-            return predicateObjectMap;
+            if (conditions.size() > 0 || fallbackPOMs.size() > 0) {
+                log.debug("Conditional Predicate Object Map was extracted!");
+                //predicateObjectMap = (StdConditionPredicateObjectMap) pom;
+                predicateObjectMap = new StdConditionPredicateObjectMap(
+                        pom.getPredicateMaps(), pom.getObjectMaps(),
+                        pom.getReferencingObjectMaps(), conditions, fallbackPOMs);
+                return predicateObjectMap;
+            } else {
+                log.error("Conditions were not properly extracted");
+            }
         }
-        else
-            log.error("Conditions were not properly extracted");
-        
         return predicateObjectMap;
     }
     
@@ -90,10 +90,10 @@ public class ConditionPredicateObjectMapExtractor extends PredicateObjectMapExtr
                             conditionsExtractor.extractBooleanCondition(
                             repository, conditionResource);
 
-                    log.debug("Extracting fallback Maps...");
+                    log.debug("Extracting Fallback Maps...");
                     List<Value> fallbackTerms = conditionsExtractor.extractFallback(
                             repository, conditionResource);
-                    log.debug("found " + fallbackTerms.size() + " fallback Maps");
+                    log.debug("Found " + fallbackTerms.size() + " fallback Maps");
 
                     //Extract the fallbackTerms
                     for (Value fallbackTerm : fallbackTerms) {
@@ -104,7 +104,6 @@ public class ConditionPredicateObjectMapExtractor extends PredicateObjectMapExtr
                                 preObjMapExtractor.extractPredicateObjectMap(
                                 repository, conditionResource,
                                 (Resource) fallbackTerm, null, null, null);
-
                         log.debug("Setting the fallback POM");
                         //extractFallback(fallbackTerm);
                         booleanCondition.setFallback(predicateObjectMap);
@@ -131,7 +130,9 @@ public class ConditionPredicateObjectMapExtractor extends PredicateObjectMapExtr
     }
     
     public static Set<PredicateObjectMap> extractFallback(
-            Repository repository, Resource object) {
+            Repository repository, Resource object,
+            Map<Resource, TriplesMap> triplesMapResources,
+            TriplesMap triplesMap) {
         Set<PredicateObjectMap> nestedPOMs = new HashSet();
         StdConditionExtractor conditionsExtractor =
                 new StdConditionExtractor();
@@ -154,7 +155,7 @@ public class ConditionPredicateObjectMapExtractor extends PredicateObjectMapExtr
             PredicateObjectMap predicateObjectMap =
                     preObjMapExtractor.extractPredicateObjectMap(
                     repository, null, (Resource) conditionResource,
-                    null, null, null);
+                    null, triplesMapResources,triplesMap);
             log.debug("fallback POM extracted "
                     + predicateObjectMap.toString());
 

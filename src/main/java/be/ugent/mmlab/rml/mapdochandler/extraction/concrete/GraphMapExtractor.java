@@ -34,11 +34,11 @@ public class GraphMapExtractor extends StdTermMapExtractor {
             GraphMapExtractor.class.getSimpleName());
     
     public Set<GraphMap> extractGraphMapValues(
-            Repository repository, Set<Value> graphMapValues,
-            Set<GraphMap> savedGraphMaps, TriplesMap triplesMap) {
+            Repository repository, Set<Value> graphMapValues, TriplesMap triplesMap) {
 
         Set<GraphMap> graphMaps = new HashSet<GraphMap>();
 
+        if(graphMapValues != null)
         for (Value graphMap : graphMapValues) {
             // Create associated graphMap if it has not already created
             boolean found = false;
@@ -50,7 +50,6 @@ public class GraphMapExtractor extends StdTermMapExtractor {
                 GraphMap newGraphMap = null;
                 newGraphMap = extractGraphMap(repository, (Resource) graphMap, triplesMap);
 
-                savedGraphMaps.add(newGraphMap);
                 graphMaps.add(newGraphMap);
             }
         }
@@ -84,7 +83,7 @@ public class GraphMapExtractor extends StdTermMapExtractor {
     
     public PredicateObjectMap processGraphMaps(
             Repository repository, Resource predicateObject, TriplesMap triplesMap, 
-            PredicateObjectMap predicateObjectMap, Set<GraphMap> savedGraphMaps) {
+            PredicateObjectMap predicateObjectMap, GraphMap savedGraphMap) {
         // Add graphMaps
         Set<GraphMap> graphMaps = new HashSet<GraphMap>();
         Set<Value> graphMapValues = TermExtractor.extractValuesFromResource(
@@ -92,10 +91,8 @@ public class GraphMapExtractor extends StdTermMapExtractor {
 
         if (graphMapValues != null) {
             graphMaps = extractGraphMapValues(
-                    repository, graphMapValues, savedGraphMaps, triplesMap);
-            log.debug("Gtraph Maps returned " + graphMaps);
+                    repository, graphMapValues, triplesMap);
         }
-
         predicateObjectMap.setGraphMaps(graphMaps);
         return predicateObjectMap;
     }

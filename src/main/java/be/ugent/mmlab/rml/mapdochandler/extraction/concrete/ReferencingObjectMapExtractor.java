@@ -3,6 +3,7 @@ package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
 import be.ugent.mmlab.rml.condition.extractor.AbstractConditionExtractor;
 import be.ugent.mmlab.rml.condition.model.Condition;
 import be.ugent.mmlab.rml.condition.model.std.StdJoinConditionMetric;
+import be.ugent.mmlab.rml.mapdochandler.extraction.condition.ConditionPredicateObjectMapExtractor;
 import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
 import be.ugent.mmlab.rml.model.JoinCondition;
 import be.ugent.mmlab.rml.model.RDFTerm.ReferencingObjectMap;
@@ -48,17 +49,16 @@ public class ReferencingObjectMapExtractor {
     
     public Set<ReferencingObjectMap> processReferencingObjectMap(
             Repository repository, Statement object_statement, 
-            Set<GraphMap> savedGraphMaps, Map<Resource, TriplesMap> triplesMapResources, 
+            GraphMap savedGraphMap, Map<Resource, TriplesMap> triplesMapResources,
             TriplesMap triplesMap, Resource triplesMapSubject, Resource predicateObject) {
         Set<ReferencingObjectMap> refObjectMaps = new HashSet<ReferencingObjectMap>();
         try {
             log.debug("Extracting Referencing Object Map..");
             ReferencingObjectMap refObjectMap = extractReferencingObjectMap(
                     repository, (Resource) object_statement.getObject(),
-                    savedGraphMaps, triplesMapResources, triplesMap, 
+                    savedGraphMap, triplesMapResources, triplesMap,
                     triplesMapSubject, predicateObject);
             if (refObjectMap != null) {
-                //refObjectMap.setOwnTriplesMap(triplesMapResources.get(triplesMapSubject));
                 refObjectMaps.add(refObjectMap);
             }
         } catch (ClassCastException e) {
@@ -70,21 +70,23 @@ public class ReferencingObjectMapExtractor {
     
     /**
      *
-     * @param rmlMappingGraph
      * @param object
-     * @param graphMaps
+     * @param graphMap
      * @param triplesMapResources
      * @param triplesMap
      * @return
      */
     protected ReferencingObjectMap extractReferencingObjectMap(
-            Repository repository, Resource object, Set<GraphMap> graphMaps,
+            Repository repository, Resource object, GraphMap graphMap,
             Map<Resource, TriplesMap> triplesMapResources, TriplesMap triplesMap, 
             Resource triplesMapSubject, Resource predicateObject) {
         TriplesMap parent = null;
-        ReferencingObjectMap refObjectMap;
+        ReferencingObjectMap refObjectMap = null;
 
         try {
+            RepositoryConnection connection = repository.getConnection();
+            ValueFactory vf = connection.getValueFactory();
+            
             URI parentTriplesMap = (URI) TermExtractor.extractValueFromTermMap(
                     repository, object, R2RMLVocabulary.R2RMLTerm.PARENT_TRIPLES_MAP, triplesMap);
             log.debug("Parent Triples Maps were found " + parentTriplesMap);
@@ -95,16 +97,49 @@ public class ReferencingObjectMapExtractor {
             Set<JoinCondition> joinConditions = extractJoinConditions(
                     repository, object, triplesMap);
 
-            //Extracting Conditions
-            AbstractConditionExtractor conditionsExtractor =
+            //TODO: Transfer the following condition implementation to a separate function
+            if (connection.hasStatement(
+                    object, vf.createURI(CRMLVocabulary.CRML_NAMESPACE
+                    + CRMLVocabulary.cRMLTerm.BOOLEAN_CONDITION), null, true) || 
+                connection.hasStatement(
+                    object, vf.createURI(CRMLVocabulary.CRML_NAMESPACE
+                    + CRMLVocabulary.cRMLTerm.BINDING_CONDITION), null, true)) {
+                //TODO: Clean up the conditions mess - Properly rename classess
+                //ConditionPredicateObjectMapExtractor is for equalCondition
+                //AbstractConditionExtractor is for bindingCondition
+                ConditionPredicateObjectMapExtractor preObjMapExtractor =
+                        new ConditionPredicateObjectMapExtractor();
+                conditions = preObjMapExtractor.extractConditions(
+                        repository, object);
+                AbstractConditionExtractor conditionsExtractor =
                 new AbstractConditionExtractor();
-            conditions = conditionsExtractor.extractConditions(repository, object);
+                Set<Condition> conditions2 = conditionsExtractor.extractConditions(repository, object);
+                conditions.addAll(conditions2);
+                if(conditions != null) {
+                    log.debug("Conditional Referencing Object Map extracted.");
+                    log.debug(conditions.size() + " conditions were found");
+                }
+            }
+
+            if (graphMap != null) {
+                GraphMapExtractor graphMapExtractor = new GraphMapExtractor();
+                graphMap = graphMapExtractor.extractGraphMap(
+                        repository, (Resource) graphMap.getConstantValue(), triplesMap);
+            }
+            if (graphMap != null)
+                log.debug("Found Graph Map for this Referencing Object Map " + graphMap.getConstantValue());
+
             //Extracting fallbacks
             Set<ReferencingObjectMap> fallbackReferencingObjectMaps =
-                    extractFallbackObjectMap(repository, object, graphMaps, 
+                    extractFallbackObjectMap(repository, object, graphMap,
                     triplesMapResources, triplesMap, triplesMapSubject, predicateObject);
 
+            if (fallbackReferencingObjectMaps != null)
+                log.debug("Found " + fallbackReferencingObjectMaps.size()
+                        + " Fallback Maps.");
+
             // Extract parent
+            if(triplesMapResources != null)
             for (Resource triplesMapResource : triplesMapResources.keySet()) {
                 log.debug("Current Triples Map resource "
                         + triplesMapResource.stringValue());
@@ -112,12 +147,34 @@ public class ReferencingObjectMapExtractor {
                         triplesMapResource.stringValue().equals(
                         parentTriplesMap.stringValue())) {
                     parent = triplesMapResources.get(triplesMapResource);
-                    log.debug("Parent triples map found : "
-                            + triplesMapResource.stringValue());
                     break;
                 }
             }
+            else {
+                //TODO: Check if this is needed in the end or not
+                //Set main PreObjMap as FalMap's own Triples Map
+                RepositoryResult<Statement> triplesMapStatements = connection.getStatements(
+                        null, null, object, true);
+                triplesMapStatements = connection.getStatements(
+                        null, vf.createURI(CRMLVocabulary.CRML_NAMESPACE + CRMLVocabulary.cRMLTerm.FALLBACK),
+                        triplesMapStatements.next().getSubject(), true);
 
+                triplesMapStatements = connection.getStatements(
+                    null, vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE + R2RMLVocabulary.R2RMLTerm.PREDICATE_OBJECT_MAP),
+                        triplesMapStatements.next().getSubject(), true);
+                Resource tm = triplesMapStatements.next().getSubject();
+                //TODO: Properly handle duplicate code
+                for (Resource triplesMapResource : triplesMapResources.keySet()) {
+                    if (parentTriplesMap != null &&
+                            triplesMapResource.stringValue().equals(tm.stringValue())) {
+                        parent = triplesMapResources.get(triplesMapResource);
+                        break;
+                    }
+                }
+            }
+
+            connection.close();
+            
             //TODO: Move error checking elsewhere
             if (parentTriplesMap == null && !joinConditions.isEmpty()
                     && !conditions.isEmpty()) {
@@ -131,21 +188,21 @@ public class ReferencingObjectMapExtractor {
                 log.debug("Not a Referencing Object Map.");
                 return null;
             }
-
-            if (!conditions.isEmpty() && conditions != null && conditions.size() > 0) {
-                log.debug("Referencing Object Map "
-                        + "with Conditions is being extracted..");
-                //if (conditions != null && conditions.size() > 0) {
+            if (conditions != null) {
+                if (!conditions.isEmpty() && conditions.size() > 0) {
+                    log.debug("Referencing Object Map "
+                            + "with Conditions is being extracted..");
+                    //if (conditions != null && conditions.size() > 0) {
                     refObjectMap = new ConditionReferencingObjectMap(null,
-                            parent, joinConditions, conditions, fallbackReferencingObjectMaps);
-
+                            parent, joinConditions, conditions, fallbackReferencingObjectMaps, graphMap);
+                }
             } // Link between this reerencing object and its triplesMap parent will be
             // performed at the end f treatment.
             else {
                 log.debug("Referencing Object Map "
                         + "without Conditions is being extracted..");
                 refObjectMap = new StdReferencingObjectMap(null,
-                        parent, joinConditions, fallbackReferencingObjectMaps);
+                        parent, joinConditions, fallbackReferencingObjectMaps, graphMap);
             }
 
             return refObjectMap;
@@ -214,7 +271,7 @@ public class ReferencingObjectMapExtractor {
     }
     
     private Set<ReferencingObjectMap> extractFallbackObjectMap(
-            Repository repository, Resource object, Set<GraphMap> graphMaps, 
+            Repository repository, Resource object, GraphMap graphMap,
             Map<Resource,TriplesMap> triplesMapResources, TriplesMap triplesMap,
             Resource triplesMapSubject, Resource predicateObject) {
         Set<ReferencingObjectMap> fallbackReferencingObjectMaps = 
@@ -242,7 +299,7 @@ public class ReferencingObjectMapExtractor {
                             new ReferencingObjectMapExtractor();
                     fallbackReferencingObjectMaps =
                             refObjMapExtractor.processReferencingObjectMap(
-                            repository, fallbackStatement, graphMaps,
+                            repository, fallbackStatement, graphMap,
                             triplesMapResources, triplesMap,
                             triplesMapSubject, predicateObject);
                     log.debug("Extract Fallback Object Map done.");

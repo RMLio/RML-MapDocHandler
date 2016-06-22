@@ -61,7 +61,7 @@ public class TriplesMapExtractor {
         
         result.setLogicalSource(logicalSource);
         // Create a graph maps storage to save all met graph uri during parsing.
-        Set<GraphMap> graphMaps = new HashSet<GraphMap>();
+        GraphMap graphMap = null;
 
         // Extract exactly one SubjectMap
         //SubjectMap subjectMap = extractSubjectMap(
@@ -69,7 +69,7 @@ public class TriplesMapExtractor {
         SubjectMapExtractor sbjMapExtractor = new SubjectMapExtractor();
         SubjectMap subjectMap =
                 sbjMapExtractor.extractSubjectMap(
-                repository, triplesMapSubject, graphMaps, result);
+                repository, triplesMapSubject, graphMap, result);
         
         try {
             result.setSubjectMap(subjectMap);
@@ -79,7 +79,7 @@ public class TriplesMapExtractor {
 
         // Extract PredicateObjectMaps
         Set<PredicateObjectMap> predicateObjectMaps = extractPredicateObjectMaps(
-                repository, triplesMapSubject, graphMaps, result,
+                repository, triplesMapSubject, graphMap, result,
                 triplesMapResources);
 
         // Extract zero or more PredicateObjectMaps
@@ -87,7 +87,7 @@ public class TriplesMapExtractor {
             result.setPredicateObjectMap(predicateObjectMap);
         }
 
-        log.debug("Extract of TriplesMap subject : "
+        log.debug("Extract of TriplesMap : "
                 + triplesMapSubject.stringValue() + " done.");
     }
     
@@ -184,7 +184,7 @@ public class TriplesMapExtractor {
 
     public Set<PredicateObjectMap> extractPredicateObjectMaps(
             Repository repository, Resource triplesMapSubject,
-            Set<GraphMap> graphMaps, TriplesMap result,
+            GraphMap graphMap, TriplesMap result,
             Map<Resource, TriplesMap> triplesMapResources) {
         Set<PredicateObjectMap> predicateObjectMaps = null;
         try {
@@ -226,7 +226,7 @@ public class TriplesMapExtractor {
                             preObjMapExtractor.extractPredicateObjectMap(
                             repository, triplesMapSubject,
                             (Resource) statement.getObject(),
-                            graphMaps, triplesMapResources, result);
+                            graphMap, triplesMapResources, result);
                     if (predicateObjectMap != null) {
                         predicateObjectMap.setOwnTriplesMap(result);
                         predicateObjectMaps.add(predicateObjectMap);

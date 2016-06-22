@@ -53,7 +53,7 @@ public class ConcreteSourceFactory implements SourceFactory {
                 RepositoryResult<Statement> inputStatements =
                         connection.getStatements(
                         (Resource) value, RDF.TYPE, null, true);
-                if(inputStatements != null || inputStatements.hasNext() == false)
+                if(inputStatements == null)
                     log.error("no input statement found");
 
                 String sourceType = 

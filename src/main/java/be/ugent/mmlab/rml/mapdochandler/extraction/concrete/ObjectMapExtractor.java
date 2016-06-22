@@ -8,7 +8,6 @@ import be.ugent.mmlab.rml.model.std.StdConditionObjectMap;
 import be.ugent.mmlab.rml.model.std.StdObjectMap;
 import be.ugent.mmlab.rml.vocabularies.CRMLVocabulary;
 import be.ugent.mmlab.rml.vocabularies.R2RMLVocabulary;
-import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.openrdf.model.Resource;
@@ -29,21 +28,21 @@ import org.openrdf.repository.RepositoryConnection;
  */
 
 public class ObjectMapExtractor extends StdTermMapExtractor {
-    
+
     // Log
     static final Logger log = 
             LoggerFactory.getLogger(
             ObjectMapExtractor.class.getSimpleName());
     
     public ObjectMap extractObjectMap(Repository repository,
-            Resource object, Set<GraphMap> graphMaps, TriplesMap triplesMap){
+            Resource object, GraphMap graphMap, TriplesMap triplesMap){
         ObjectMap result ;
         log.debug("Extracting Object Map..");
         
         try {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
-            
+            log.debug("object " + object.stringValue());
             extractProperties(repository, triplesMap, object);
             
             //Extract additional properties for Object Map
@@ -51,7 +50,12 @@ public class ObjectMapExtractor extends StdTermMapExtractor {
                     object, R2RMLVocabulary.R2RMLTerm.LANGUAGE, triplesMap);
             URI dataType = (URI) TermExtractor.extractValueFromTermMap(repository, object,
                     R2RMLVocabulary.R2RMLTerm.DATATYPE, triplesMap);
-            
+
+            graphMap = extractGraphMap(repository, triplesMap, graphMap);
+            if (graphMap != null)
+                log.debug("Found Graph Map for this Object Map " + graphMap.getConstantValue());
+
+            log.debug("Extracting conditions...");
             if (connection.hasStatement(
                     object, vf.createURI(CRMLVocabulary.CRML_NAMESPACE
                     + CRMLVocabulary.cRMLTerm.BOOLEAN_CONDITION), null, true)) {
@@ -60,15 +64,16 @@ public class ObjectMapExtractor extends StdTermMapExtractor {
                         new ConditionPredicateObjectMapExtractor();
                 conditions = preObjMapExtractor.extractConditions(
                         repository, object);
-                log.debug(conditions.size() + " conditions were found");
-                result = new StdConditionObjectMap(triplesMap, null, 
+                if (conditions != null)
+                    log.debug(conditions.size() + " conditions were found");
+                result = new StdConditionObjectMap(triplesMap, null,
                     constantValue, dataType, languageTag, stringTemplate, 
-                    termType, inverseExpression, referenceValue, conditions);
+                    termType, inverseExpression, referenceValue, conditions, graphMap);
             } else {
                 log.debug("Simple Object Map extracted.");
                 result = new StdObjectMap(triplesMap, null, 
                     constantValue, dataType, languageTag, stringTemplate, 
-                    termType, inverseExpression, referenceValue);
+                    termType, inverseExpression, referenceValue, graphMap);
             }
             connection.close();
             return result;

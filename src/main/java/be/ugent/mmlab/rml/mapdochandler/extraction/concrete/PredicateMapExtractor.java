@@ -35,7 +35,7 @@ public class PredicateMapExtractor extends StdTermMapExtractor {
     
     public PredicateMap extractPredicateMap(
             Repository repository, Statement statement,
-            Set<GraphMap> graphMaps, TriplesMap triplesMap) {
+            GraphMap graphMap, TriplesMap triplesMap) {
         Resource object = (Resource) statement.getObject();
         PredicateMap result;
         log.debug("Extracting Predicate Map..");
@@ -44,6 +44,10 @@ public class PredicateMapExtractor extends StdTermMapExtractor {
             ValueFactory vf = connection.getValueFactory();
             
             extractProperties(repository, triplesMap, object);
+
+            graphMap = extractGraphMap(repository, triplesMap, graphMap);
+            if (graphMap != null)
+                log.debug("Found Graph Map for this Predicate Map " + graphMap.getConstantValue());
             
             if (connection.hasStatement(
                     object, vf.createURI(CRMLVocabulary.CRML_NAMESPACE
@@ -53,15 +57,13 @@ public class PredicateMapExtractor extends StdTermMapExtractor {
                         new ConditionPredicateObjectMapExtractor();
                 conditions = preObjMapExtractor.extractConditions(
                         repository, object);
-                log.debug("In the end " + conditions.size()
-                        + " conditions were found");
-                result = new StdConditionPredicateMap(triplesMap, null, 
+                result = new StdConditionPredicateMap(triplesMap, null,
                     constantValue, stringTemplate, inverseExpression, 
-                        referenceValue, termType, conditions);
+                        referenceValue, termType, conditions, graphMap);
             } else {
                 log.debug("Simple Predicate Map extracted");
                 result = new StdPredicateMap(triplesMap, null, constantValue, 
-                        stringTemplate, inverseExpression, referenceValue, termType);
+                        stringTemplate, inverseExpression, referenceValue, termType, graphMap);
             }
             connection.close();
             return result;

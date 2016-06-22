@@ -1,5 +1,6 @@
 package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
 
+import be.ugent.mmlab.rml.condition.extractor.FallbackMapExtractor;
 import be.ugent.mmlab.rml.condition.model.Condition;
 import be.ugent.mmlab.rml.mapdochandler.extraction.condition.ConditionPredicateObjectMapExtractor;
 import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
@@ -8,6 +9,7 @@ import be.ugent.mmlab.rml.model.RDFTerm.PredicateMap;
 import be.ugent.mmlab.rml.model.PredicateObjectMap;
 import be.ugent.mmlab.rml.model.RDFTerm.ReferencingObjectMap;
 import be.ugent.mmlab.rml.model.TriplesMap;
+import be.ugent.mmlab.rml.model.std.StdConditionPredicateObjectMap;
 import be.ugent.mmlab.rml.model.std.StdPredicateObjectMap;
 import be.ugent.mmlab.rml.vocabularies.CRMLVocabulary;
 import be.ugent.mmlab.rml.vocabularies.R2RMLVocabulary;
@@ -46,7 +48,7 @@ public class PredicateObjectMapExtractor {
             Repository repository,
             Resource triplesMapSubject,
             Resource predicateObject,
-            Set<GraphMap> savedGraphMaps,
+            GraphMap savedGraphMap,
             Map<Resource, TriplesMap> triplesMapResources,
             TriplesMap triplesMap) {
         RepositoryResult<Statement> predicate_statements;
@@ -60,56 +62,41 @@ public class PredicateObjectMapExtractor {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
             
-            if (connection.hasStatement(
-                    predicateObject, vf.createURI(CRMLVocabulary.CRML_NAMESPACE
-                    + CRMLVocabulary.cRMLTerm.BOOLEAN_CONDITION), null, true)) {
-                log.debug("Conditional POM extracted.");
-                ConditionPredicateObjectMapExtractor preObjMapExtractor =
-                        new ConditionPredicateObjectMapExtractor();
-                Set<Condition> conditions = preObjMapExtractor.extractConditions(
-                                       repository, predicateObject);
-                log.debug(conditions.size() + " conditions were found");
-            } else {
-                log.debug("Simple POM extracted.");
-            }
-
             URI p = vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.PREDICATE_MAP);
             predicate_statements = connection.getStatements(predicateObject, p, null, true);
             log.debug("More Predicate Map statements: " 
                     + predicate_statements.hasNext());
-
             while (predicate_statements.hasNext()) {
                 PredicateMapExtractor predMapExtractor = new PredicateMapExtractor();
                 PredicateMap predicateMap = predMapExtractor.extractPredicateMap(
                         repository, predicate_statements.next(),
-                        savedGraphMaps, triplesMap);
+                        savedGraphMap, triplesMap);
                 predicateMaps.add(predicateMap);
-
 
                 URI o = vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
                         + R2RMLVocabulary.R2RMLTerm.OBJECT_MAP);
                 // Extract object maps
                 object_statements = connection.getStatements(predicateObject, o, null, true);
-                log.debug("Object Map statements found: " + object_statements);
 
+                if(object_statements.hasNext())
                 while (object_statements.hasNext()) {
                     Statement object_statement = object_statements.next();
-
                     //Extract Referencing Object Maps
                     log.debug("Extracting Referencing Object Maps..");
                     ReferencingObjectMapExtractor refObjMapExtractor = 
                             new ReferencingObjectMapExtractor();
                     refObjectMaps = refObjMapExtractor.processReferencingObjectMap(
-                            repository, object_statement, savedGraphMaps,
+                            repository, object_statement, savedGraphMap,
                             triplesMapResources, triplesMap, triplesMapSubject, predicateObject);
-                    log.debug("Referencing Object Map statements found: " + refObjectMaps);
+                    if(refObjectMaps != null)
+                    log.debug("Referencing Object Map statements found: " + refObjectMaps.size());
                     
                     if (refObjectMaps.isEmpty()) {
                         ObjectMapExtractor objMapExtractor = new ObjectMapExtractor();
 
                         ObjectMap objectMap = objMapExtractor.extractObjectMap(repository,
-                                (Resource) object_statement.getObject(), savedGraphMaps, triplesMap);
+                                (Resource) object_statement.getObject(), savedGraphMap, triplesMap);
                         try {
                             objectMap.setOwnTriplesMap(triplesMapResources.get(triplesMapSubject));
                         } catch (Exception ex) {
@@ -117,14 +104,26 @@ public class PredicateObjectMapExtractor {
                         }
                         objectMaps.add(objectMap);
                     }
-                    predicateObjectMap = new StdPredicateObjectMap(
-                            predicateMaps, objectMaps, refObjectMaps);
-                    GraphMapExtractor graphMapExtractor = new GraphMapExtractor();
-                    graphMapExtractor.processGraphMaps(
-                            repository, predicateObject, triplesMap, predicateObjectMap, savedGraphMaps);
 
+                    predicateObjectMap = createPredicateObjectMap(
+                            repository, triplesMapSubject,
+                            predicateObject, savedGraphMap, triplesMapResources,
+                            triplesMap, objectMaps, refObjectMaps, predicateMaps);
+                    
+                    /*predicateObjectMap = new StdPredicateObjectMap(
+                            predicateMaps, objectMaps, refObjectMaps);*/
+                    if (predicateObjectMap != null) {
+                        GraphMapExtractor graphMapExtractor = new GraphMapExtractor();
+                        graphMapExtractor.processGraphMaps(
+                                repository, predicateObject, triplesMap,
+                                predicateObjectMap, savedGraphMap);
+                    }
                     log.debug("Extract predicate-object map done.");
 
+                }
+                else {
+                    predicateObjectMap = null;
+                    return predicateObjectMap;
                 }
             }
             connection.close();
@@ -132,6 +131,74 @@ public class PredicateObjectMapExtractor {
             log.error("RepositoryException " + ex);
         }
         return predicateObjectMap;
+    }
+    
+    public PredicateObjectMap createPredicateObjectMap(
+            Repository repository,
+            Resource triplesMapSubject,
+            Resource predicateObject,
+            GraphMap savedGraphMap,
+            Map<Resource, TriplesMap> triplesMapResources,
+            TriplesMap triplesMap,
+            Set<ObjectMap> objectMaps,
+            Set<ReferencingObjectMap> refObjectMaps,
+            Set<PredicateMap> predicateMaps) {
+        PredicateObjectMap predicateObjectMap = null;
+        Set<PredicateObjectMap> fallbackPOMs = new HashSet();
+        
+        try {
+            RepositoryConnection connection = repository.getConnection();
+            ValueFactory vf = connection.getValueFactory();
+            
+            if (connection.hasStatement(
+                    predicateObject, vf.createURI(CRMLVocabulary.CRML_NAMESPACE
+                    + CRMLVocabulary.cRMLTerm.BOOLEAN_CONDITION), null, true)) {
+                ConditionPredicateObjectMapExtractor preObjMapExtractor =
+                        new ConditionPredicateObjectMapExtractor();
+                Set<Condition> conditions = preObjMapExtractor.extractConditions(
+                        repository, predicateObject);
+
+                //Extracting fallbacks
+                FallbackMapExtractor fallbackExtractor =
+                        new FallbackMapExtractor();
+                RepositoryResult<Statement> fallbackStatements =
+                        fallbackExtractor.extractFallbackObjectMap(
+                        repository, predicateObject, null, triplesMapResources,
+                        triplesMap, triplesMapSubject, predicateObject);
+                log.debug("Processing fallbacks...");
+                if(fallbackStatements != null)
+                while (fallbackStatements.hasNext()) {
+                    Statement fallbackStatement = fallbackStatements.next();
+
+                    //Extract Referencing Object Maps
+                    log.debug("Extracting fallback POMs..");
+                    PredicateObjectMapExtractor fallbackPreObjMapExtractor =
+                            new PredicateObjectMapExtractor();
+                    PredicateObjectMap fallbackPredicateObjectMap =
+                            fallbackPreObjMapExtractor.extractPredicateObjectMap(
+                            repository, triplesMapSubject,
+                            (Resource) fallbackStatement.getObject(),
+                            savedGraphMap, triplesMapResources, triplesMap);
+                    fallbackPOMs.add(fallbackPredicateObjectMap);
+                    predicateObjectMap = new StdConditionPredicateObjectMap(predicateMaps, objectMaps,
+                            refObjectMaps, conditions, fallbackPOMs);
+                }
+                else{
+                    log.debug("Simple POM extracted .");
+                    predicateObjectMap = new StdPredicateObjectMap(
+                            predicateMaps, objectMaps, refObjectMaps);
+                }
+            } else {
+                log.debug("Simple POM extracted.");
+                predicateObjectMap = new StdPredicateObjectMap(
+                            predicateMaps, objectMaps, refObjectMaps);
+            }
+            
+        } catch (RepositoryException ex) {
+            log.error("Repository Exception " + ex);
+        } finally {
+            return predicateObjectMap;
+        }
     }
     
 }

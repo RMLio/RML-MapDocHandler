@@ -39,7 +39,7 @@ public class SubjectMapExtractor extends StdTermMapExtractor {
     
     public SubjectMap extractSubjectMap(
             Repository repository, Resource triplesMapSubject,
-            Set<GraphMap> savedGraphMaps, TriplesMap triplesMap) {
+            GraphMap graphMap, TriplesMap triplesMap) {
         SubjectMap result = null;
         RepositoryResult<Statement> statements;
         log.debug("Extracting Subject Map...");
@@ -57,17 +57,10 @@ public class SubjectMapExtractor extends StdTermMapExtractor {
             
             extractProperties(repository, triplesMap, subjectMap);
             
-            //AD: The values of the rr:class property must be IRIs. 
-            //AD: Would that mean that it can not be a reference to an extract of the input or a template?
             Set<URI> classIRIs = TermExtractor.extractURIsFromTermMap(
                     repository, subjectMap, R2RMLVocabulary.R2RMLTerm.CLASS);
 
-            if (graphMapValues != null && graphMapValues.size() > 0) {
-                GraphMapExtractor graphMapExtractor = new GraphMapExtractor();
-                graphMaps = graphMapExtractor.extractGraphMapValues(
-                        repository, graphMapValues, savedGraphMaps, triplesMap);
-                log.debug("Graph Maps returned " + graphMaps);
-            }
+            graphMap = extractGraphMap(repository, triplesMap, graphMap);
 
             try {
 
@@ -83,12 +76,12 @@ public class SubjectMapExtractor extends StdTermMapExtractor {
                     log.debug(conditions.size() + " conditions were found");
                     result = new StdConditionSubjectMap(triplesMap, constantValue, 
                             stringTemplate, termType, inverseExpression,
-                            referenceValue, classIRIs, graphMaps, conditions);
+                            referenceValue, classIRIs, graphMap, conditions);
                 } else {
                     log.debug("Simple Subject Map Extractor");
                     result = new StdSubjectMap(triplesMap, constantValue,
                             stringTemplate, termType, inverseExpression, 
-                            referenceValue, classIRIs, graphMaps);
+                            referenceValue, classIRIs, graphMap);
                 }
             } catch (Exception ex) {
                 log.error("Exception: " + ex);

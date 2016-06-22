@@ -63,12 +63,26 @@ public class StdTermMapExtractor implements TermMapExtractor {
         graphMaps = new HashSet<GraphMap>();
         graphMapValues = TermExtractor.extractValuesFromResource(
                     repository, object, R2RMLVocabulary.R2RMLTerm.GRAPH_MAP);
-        
+        if(graphMapValues != null)
+            log.debug("Found Graph Maps!");
         //TODO: Generalize the following for every condition
         AbstractConditionExtractor conditionsExtractor =
                 new AbstractConditionExtractor();
         conditions = conditionsExtractor.extractConditions(repository, object);
 
+    }
+
+    public  GraphMap extractGraphMap(Repository repository, TriplesMap triplesMap, GraphMap graphMap){
+        if (graphMapValues != null && graphMapValues.size() > 0) {
+            GraphMapExtractor graphMapExtractor = new GraphMapExtractor();
+            graphMaps = graphMapExtractor.extractGraphMapValues(
+                    repository, graphMapValues, triplesMap);
+            if(graphMaps != null && graphMaps.size() > 0){
+                graphMap = graphMaps.iterator().next();
+            }
+
+        }
+        return graphMap;
     }
 
 }
