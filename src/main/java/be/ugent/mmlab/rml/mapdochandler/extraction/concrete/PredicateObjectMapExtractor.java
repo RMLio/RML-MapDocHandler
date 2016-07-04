@@ -52,6 +52,8 @@ public class PredicateObjectMapExtractor {
         Set<PredicateMap> predicateMaps = new HashSet<PredicateMap>();
         Set<ObjectMap> objectMaps = new HashSet<ObjectMap>();
         Set<ReferencingObjectMap> refObjectMaps = new HashSet<ReferencingObjectMap>();
+
+
         
         try {
             RepositoryConnection connection = repository.getConnection();
@@ -103,6 +105,19 @@ public class PredicateObjectMapExtractor {
                     }
                     predicateObjectMap = new StdPredicateObjectMap(
                             predicateMaps, objectMaps, refObjectMaps);
+
+                    //Extract dcterms:type if exists
+                    try {
+                        RepositoryConnection dcTermsConnection = repository.getConnection();
+                        RepositoryResult<Statement> dcTermsStatements = dcTermsConnection.getStatements(predicateObject, repository.getValueFactory().createURI("http://purl.org/dc/terms/type"), null, false);
+                        if( dcTermsStatements != null && dcTermsStatements.hasNext()) {
+                            predicateObjectMap.setDCTermsType(dcTermsStatements.next().getObject().stringValue());
+                        }
+                        dcTermsConnection.close();
+                    } catch (RepositoryException ex) {
+                        log.error("Exception: " + ex);
+                    }
+
                     GraphMapExtractor graphMapExtractor = new GraphMapExtractor();
                     graphMapExtractor.processGraphMaps(
                             repository, predicateObject, triplesMap, predicateObjectMap, savedGraphMaps);
