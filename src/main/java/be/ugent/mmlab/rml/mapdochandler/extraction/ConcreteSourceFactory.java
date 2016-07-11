@@ -36,7 +36,7 @@ import org.openrdf.repository.RepositoryResult;
 public class ConcreteSourceFactory implements SourceFactory {
     
     // Log
-    private static final Logger log = 
+    private static final Logger log =
             LoggerFactory.getLogger(
             ConcreteSourceFactory.class.getSimpleName());
     
@@ -54,6 +54,8 @@ public class ConcreteSourceFactory implements SourceFactory {
                 RepositoryResult<Statement> inputStatements =
                         connection.getStatements(
                         (Resource) value, RDF.TYPE, null, true);
+                if(inputStatements == null)
+                    log.error("no input statement found");
 
                 String sourceType = 
                         inputStatements.next().getObject().stringValue().toString();
@@ -73,6 +75,7 @@ public class ConcreteSourceFactory implements SourceFactory {
                         sourceExtractor = new CsvwExtractor();
                         break;
                     case ("http://www.w3.org/ns/dcat#Distribution"):
+                    case ("http://www.w3.org/ns/dcat#Dataset"):    
                         log.debug("Source described with DCAT vocabulary.");
                         sourceExtractor = new DcatExtractor();
                         break;

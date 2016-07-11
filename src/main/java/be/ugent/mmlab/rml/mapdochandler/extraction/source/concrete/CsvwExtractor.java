@@ -34,7 +34,8 @@ public class CsvwExtractor extends StdSourceExtractor {
     
     // Log
     private static final Logger log = 
-            LoggerFactory.getLogger(CsvwExtractor.class.getSimpleName());
+            LoggerFactory.getLogger(
+            CsvwExtractor.class.getSimpleName());
 
     public CsvwExtractor() {
     }

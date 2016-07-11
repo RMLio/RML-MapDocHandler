@@ -37,7 +37,8 @@ public class HydraExtractor extends StdSourceExtractor {
     
     // Log
     private static final Logger log = 
-            LoggerFactory.getLogger(HydraExtractor.class.getSimpleName());
+            LoggerFactory.getLogger(
+            HydraExtractor.class.getSimpleName());
     // Value factory
     private static ValueFactory vf = new ValueFactoryImpl();
 

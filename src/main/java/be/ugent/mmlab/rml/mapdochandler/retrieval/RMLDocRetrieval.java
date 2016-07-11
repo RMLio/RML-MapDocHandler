@@ -28,7 +28,7 @@ import org.openrdf.sail.memory.MemoryStore;
 public class RMLDocRetrieval {
     
     // Log
-    static final Logger log = 
+    static final Logger log =
             LoggerFactory.getLogger(
             RMLDocRetrieval.class.getSimpleName());
     
@@ -78,8 +78,9 @@ public class RMLDocRetrieval {
                     log.error("RDFParseException " + ex);
                 }
             }
+            long size = con.size();
             log.debug("Number of RML triples in the repository "
-                    + fileToRMLFile + " : " + con.size() + " from local file");
+                    + fileToRMLFile + " : " + size + " from local file");
             if(con.size() == 0)
                 return null;
             con.close();

@@ -97,6 +97,7 @@ public abstract class StdSourceExtractor  implements SourceExtractor {
      * @param value
      * @return
      */
+    @Override
     public ReferenceFormulation extractCustomReferenceFormulation(
             Repository repository, Value value){
             return null;

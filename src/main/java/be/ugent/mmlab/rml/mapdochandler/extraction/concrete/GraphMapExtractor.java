@@ -1,5 +1,6 @@
 package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
 
+import be.ugent.mmlab.rml.extraction.TermExtractor;
 import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
 import be.ugent.mmlab.rml.model.PredicateObjectMap;
 import be.ugent.mmlab.rml.model.TriplesMap;
@@ -29,15 +30,16 @@ import org.openrdf.repository.RepositoryException;
 public class GraphMapExtractor extends StdTermMapExtractor {
     
     // Log
-    static final Logger log = LoggerFactory.getLogger(
+    static final Logger log =
+            LoggerFactory.getLogger(
             GraphMapExtractor.class.getSimpleName());
     
     public Set<GraphMap> extractGraphMapValues(
-            Repository repository, Set<Value> graphMapValues,
-            Set<GraphMap> savedGraphMaps, TriplesMap triplesMap) {
+            Repository repository, Set<Value> graphMapValues, TriplesMap triplesMap) {
 
         Set<GraphMap> graphMaps = new HashSet<GraphMap>();
 
+        if(graphMapValues != null)
         for (Value graphMap : graphMapValues) {
             // Create associated graphMap if it has not already created
             boolean found = false;
@@ -49,7 +51,6 @@ public class GraphMapExtractor extends StdTermMapExtractor {
                 GraphMap newGraphMap = null;
                 newGraphMap = extractGraphMap(repository, (Resource) graphMap, triplesMap);
 
-                savedGraphMaps.add(newGraphMap);
                 graphMaps.add(newGraphMap);
             }
         }
@@ -83,7 +84,7 @@ public class GraphMapExtractor extends StdTermMapExtractor {
     
     public PredicateObjectMap processGraphMaps(
             Repository repository, Resource predicateObject, TriplesMap triplesMap, 
-            PredicateObjectMap predicateObjectMap, Set<GraphMap> savedGraphMaps) {
+            PredicateObjectMap predicateObjectMap, GraphMap savedGraphMap) {
         // Add graphMaps
         Set<GraphMap> graphMaps = new HashSet<GraphMap>();
         Set<Value> graphMapValues = TermExtractor.extractValuesFromResource(
@@ -91,10 +92,8 @@ public class GraphMapExtractor extends StdTermMapExtractor {
 
         if (graphMapValues != null) {
             graphMaps = extractGraphMapValues(
-                    repository, graphMapValues, savedGraphMaps, triplesMap);
-            log.debug("Graph Maps returned " + graphMaps);
+                    repository, graphMapValues, triplesMap);
         }
-
         predicateObjectMap.setGraphMaps(graphMaps);
         return predicateObjectMap;
     }
