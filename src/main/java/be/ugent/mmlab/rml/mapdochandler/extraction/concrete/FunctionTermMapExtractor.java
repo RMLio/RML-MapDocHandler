@@ -17,6 +17,7 @@ import org.openrdf.repository.RepositoryConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -61,7 +62,7 @@ public class FunctionTermMapExtractor {
                 function = getFunction(functionTriplesMap);
                 parameters = getParameters(functionTriplesMap);
 
-                Set<String> parametersRefs = getFunRefPairs(functionTriplesMap);
+                Map<String,String> parametersRefs = getFunRefPairs(functionTriplesMap);
 
                 Value constantValue = null;
                 URI dataType = null;
@@ -106,8 +107,8 @@ public class FunctionTermMapExtractor {
         return funPredicateURI;
     }
 
-    private Set<String> getFunRefPairs(TriplesMap functionTriplesMap){
-        Set<String> parameters = new HashSet<>();
+    private Map<String,String> getFunRefPairs(TriplesMap functionTriplesMap){
+        Map<String,String> parameters = new HashMap<String,String>();
 
         Set<PredicateObjectMap> predObjMaps = functionTriplesMap.getPredicateObjectMaps();
 
@@ -120,7 +121,7 @@ public class FunctionTermMapExtractor {
             if(!funPredicateValue.equals(executes)) {
                 parameter = predicateObjectMap.getObjectMaps().iterator().next();
                 parameterValue = parameter.getReferenceMap().getReference();
-                parameters.add(parameterValue);
+                parameters.put(funPredicateValue, parameterValue);
             }
         }
         return parameters;
