@@ -76,7 +76,7 @@ public class TriplesMapExtractor {
         SubjectMap subjectMap =
                 sbjMapExtractor.extractSubjectMap(
                 repository, triplesMapSubject, graphMap, result);
-        
+
         try {
             result.setSubjectMap(subjectMap);
             } catch (Exception ex) {

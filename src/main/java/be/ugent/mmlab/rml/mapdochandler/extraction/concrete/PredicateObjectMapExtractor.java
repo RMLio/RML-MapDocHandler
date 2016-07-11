@@ -133,6 +133,20 @@ public class PredicateObjectMapExtractor {
                         }
                         objectMaps.add(objectMap);
                     }
+                    predicateObjectMap = new StdPredicateObjectMap(
+                            predicateMaps, objectMaps, refObjectMaps);
+
+                    //Extract dcterms:type if exists
+                    try {
+                        RepositoryConnection dcTermsConnection = repository.getConnection();
+                        RepositoryResult<Statement> dcTermsStatements = dcTermsConnection.getStatements(predicateObject, repository.getValueFactory().createURI("http://purl.org/dc/terms/type"), null, false);
+                        if( dcTermsStatements != null && dcTermsStatements.hasNext()) {
+                            predicateObjectMap.setDCTermsType(dcTermsStatements.next().getObject().stringValue());
+                        }
+                        dcTermsConnection.close();
+                    } catch (RepositoryException ex) {
+                        log.error("Exception: " + ex);
+                    }
 
                     predicateObjectMap = createPredicateObjectMap(
                             repository, triplesMapSubject,
