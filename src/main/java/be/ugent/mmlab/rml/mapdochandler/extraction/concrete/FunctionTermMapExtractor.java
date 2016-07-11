@@ -76,7 +76,7 @@ public class FunctionTermMapExtractor {
                 result = new StdFunctionTermMap(triplesMap, predicateObjectMap,
                         constantValue, dataType, languageTag,
                         stringTemplate, termType, inverseExpression,
-                        referenceValue, graphMap, value, functionTriplesMap, function, parameters);
+                        referenceValue, graphMap, value, functionTriplesMap, function, parameters, parametersRefs);
                 //result = new StdFunctionTermMap(functionTriplesMap, value, function, parameters);
                 results.add(result);
             }
@@ -117,11 +117,15 @@ public class FunctionTermMapExtractor {
             ObjectMap parameter;
             PredicateMap funPredicate = predicateObjectMap.getPredicateMaps().iterator().next();
             String funPredicateValue = funPredicate.getConstantValue().stringValue();
-            Object executes = FnVocabulary.FNO_NAMESPACE + FnVocabulary.FnTerm.EXECUTES;
+
+            String executes = FnVocabulary.FNO_NAMESPACE + FnVocabulary.FnTerm.EXECUTES;
+
             if(!funPredicateValue.equals(executes)) {
                 parameter = predicateObjectMap.getObjectMaps().iterator().next();
                 parameterValue = parameter.getReferenceMap().getReference();
-                parameters.put(funPredicateValue, parameterValue);
+
+                if(funPredicateValue != null && parameterValue != null)
+                    parameters.put(funPredicateValue, parameterValue);
             }
         }
         return parameters;
