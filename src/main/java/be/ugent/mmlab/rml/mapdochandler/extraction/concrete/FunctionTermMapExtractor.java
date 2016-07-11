@@ -1,10 +1,7 @@
 package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
 
 import be.ugent.mmlab.rml.model.PredicateObjectMap;
-import be.ugent.mmlab.rml.model.RDFTerm.FunctionTermMap;
-import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
-import be.ugent.mmlab.rml.model.RDFTerm.PredicateMap;
-import be.ugent.mmlab.rml.model.RDFTerm.TermType;
+import be.ugent.mmlab.rml.model.RDFTerm.*;
 import be.ugent.mmlab.rml.model.TriplesMap;
 import be.ugent.mmlab.rml.model.std.StdFunctionTermMap;
 import be.ugent.mmlab.rml.model.termMap.ReferenceMap;
@@ -64,6 +61,8 @@ public class FunctionTermMapExtractor {
                 function = getFunction(functionTriplesMap);
                 parameters = getParameters(functionTriplesMap);
 
+                Set<String> parametersRefs = getFunRefPairs(functionTriplesMap);
+
                 Value constantValue = null;
                 URI dataType = null;
                 String languageTag = null;
@@ -107,6 +106,27 @@ public class FunctionTermMapExtractor {
         return funPredicateURI;
     }
 
+    private Set<String> getFunRefPairs(TriplesMap functionTriplesMap){
+        Set<String> parameters = new HashSet<>();
+
+        Set<PredicateObjectMap> predObjMaps = functionTriplesMap.getPredicateObjectMaps();
+
+        for(PredicateObjectMap predicateObjectMap : predObjMaps) {
+            String parameterValue;
+            ObjectMap parameter;
+            PredicateMap funPredicate = predicateObjectMap.getPredicateMaps().iterator().next();
+            String funPredicateValue = funPredicate.getConstantValue().stringValue();
+            Object executes = FnVocabulary.FNO_NAMESPACE + FnVocabulary.FnTerm.EXECUTES;
+            if(!funPredicateValue.equals(executes)) {
+                parameter = predicateObjectMap.getObjectMaps().iterator().next();
+                parameterValue = parameter.getReferenceMap().getReference();
+                parameters.add(parameterValue);
+            }
+        }
+        return parameters;
+    }
+
+
     private Set<URI> getParameters(TriplesMap functionTriplesMap){
         Set<PredicateObjectMap> predObjMaps = functionTriplesMap.getPredicateObjectMaps();
         Set<URI> parameters = new HashSet<URI>();
@@ -115,6 +135,7 @@ public class FunctionTermMapExtractor {
         for(PredicateObjectMap predicateObjectMap : predObjMaps){
             log.debug("Retrieving the function...");
             PredicateMap funPredicate = predicateObjectMap.getPredicateMaps().iterator().next();
+
             Object executes = FnVocabulary.FNO_NAMESPACE + FnVocabulary.FnTerm.EXECUTES;
             String funPredicateValue = funPredicate.getConstantValue().stringValue();
 
