@@ -119,8 +119,10 @@ public class FunctionTermMapExtractor {
 
             if(!funPredicateValue.equals(executes)) {
                 parameter = predicateObjectMap.getObjectMaps().iterator().next();
-                parameterValue = parameter.getReferenceMap().getReference();
-
+                if(parameter.getReferenceMap() != null)
+                    parameterValue = parameter.getReferenceMap().getReference();
+                else
+                    parameterValue = parameter.getConstantValue().stringValue();
                 if(funPredicateValue != null && parameterValue != null)
                     parameters.put(funPredicateValue, parameterValue);
             }
