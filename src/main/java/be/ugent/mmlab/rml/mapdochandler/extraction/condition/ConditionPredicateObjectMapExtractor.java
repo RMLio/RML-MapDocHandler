@@ -103,6 +103,9 @@ public class ConditionPredicateObjectMapExtractor extends PredicateObjectMapExtr
                         booleanCondition = new StdBooleanCondition(funObjectMaps);
                         //booleanCondition.setFunctionTermMaps(funObjectMaps);
                     }
+                    else{
+                        booleanCondition.setFunctionTermMaps(funObjectMaps);
+                    }
 
                     //Extracting Fallback Maps
                     log.debug("Extracting Fallback Maps...");
