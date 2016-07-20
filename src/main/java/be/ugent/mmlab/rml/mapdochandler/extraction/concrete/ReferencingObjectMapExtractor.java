@@ -111,7 +111,7 @@ public class ReferencingObjectMapExtractor {
                 ConditionPredicateObjectMapExtractor preObjMapExtractor =
                         new ConditionPredicateObjectMapExtractor();
                 conditions = preObjMapExtractor.extractConditions(
-                        repository, object);
+                        repository, object, triplesMapResources, triplesMap);
                 AbstractConditionExtractor conditionsExtractor =
                 new AbstractConditionExtractor();
                 Set<Condition> conditions2 = conditionsExtractor.extractConditions(repository, object);

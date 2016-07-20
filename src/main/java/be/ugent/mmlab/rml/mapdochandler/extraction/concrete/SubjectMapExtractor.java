@@ -74,7 +74,7 @@ public class SubjectMapExtractor extends StdTermMapExtractor {
                     ConditionPredicateObjectMapExtractor preObjMapExtractor = 
                             new ConditionPredicateObjectMapExtractor();
                     conditions = preObjMapExtractor.extractConditions(
-                            repository, (Resource) statement.getObject());
+                            repository, (Resource) statement.getObject(), null, triplesMap);
                     log.debug(conditions.size() + " conditions were found");
                     result = new StdConditionSubjectMap(triplesMap, constantValue, 
                             stringTemplate, termType, inverseExpression,

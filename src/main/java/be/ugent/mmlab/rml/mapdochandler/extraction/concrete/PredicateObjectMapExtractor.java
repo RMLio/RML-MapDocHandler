@@ -97,8 +97,8 @@ public class PredicateObjectMapExtractor {
                         FunctionTermMapExtractor funObjMapExtractor =
                                 new FunctionTermMapExtractor();
                         funObjectMaps = funObjMapExtractor.processFunctionTermMap(
-                                repository, predicateObjectMap, (Resource) object_statement.getObject(),
-                                triplesMapResources, triplesMap, triplesMapSubject, predicateObject, savedGraphMap);
+                                repository, (Resource) object_statement.getObject(),
+                                triplesMapResources, triplesMap, predicateObjectMap, savedGraphMap);
                         log.debug("Function Object Map statements found: " + funObjectMaps);
                     }
 
@@ -107,7 +107,7 @@ public class PredicateObjectMapExtractor {
                         ObjectMapExtractor objMapExtractor = new ObjectMapExtractor();
 
                         ObjectMap objectMap = objMapExtractor.extractObjectMap(repository,
-                                (Resource) object_statement.getObject(), savedGraphMap, triplesMap);
+                                (Resource) object_statement.getObject(), savedGraphMap, triplesMap, triplesMapResources);
 
                         //COMBUST specific annotation
                         CombustExtractor combustExtractor = new CombustExtractor();
@@ -200,7 +200,7 @@ public class PredicateObjectMapExtractor {
                 ConditionPredicateObjectMapExtractor preObjMapExtractor =
                         new ConditionPredicateObjectMapExtractor();
                 Set<Condition> conditions = preObjMapExtractor.extractConditions(
-                        repository, predicateObject);
+                        repository, predicateObject, triplesMapResources, triplesMap);
 
                 //Extracting fallbacks
                 FallbackMapExtractor fallbackExtractor =

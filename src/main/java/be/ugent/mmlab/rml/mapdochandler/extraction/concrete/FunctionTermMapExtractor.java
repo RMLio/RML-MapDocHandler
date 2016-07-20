@@ -6,7 +6,6 @@ import be.ugent.mmlab.rml.model.TriplesMap;
 import be.ugent.mmlab.rml.model.std.StdFunctionTermMap;
 import be.ugent.mmlab.rml.model.termMap.ReferenceMap;
 import be.ugent.mmlab.rml.vocabularies.FnVocabulary;
-import be.ugent.mmlab.rml.vocabularies.R2RMLVocabulary;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
@@ -36,9 +35,9 @@ public class FunctionTermMapExtractor {
                     FunctionTermMapExtractor.class.getSimpleName());
 
     public Set<FunctionTermMap> processFunctionTermMap(
-            Repository repository, PredicateObjectMap predicateObjectMap, Resource object, Map<Resource,
-            TriplesMap> triplesMapResources,
-            TriplesMap triplesMap, Resource triplesMapSubject, Resource predicateObject, GraphMap graphMap){
+            Repository repository, Resource object, Map<Resource,
+            TriplesMap> triplesMapResources, TriplesMap triplesMap,
+            PredicateObjectMap predicateObjectMap, GraphMap graphMap){
         Set<FunctionTermMap> results = new HashSet<>();
         FunctionTermMap result = null;
         Value value = null;
@@ -73,11 +72,9 @@ public class FunctionTermMapExtractor {
                 String inverseExpression = null;
                 ReferenceMap referenceValue = null;
                 log.debug("Function Object Map extracted.");
-                result = new StdFunctionTermMap(triplesMap, predicateObjectMap,
-                        constantValue, dataType, languageTag,
-                        stringTemplate, termType, inverseExpression,
-                        referenceValue, graphMap, value, functionTriplesMap, function, parameters, parametersRefs);
-                //result = new StdFunctionTermMap(functionTriplesMap, value, function, parameters);
+                result = new StdFunctionTermMap(
+                        constantValue, dataType, languageTag, stringTemplate, termType, inverseExpression, referenceValue,
+                        predicateObjectMap, graphMap, functionTriplesMap, function, parameters, parametersRefs);
                 results.add(result);
             }
 

@@ -17,6 +17,8 @@ import org.openrdf.model.ValueFactory;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 
+import java.util.Map;
+
 /**
  * *************************************************************************
  *
@@ -36,7 +38,7 @@ public class ObjectMapExtractor extends StdTermMapExtractor {
             ObjectMapExtractor.class.getSimpleName());
     
     public ObjectMap extractObjectMap(Repository repository,
-            Resource object, GraphMap graphMap, TriplesMap triplesMap){
+            Resource object, GraphMap graphMap, TriplesMap triplesMap, Map<Resource, TriplesMap> triplesMapResources){
         ObjectMap result ;
         log.debug("Extracting Object Map..");
         
@@ -64,7 +66,7 @@ public class ObjectMapExtractor extends StdTermMapExtractor {
                 ConditionPredicateObjectMapExtractor preObjMapExtractor =
                         new ConditionPredicateObjectMapExtractor();
                 conditions = preObjMapExtractor.extractConditions(
-                        repository, object);
+                        repository, object, triplesMapResources, triplesMap);
                 if (conditions != null)
                     log.debug(conditions.size() + " conditions were found");
                 result = new StdConditionObjectMap(triplesMap, null,

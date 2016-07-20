@@ -56,7 +56,7 @@ public class PredicateMapExtractor extends StdTermMapExtractor {
                 ConditionPredicateObjectMapExtractor preObjMapExtractor =
                         new ConditionPredicateObjectMapExtractor();
                 conditions = preObjMapExtractor.extractConditions(
-                        repository, object);
+                        repository, object, null, triplesMap);
                 result = new StdConditionPredicateMap(triplesMap, null,
                     constantValue, stringTemplate, inverseExpression, 
                         referenceValue, termType, conditions, graphMap);
