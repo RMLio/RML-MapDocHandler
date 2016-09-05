@@ -2,8 +2,8 @@ package be.ugent.mmlab.rml.mapdochandler.extraction;
 
 import be.ugent.mmlab.rml.model.TriplesMap;
 import java.util.Map;
-import org.openrdf.model.Resource;
-import org.openrdf.repository.Repository;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.repository.Repository;
 
 /**
  * *************************************************************************

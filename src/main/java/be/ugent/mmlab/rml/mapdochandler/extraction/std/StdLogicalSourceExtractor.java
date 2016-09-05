@@ -12,14 +12,14 @@ import java.util.Map;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.RepositoryResult;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.URI;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.repository.Repository;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.RepositoryException;
+import org.eclipse.rdf4j.repository.RepositoryResult;
 
 /**
  * *************************************************************************
@@ -40,7 +40,6 @@ public class StdLogicalSourceExtractor {
 
     /**
      *
-     * @param rmlMappingGraph
      * @return
      */
     public Map<Resource, Source> extractInputResources(Repository repository) {
@@ -55,7 +54,6 @@ public class StdLogicalSourceExtractor {
 
     /**
      *
-     * @param rmlMappingGraph
      * @return
      */
     protected RepositoryResult<Statement> getInputResources(Repository repository) {
@@ -79,7 +77,6 @@ public class StdLogicalSourceExtractor {
 
     /**
      *
-     * @param rmlMappingGraph
      * @param statements
      * @param inputResources
      * @return
@@ -117,7 +114,6 @@ public class StdLogicalSourceExtractor {
 
     /**
      *
-     * @param rmlMappingGraph
      * @param inputResource
      * @param inputResources
      */
@@ -146,7 +142,6 @@ public class StdLogicalSourceExtractor {
 
     /**
      *
-     * @param rmlMappingGraph
      * @param inputResource
      * @return
      */
@@ -177,7 +172,6 @@ public class StdLogicalSourceExtractor {
 
     /**
      *
-     * @param rmlMappingGraph
      * @param term
      * @param resource
      * @param triplesMap
@@ -200,7 +194,6 @@ public class StdLogicalSourceExtractor {
 
     /**
      *
-     * @param rmlMappingGraph
      * @param term
      * @return
      */

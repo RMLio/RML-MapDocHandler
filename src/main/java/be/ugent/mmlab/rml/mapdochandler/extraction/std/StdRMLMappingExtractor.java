@@ -9,17 +9,17 @@ import be.ugent.mmlab.rml.vocabularies.RMLVocabulary;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import org.openrdf.model.BNode;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
-import org.openrdf.model.Value;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.RepositoryResult;
+import org.eclipse.rdf4j.model.BNode;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.URI;
+import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.model.impl.ValueFactoryImpl;
+import org.eclipse.rdf4j.repository.Repository;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.RepositoryException;
+import org.eclipse.rdf4j.repository.RepositoryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +56,6 @@ public class StdRMLMappingExtractor implements RMLMappingExtractor{
      * resource that references the following other resources : - It must have
      * exactly one subject map * using the rr:subjectMap property.
      *
-     * @param rmlMappingGraph
      * @return
      */
     @Override
@@ -72,7 +71,6 @@ public class StdRMLMappingExtractor implements RMLMappingExtractor{
     
     /**
      *
-     * @param rmlMappingGraph
      * @return
      */
     protected RepositoryResult<Statement> getTriplesMapResources(Repository repo) {
@@ -121,7 +119,6 @@ public class StdRMLMappingExtractor implements RMLMappingExtractor{
      * rr:graph. Occurrences of these properties must be treated exactly as if
      * the following triples were present in the mapping graph instead.
      *
-     * @param rmlMappingGraph
      */
     @Override
         public Repository replaceShortcuts(Repository mapDocRepo) {
@@ -238,7 +235,7 @@ public class StdRMLMappingExtractor implements RMLMappingExtractor{
                             (  st.getObject().getClass() == Resource.class
                             || st.getObject().getClass() == Value.class
                             || st.getObject().getClass() == 
-                            org.openrdf.sail.memory.model.MemBNode.class) ) {
+                            org.eclipse.rdf4j.sail.memory.model.MemBNode.class) ) {
                         skolemizationFactory.skolemSubstitution(
                                 st.getObject(), skolemizedObjectMap, mapDocRepo);
                     }
