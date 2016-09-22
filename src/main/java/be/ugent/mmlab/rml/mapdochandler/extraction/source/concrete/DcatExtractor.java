@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
-import org.eclipse.rdf4j.model.URI;
+import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.repository.Repository;
@@ -44,7 +44,7 @@ public class DcatExtractor extends StdSourceExtractor {
         try {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
-            URI predicate = vf.createURI(
+            IRI predicate = vf.createIRI(
                     DCATVocabulary.DCAT_NAMESPACE + DCATVocabulary.DcatTerm.DOWNLOADURL);
             
             //Extract DCAT Distribution
@@ -53,14 +53,14 @@ public class DcatExtractor extends StdSourceExtractor {
             log.debug("Distribution statements " + statements.hasNext());
             
             if(!statements.hasNext()){
-                predicate = vf.createURI(
+                predicate = vf.createIRI(
                     DCATVocabulary.DCAT_NAMESPACE + DCATVocabulary.DcatTerm.DISTRIBUTION);
                 statements = connection.getStatements((Resource) value, predicate, null, true);
                 
                 log.debug("Dataset statements " + statements.hasNext());
                 while(statements.hasNext()){
                     Statement statement = statements.next();
-                    predicate = vf.createURI(
+                    predicate = vf.createIRI(
                             DCATVocabulary.DCAT_NAMESPACE + DCATVocabulary.DcatTerm.DOWNLOADURL);
                     RepositoryResult<Statement> distributions = connection.getStatements(
                             (Resource) statement.getObject(), predicate, null, true);

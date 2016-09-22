@@ -12,7 +12,7 @@ import java.util.Map;
 import org.eclipse.rdf4j.model.BNode;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
-import org.eclipse.rdf4j.model.URI;
+import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.ValueFactoryImpl;
@@ -79,9 +79,9 @@ public class StdRMLMappingExtractor implements RMLMappingExtractor{
         try {
             RepositoryConnection connection = repo.getConnection();
 
-            URI o = vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+            IRI o = vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.TRIPLES_MAP_CLASS);
-            URI p = vf.createURI(RMLVocabulary.RML_NAMESPACE
+            IRI p = vf.createIRI(RMLVocabulary.RML_NAMESPACE
                     + RMLVocabulary.RMLTerm.LOGICAL_SOURCE);
 
             statements = connection.getStatements(null, p, null, true);
@@ -122,32 +122,32 @@ public class StdRMLMappingExtractor implements RMLMappingExtractor{
      */
     @Override
         public Repository replaceShortcuts(Repository mapDocRepo) {
-        Map<URI, URI> shortcutPredicates = new HashMap<URI, URI>();
+        Map<IRI, IRI> shortcutPredicates = new HashMap<IRI, IRI>();
 
         try {
             RepositoryConnection mapDocRepoCon = mapDocRepo.getConnection();
 
             shortcutPredicates.put(
-                    vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.SUBJECT),
-                    vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.SUBJECT_MAP));
             shortcutPredicates.put(
-                    vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.PREDICATE),
-                    vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.PREDICATE_MAP));
-            shortcutPredicates.put(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+            shortcutPredicates.put(vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.OBJECT),
-                    vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.OBJECT_MAP));
             shortcutPredicates
-                    .put(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    .put(vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.GRAPH),
-                    vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.GRAPH_MAP));
 
-            for (URI uri : shortcutPredicates.keySet()) {
+            for (IRI uri : shortcutPredicates.keySet()) {
                 RepositoryResult<Statement> shortcuts =
                         mapDocRepoCon.getStatements(null, uri, null, true);
 
@@ -156,8 +156,8 @@ public class StdRMLMappingExtractor implements RMLMappingExtractor{
                     mapDocRepoCon.remove(st);
                     BNode blankMap = vf.createBNode();
 
-                    URI pMap = vf.createURI(shortcutPredicates.get(uri).toString());
-                    URI pConstant = vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                    IRI pMap = vf.createIRI(shortcutPredicates.get(uri).toString());
+                    IRI pConstant = vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE
                             + R2RMLVocabulary.R2RMLTerm.CONSTANT);
                     mapDocRepoCon.add(st.getSubject(), pMap, blankMap);
                     mapDocRepoCon.add(blankMap, pConstant, st.getObject());
@@ -177,39 +177,39 @@ public class StdRMLMappingExtractor implements RMLMappingExtractor{
             RepositoryConnection mapDocRepoCon = mapDocRepo.getConnection();
             
             // Create new ArrayList.
-            ArrayList<URI> elements = new ArrayList<>();
-            elements.add(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+            ArrayList<IRI> elements = new ArrayList<>();
+            elements.add(vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.SUBJECT_MAP));
-            elements.add(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+            elements.add(vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.PREDICATE_MAP));
-            elements.add(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+            elements.add(vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.OBJECT_MAP));
-            elements.add(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+            elements.add(vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.PARENT_TRIPLES_MAP));
-            elements.add(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+            elements.add(vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.JOIN_CONDITION));
-            elements.add(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+            elements.add(vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.GRAPH_MAP));
-            elements.add(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+            elements.add(vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.CLASS));
-            elements.add(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+            elements.add(vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.CONSTANT));
-            elements.add(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+            elements.add(vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.TEMPLATE));
-            elements.add(vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+            elements.add(vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.TERM_TYPE));
-            elements.add(vf.createURI(RMLVocabulary.RML_NAMESPACE
+            elements.add(vf.createIRI(RMLVocabulary.RML_NAMESPACE
                     + RMLVocabulary.RMLTerm.LOGICAL_SOURCE));
-            elements.add(vf.createURI(RMLVocabulary.RML_NAMESPACE
+            elements.add(vf.createIRI(RMLVocabulary.RML_NAMESPACE
                     + RMLVocabulary.RMLTerm.SOURCE));
-            elements.add(vf.createURI(RMLVocabulary.RML_NAMESPACE
+            elements.add(vf.createIRI(RMLVocabulary.RML_NAMESPACE
                     + RMLVocabulary.RMLTerm.REFERENCE_FORMULATION));
-            elements.add(vf.createURI(RMLVocabulary.RML_NAMESPACE
+            elements.add(vf.createIRI(RMLVocabulary.RML_NAMESPACE
                     + RMLVocabulary.RMLTerm.REFERENCE));
-            elements.add(vf.createURI(RMLVocabulary.RML_NAMESPACE
+            elements.add(vf.createIRI(RMLVocabulary.RML_NAMESPACE
                     + RMLVocabulary.RMLTerm.ITERATOR));
             
-            for (URI uri : elements) {
+            for (IRI uri : elements) {
                 RepositoryResult<Statement> statements =
                         mapDocRepoCon.getStatements(null, uri, null, true);
 

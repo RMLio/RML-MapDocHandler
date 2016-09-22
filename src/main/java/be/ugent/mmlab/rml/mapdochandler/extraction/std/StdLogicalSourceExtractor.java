@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
-import org.eclipse.rdf4j.model.URI;
+import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
@@ -63,7 +63,7 @@ public class StdLogicalSourceExtractor {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
 
-            URI p = vf.createURI(RMLVocabulary.RML_NAMESPACE
+            IRI p = vf.createIRI(RMLVocabulary.RML_NAMESPACE
                     + RMLVocabulary.RMLTerm.SOURCE);
             inputStatements = connection.getStatements(null, p, null, true);
 
@@ -87,7 +87,7 @@ public class StdLogicalSourceExtractor {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
 
-            URI p = vf.createURI(RMLVocabulary.RML_NAMESPACE
+            IRI p = vf.createIRI(RMLVocabulary.RML_NAMESPACE
                     + RMLVocabulary.RMLTerm.LOGICAL_SOURCE);
 
             while (statements.hasNext()) {
@@ -153,7 +153,7 @@ public class StdLogicalSourceExtractor {
 
             RepositoryConnection connection = repository.getConnection();
 
-            URI p = getTermURI(repository, RMLVocabulary.RMLTerm.LOGICAL_SOURCE);
+            IRI p = getTermURI(repository, RMLVocabulary.RMLTerm.LOGICAL_SOURCE);
             RepositoryResult<Statement> triplesMapStatements =
                     connection.getStatements(null, p, inputResource, true);
 
@@ -181,7 +181,7 @@ public class StdLogicalSourceExtractor {
             Repository repository, Enum term, Resource resource, TriplesMap triplesMap) {
         RepositoryResult<Statement> statements = null;
         try {
-            URI p = getTermURI(repository, term);
+            IRI p = getTermURI(repository, term);
             RepositoryConnection connection = repository.getConnection();
             statements = connection.getStatements(resource, p, null, true);
 
@@ -197,7 +197,7 @@ public class StdLogicalSourceExtractor {
      * @param term
      * @return
      */
-    protected static URI getTermURI(Repository repository, Enum term) {
+    protected static IRI getTermURI(Repository repository, Enum term) {
         String namespace = R2RMLVocabulary.R2RML_NAMESPACE;
 
         if (term instanceof RMLVocabulary.RMLTerm) {
@@ -210,11 +210,11 @@ public class StdLogicalSourceExtractor {
         }
 
         RepositoryConnection connection;
-        URI uri = null;
+        IRI uri = null;
         try {
             connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
-            uri = vf.createURI(namespace + term);
+            uri = vf.createIRI(namespace + term);
             connection.close();
         } catch (RepositoryException ex) {
             log.error("RepositoryException " + ex);

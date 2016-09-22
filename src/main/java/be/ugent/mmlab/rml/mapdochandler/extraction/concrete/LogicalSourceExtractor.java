@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
-import org.eclipse.rdf4j.model.URI;
+import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
@@ -74,7 +74,7 @@ public class LogicalSourceExtractor {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
 
-            URI logicalSource = vf.createURI(
+            IRI logicalSource = vf.createIRI(
                     RMLVocabulary.RML_NAMESPACE + RMLVocabulary.RMLTerm.REFERENCE_FORMULATION);
 
             statements = connection.getStatements(subject, logicalSource, null, true);
@@ -97,7 +97,7 @@ public class LogicalSourceExtractor {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
 
-            URI logicalSource = vf.createURI(
+            IRI logicalSource = vf.createIRI(
                     RMLVocabulary.RML_NAMESPACE + RMLVocabulary.RMLTerm.ITERATOR);
             statements = connection.getStatements(subject, logicalSource, null, true);
             
@@ -121,7 +121,7 @@ public class LogicalSourceExtractor {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
             
-            URI queryURI = vf.createURI(
+            IRI queryURI = vf.createIRI(
                     RMLVocabulary.RML_NAMESPACE + RMLVocabulary.RMLTerm.QUERY);
             statements = 
                     connection.getStatements(subject, queryURI, null, true);
@@ -145,7 +145,7 @@ public class LogicalSourceExtractor {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
             
-            URI queryURI = vf.createURI(
+            IRI queryURI = vf.createIRI(
                     R2RMLVocabulary.R2RML_NAMESPACE + 
                     R2RMLVocabulary.R2RMLTerm.TABLE_NAME);
             statements = 

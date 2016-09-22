@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
-import org.eclipse.rdf4j.model.URI;
+import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.repository.Repository;
@@ -45,7 +45,7 @@ public class VoidExtractor extends StdSourceExtractor {
         try {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
-            URI predicate = vf.createURI(
+            IRI predicate = vf.createIRI(
                     VoIDVocabulary.VOID_NAMESPACE + VoIDVocabulary.VoIDTerm.SPARQLENDPOINT);
             //TODO: Check the following: sub and obj same value
             RepositoryResult<Statement> statements =
@@ -58,7 +58,7 @@ public class VoidExtractor extends StdSourceExtractor {
             }
 
             if (!statements.hasNext()) {
-                predicate = vf.createURI(
+                predicate = vf.createIRI(
                         VoIDVocabulary.VOID_NAMESPACE + VoIDVocabulary.VoIDTerm.DATADUMP);
                 //TODO: Check the following: sub and obj same value
                 statements = connection.getStatements((Resource) value, predicate, null, true);

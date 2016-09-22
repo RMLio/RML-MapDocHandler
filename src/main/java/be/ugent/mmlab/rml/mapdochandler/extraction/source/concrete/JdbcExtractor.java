@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
-import org.eclipse.rdf4j.model.URI;
+import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.repository.Repository;
@@ -65,7 +65,7 @@ public class JdbcExtractor extends StdSourceExtractor {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
             
-            URI predicate = vf.createURI(
+            IRI predicate = vf.createIRI(
                         D2RQVocabulary.D2RQ_NAMESPACE + term);
             
             RepositoryResult<Statement> statements =

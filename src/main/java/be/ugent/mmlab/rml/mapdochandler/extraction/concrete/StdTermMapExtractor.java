@@ -10,7 +10,7 @@ import be.ugent.mmlab.rml.vocabularies.R2RMLVocabulary;
 import java.util.HashSet;
 import java.util.Set;
 import org.eclipse.rdf4j.model.Resource;
-import org.eclipse.rdf4j.model.URI;
+import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.repository.Repository;
 import org.slf4j.Logger;
@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 public class StdTermMapExtractor implements TermMapExtractor {
     protected Value constantValue = null;
     protected String stringTemplate = null, inverseExpression = null;
-    protected URI termType = null;
+    protected IRI termType = null;
     protected TermExtractor termMapExtractor = null;
     protected ReferenceMap referenceValue = null;
     protected Set<Condition> conditions = null;
@@ -49,7 +49,7 @@ public class StdTermMapExtractor implements TermMapExtractor {
                 object, R2RMLVocabulary.R2RMLTerm.CONSTANT, triplesMap);
         stringTemplate = TermExtractor.extractLiteralFromTermMap(repository,
                 object, R2RMLVocabulary.R2RMLTerm.TEMPLATE, triplesMap);
-        termType = (URI) TermExtractor.extractValueFromTermMap(repository, object,
+        termType = (IRI) TermExtractor.extractValueFromTermMap(repository, object,
                 R2RMLVocabulary.R2RMLTerm.TERM_TYPE, triplesMap);
         inverseExpression = TermExtractor.extractLiteralFromTermMap(repository,
                 object, R2RMLVocabulary.R2RMLTerm.INVERSE_EXPRESSION, triplesMap);

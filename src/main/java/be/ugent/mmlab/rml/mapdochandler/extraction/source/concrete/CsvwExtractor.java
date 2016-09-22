@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
-import org.eclipse.rdf4j.model.URI;
+import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.repository.Repository;
@@ -82,7 +82,7 @@ public class CsvwExtractor extends StdSourceExtractor {
         try {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
-            URI predicate = vf.createURI(
+            IRI predicate = vf.createIRI(
                     CSVWVocabulary.CSVW_NAMESPACE + CSVWVocabulary.CSVWTerm.URL);
             
             statements = connection.getStatements(resource, predicate, null, true);
@@ -101,7 +101,7 @@ public class CsvwExtractor extends StdSourceExtractor {
         try {
             RepositoryConnection connection = repository.getConnection();
                 ValueFactory vf = connection.getValueFactory();
-            URI p = vf.createURI(
+            IRI p = vf.createIRI(
                     CSVWVocabulary.CSVW_NAMESPACE + CSVWVocabulary.CSVWTerm.DIALECT);
             RepositoryResult<Statement> dialectStatements =
                     connection.getStatements(
@@ -110,7 +110,7 @@ public class CsvwExtractor extends StdSourceExtractor {
             if (dialectStatements.hasNext()) {
                 log.debug("CSVW Custom Reference formulation is triggered.");
                 Statement dialectStatement = dialectStatements.next();
-                p = vf.createURI(
+                p = vf.createIRI(
                     CSVWVocabulary.CSVW_NAMESPACE + CSVWVocabulary.CSVWTerm.DELIMITER);
                 RepositoryResult<Statement> statements =
                     connection.getStatements(
@@ -138,7 +138,7 @@ public class CsvwExtractor extends StdSourceExtractor {
         try {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
-            URI predicate = vf.createURI(
+            IRI predicate = vf.createIRI(
                     CSVWVocabulary.CSVW_NAMESPACE + CSVWVocabulary.CSVWTerm.DIALECT);
             //TODO: Fix the following: sub and obj same value
             RepositoryResult<Statement> statements =
@@ -146,7 +146,7 @@ public class CsvwExtractor extends StdSourceExtractor {
             log.debug("Delimiter statements from CSVW " + statements.hasNext());
             Statement statement = statements.next();
             
-            predicate = vf.createURI(
+            predicate = vf.createIRI(
                     CSVWVocabulary.CSVW_NAMESPACE + CSVWVocabulary.CSVWTerm.DELIMITER);
             statements =
                     connection.getStatements(

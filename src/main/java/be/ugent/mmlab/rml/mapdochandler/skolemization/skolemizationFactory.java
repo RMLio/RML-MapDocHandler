@@ -7,7 +7,7 @@ import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.ValueFactory;
-import org.eclipse.rdf4j.model.impl.ValueFactoryImpl;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.URI;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
@@ -32,7 +32,7 @@ public class skolemizationFactory {
             LoggerFactory.getLogger(
             skolemizationFactory.class.getSimpleName());
     
-    private static ValueFactory vf = new ValueFactoryImpl();
+    private static ValueFactory vf = SimpleValueFactory.getInstance();
 
     public static void skolemSubjectSubsitution(
             Resource resource, Resource skolemizedMap, Repository mapDocRepo) {

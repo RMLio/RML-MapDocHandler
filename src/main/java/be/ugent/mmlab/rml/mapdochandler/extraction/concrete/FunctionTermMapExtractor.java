@@ -7,9 +7,10 @@ import be.ugent.mmlab.rml.model.std.StdFunctionTermMap;
 import be.ugent.mmlab.rml.model.termMap.ReferenceMap;
 import be.ugent.mmlab.rml.vocabularies.FnVocabulary;
 import org.eclipse.rdf4j.model.Resource;
-import org.eclipse.rdf4j.model.URI;
+import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.impl.URIImpl;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
@@ -46,12 +47,12 @@ public class FunctionTermMapExtractor {
         try {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
-            URI pred = vf.createURI(FnVocabulary.FnML_NAMESPACE + FnVocabulary.FnTerm.FUNCTION_VALUE);
-            URI function = null;
-            Set<URI> parameters = null;
+            IRI pred = vf.createIRI(FnVocabulary.FnML_NAMESPACE + FnVocabulary.FnTerm.FUNCTION_VALUE);
+            IRI function = null;
+            Set<IRI> parameters = null;
 
             //Extract additional properties for Function Term Map
-            URI functionValue = (URI) extractValueFromTermMap(repository, object, pred, triplesMap);
+            IRI functionValue = (IRI) extractValueFromTermMap(repository, object, pred, triplesMap);
 
             if(functionValue != null) {
                 TriplesMapExtractor triplesMapExtractor = new TriplesMapExtractor();
@@ -64,10 +65,10 @@ public class FunctionTermMapExtractor {
                 Map<String,String> parametersRefs = getFunRefPairs(functionTriplesMap);
 
                 Value constantValue = null;
-                URI dataType = null;
+                IRI dataType = null;
                 String languageTag = null;
                 String stringTemplate = null;
-                URI termType = null;
+                IRI termType = null;
                 //URI termType = new URIImpl(R2RMLVocabulary.R2RMLTerm.LITERAL.toString());
                 String inverseExpression = null;
                 ReferenceMap referenceValue = null;
@@ -86,9 +87,9 @@ public class FunctionTermMapExtractor {
 
     }
 
-    private URI getFunction(TriplesMap functionTriplesMap){
+    private IRI getFunction(TriplesMap functionTriplesMap){
         Set<PredicateObjectMap> predObjMaps = functionTriplesMap.getPredicateObjectMaps();
-        URI funPredicateURI = null;
+        IRI funPredicateURI = null;
 
         for(PredicateObjectMap predicateObjectMap : predObjMaps){
             log.debug("Retrieving the function...");
@@ -97,7 +98,8 @@ public class FunctionTermMapExtractor {
             String funPredicateValue = funPredicate.getConstantValue().stringValue();
 
             if(funPredicateValue.equals(executes)){
-                funPredicateURI = new URIImpl(funPredicateValue);
+                SimpleValueFactory vf = SimpleValueFactory.getInstance();
+                funPredicateURI = vf.createIRI(funPredicateValue);
             }
 
         }
@@ -131,10 +133,10 @@ public class FunctionTermMapExtractor {
     }
 
 
-    private Set<URI> getParameters(TriplesMap functionTriplesMap){
+    private Set<IRI> getParameters(TriplesMap functionTriplesMap){
         Set<PredicateObjectMap> predObjMaps = functionTriplesMap.getPredicateObjectMaps();
-        Set<URI> parameters = new HashSet<URI>();
-        URI parameter = null;
+        Set<IRI> parameters = new HashSet<IRI>();
+        IRI parameter = null;
 
         for(PredicateObjectMap predicateObjectMap : predObjMaps){
             log.debug("Retrieving the function...");

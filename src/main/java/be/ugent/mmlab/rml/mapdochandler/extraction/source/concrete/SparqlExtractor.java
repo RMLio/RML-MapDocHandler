@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
-import org.eclipse.rdf4j.model.URI;
+import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.repository.Repository;
@@ -43,7 +43,7 @@ public class SparqlExtractor extends StdSourceExtractor {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
 
-            URI predicate = vf.createURI(SPARQLSDVocabulary.SPARQLSD_NAMESPACE
+            IRI predicate = vf.createIRI(SPARQLSDVocabulary.SPARQLSD_NAMESPACE
                     + SPARQLSDVocabulary.SparqlSdTerm.ENDPOINT);
             RepositoryResult<Statement> statements =
                     connection.getStatements((Resource) value, predicate, null, true);
@@ -81,7 +81,7 @@ public class SparqlExtractor extends StdSourceExtractor {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
 
-            URI predicate = vf.createURI(SPARQLSDVocabulary.SPARQLSD_NAMESPACE
+            IRI predicate = vf.createIRI(SPARQLSDVocabulary.SPARQLSD_NAMESPACE
                     + SPARQLSDVocabulary.SparqlSdTerm.SUPPORTEDLANGUAGE);
             RepositoryResult<Statement> statements =
                     connection.getStatements(resource, predicate, null, true);
@@ -112,7 +112,7 @@ public class SparqlExtractor extends StdSourceExtractor {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
 
-            URI predicate = vf.createURI(SPARQLSDVocabulary.SPARQLSD_NAMESPACE
+            IRI predicate = vf.createIRI(SPARQLSDVocabulary.SPARQLSD_NAMESPACE
                     + SPARQLSDVocabulary.SparqlSdTerm.RESULTFORMAT);
             RepositoryResult<Statement> statements =
                     connection.getStatements(resource, predicate, null, true);

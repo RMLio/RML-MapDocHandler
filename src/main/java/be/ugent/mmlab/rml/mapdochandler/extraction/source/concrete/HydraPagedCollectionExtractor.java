@@ -8,10 +8,10 @@ import java.util.HashSet;
 import java.util.Set;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
-import org.eclipse.rdf4j.model.URI;
+import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.ValueFactory;
-import org.eclipse.rdf4j.model.impl.ValueFactoryImpl;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.RepositoryException;
@@ -36,7 +36,7 @@ public class HydraPagedCollectionExtractor  extends StdSourceExtractor {
             LoggerFactory.getLogger(
             HydraPagedCollectionExtractor.class.getSimpleName());
     // Value factory
-    private static ValueFactory vf = new ValueFactoryImpl();
+    private static ValueFactory vf = SimpleValueFactory.getInstance();
 
     @Override
     public Set<Source> extractSources(Repository repository, Value resource) {
@@ -44,7 +44,7 @@ public class HydraPagedCollectionExtractor  extends StdSourceExtractor {
         try {
             RepositoryConnection connection = repository.getConnection();
             
-            URI predicate = vf.createURI(
+            IRI predicate = vf.createIRI(
                     HydraVocabulary.HYDRA_NAMESPACE 
                     + HydraVocabulary.HydraTerm.FIRSTPAGE);
             RepositoryResult<Statement> statements =

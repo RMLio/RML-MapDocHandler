@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
-import org.eclipse.rdf4j.model.URI;
+import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
@@ -130,7 +130,7 @@ public class TriplesMapExtractor {
                     repository, blankLogicalSource, triplesMap);
             log.debug("Table " + table);
             
-            URI p = vf.createURI(
+            IRI p = vf.createIRI(
                     RMLVocabulary.RML_NAMESPACE 
                     + RMLVocabulary.RMLTerm.SOURCE);
             sourceStatements = 
@@ -198,7 +198,7 @@ public class TriplesMapExtractor {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
             // Extract predicate-object maps
-            URI p = vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+            IRI p = vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.PREDICATE_OBJECT_MAP);
             RepositoryResult<Statement> statements =
                     connection.getStatements(triplesMapSubject, p, null, true);

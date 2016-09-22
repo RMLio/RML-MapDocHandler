@@ -12,7 +12,7 @@ import be.ugent.mmlab.rml.vocabularies.R2RMLVocabulary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.eclipse.rdf4j.model.Resource;
-import org.eclipse.rdf4j.model.URI;
+import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
@@ -51,7 +51,7 @@ public class ObjectMapExtractor extends StdTermMapExtractor {
             //Extract additional properties for Object Map
             String languageTag = TermExtractor.extractLiteralFromTermMap(repository,
                     object, R2RMLVocabulary.R2RMLTerm.LANGUAGE, triplesMap);
-            URI dataType = (URI) TermExtractor.extractValueFromTermMap(repository, object,
+            IRI dataType = (IRI) TermExtractor.extractValueFromTermMap(repository, object,
                     R2RMLVocabulary.R2RMLTerm.DATATYPE, triplesMap);
 
             graphMap = extractGraphMap(repository, triplesMap, graphMap);

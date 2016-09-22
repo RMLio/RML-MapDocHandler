@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
-import org.eclipse.rdf4j.model.URI;
+import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
@@ -59,7 +59,7 @@ public class SubjectMapExtractor extends StdTermMapExtractor {
             
             extractProperties(repository, triplesMap, subjectMap);
             
-            Set<URI> classIRIs = TermExtractor.extractURIsFromTermMap(
+            Set<IRI> classIRIs = TermExtractor.extractURIsFromTermMap(
                     repository, subjectMap, R2RMLVocabulary.R2RMLTerm.CLASS);
 
             graphMap = extractGraphMap(repository, triplesMap, graphMap);
