@@ -11,7 +11,6 @@ import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
-import org.eclipse.rdf4j.model.impl.URIImpl;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.slf4j.Logger;
@@ -146,7 +145,8 @@ public class FunctionTermMapExtractor {
             String funPredicateValue = funPredicate.getConstantValue().stringValue();
 
             if(!funPredicateValue.equals(executes)){
-                parameter = new URIImpl(funPredicateValue);
+                ValueFactory vf = SimpleValueFactory.getInstance();
+                parameter = vf.createIRI(funPredicateValue);
                 parameters.add(parameter);
             }
 

@@ -68,7 +68,7 @@ public class SubjectMapExtractor extends StdTermMapExtractor {
 
                 if (connection.hasStatement(
                         (Resource) statement.getObject(),
-                        vf.createURI(CRMLVocabulary.CRML_NAMESPACE
+                        vf.createIRI(CRMLVocabulary.CRML_NAMESPACE
                         + CRMLVocabulary.cRMLTerm.BOOLEAN_CONDITION), null, true)) {
                     log.debug("Condition Subject Map Extractor");
                     ConditionPredicateObjectMapExtractor preObjMapExtractor = 

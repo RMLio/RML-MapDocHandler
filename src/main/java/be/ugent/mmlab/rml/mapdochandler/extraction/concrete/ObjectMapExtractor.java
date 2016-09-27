@@ -60,7 +60,7 @@ public class ObjectMapExtractor extends StdTermMapExtractor {
 
             log.debug("Extracting conditions...");
             if (connection.hasStatement(
-                    object, vf.createURI(CRMLVocabulary.CRML_NAMESPACE
+                    object, vf.createIRI(CRMLVocabulary.CRML_NAMESPACE
                     + CRMLVocabulary.cRMLTerm.BOOLEAN_CONDITION), null, true)) {
                 log.debug("Conditional Object Map extracted.");
                 ConditionPredicateObjectMapExtractor preObjMapExtractor =

@@ -211,7 +211,7 @@ public class TriplesMapExtractor {
 
                     if (connection.hasStatement(
                             (Resource) statement.getObject(),
-                            vf.createURI(CRMLVocabulary.CRML_NAMESPACE
+                            vf.createIRI(CRMLVocabulary.CRML_NAMESPACE
                             + CRMLVocabulary.cRMLTerm.BOOLEAN_CONDITION), null, true)) {
                         log.debug("Condition Predicate Object Map Extractor");
                         preObjMapExtractor = new ConditionPredicateObjectMapExtractor();
@@ -219,7 +219,7 @@ public class TriplesMapExtractor {
                     else {
                         if (connection.hasStatement(
                                 (Resource) statement.getObject(),
-                                vf.createURI(CRMLVocabulary.CRML_NAMESPACE
+                                vf.createIRI(CRMLVocabulary.CRML_NAMESPACE
                                 + CRMLVocabulary.cRMLTerm.FALLBACK),
                                 null, true)) {
                             log.debug("Predicate Object Map with fallback POM");

@@ -15,7 +15,7 @@ import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.ValueFactory;
-import org.eclipse.rdf4j.model.impl.ValueFactoryImpl;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.RepositoryException;
@@ -40,7 +40,7 @@ public class StdRMLMappingExtractor implements RMLMappingExtractor{
             LoggerFactory.getLogger(
             StdRMLMappingExtractor.class.getSimpleName());
     // Value factory
-    private static ValueFactory vf = new ValueFactoryImpl();
+    private static ValueFactory vf = SimpleValueFactory.getInstance();
     private boolean skolemization = false;
     
     public StdRMLMappingExtractor(){

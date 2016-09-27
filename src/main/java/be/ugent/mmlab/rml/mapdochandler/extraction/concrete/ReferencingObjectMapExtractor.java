@@ -24,7 +24,6 @@ import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.ValueFactory;
-import org.eclipse.rdf4j.model.impl.URIImpl;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.RepositoryException;
@@ -100,10 +99,10 @@ public class ReferencingObjectMapExtractor {
 
             //TODO: Transfer the following condition implementation to a separate function
             if (connection.hasStatement(
-                    object, vf.createURI(CRMLVocabulary.CRML_NAMESPACE
+                    object, vf.createIRI(CRMLVocabulary.CRML_NAMESPACE
                     + CRMLVocabulary.cRMLTerm.BOOLEAN_CONDITION), null, true) || 
                 connection.hasStatement(
-                    object, vf.createURI(CRMLVocabulary.CRML_NAMESPACE
+                    object, vf.createIRI(CRMLVocabulary.CRML_NAMESPACE
                     + CRMLVocabulary.cRMLTerm.BINDING_CONDITION), null, true)) {
                 //TODO: Clean up the conditions mess - Properly rename classess
                 //ConditionPredicateObjectMapExtractor is for equalCondition
@@ -157,11 +156,11 @@ public class ReferencingObjectMapExtractor {
                 RepositoryResult<Statement> triplesMapStatements = connection.getStatements(
                         null, null, object, true);
                 triplesMapStatements = connection.getStatements(
-                        null, vf.createURI(CRMLVocabulary.CRML_NAMESPACE + CRMLVocabulary.cRMLTerm.FALLBACK),
+                        null, vf.createIRI(CRMLVocabulary.CRML_NAMESPACE + CRMLVocabulary.cRMLTerm.FALLBACK),
                         triplesMapStatements.next().getSubject(), true);
 
                 triplesMapStatements = connection.getStatements(
-                    null, vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE + R2RMLVocabulary.R2RMLTerm.PREDICATE_OBJECT_MAP),
+                    null, vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE + R2RMLVocabulary.R2RMLTerm.PREDICATE_OBJECT_MAP),
                         triplesMapStatements.next().getSubject(), true);
                 Resource tm = triplesMapStatements.next().getSubject();
                 //TODO: Properly handle duplicate code

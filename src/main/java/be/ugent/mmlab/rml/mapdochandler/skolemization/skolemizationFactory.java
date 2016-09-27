@@ -8,7 +8,7 @@ import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
-import org.eclipse.rdf4j.model.URI;
+import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.RepositoryException;
@@ -47,12 +47,12 @@ public class skolemizationFactory {
                 if (resource instanceof BNode) {
                     mapDocRepoCon.remove(
                             (BNode) statement.getSubject(),
-                            (URI) statement.getPredicate(),
+                            (IRI) statement.getPredicate(),
                             (Value) statement.getObject());
                 } else {
                     mapDocRepoCon.remove(
                             (Resource) statement.getSubject(),
-                            (URI) statement.getPredicate(),
+                            (IRI) statement.getPredicate(),
                             (Value) statement.getObject());
                 }
 
@@ -78,7 +78,7 @@ public class skolemizationFactory {
                 Statement statement = triplesObject.next();
                 mapDocRepoCon.remove(
                         (Resource) statement.getSubject(),
-                        (URI) statement.getPredicate(),
+                        (IRI) statement.getPredicate(),
                         (Value) statement.getObject());
                 
                 mapDocRepoCon.add(statement.getSubject(), statement.getPredicate(), skolemizedMap);
@@ -112,11 +112,11 @@ public class skolemizationFactory {
         if (re == null) {
             re = vf.createBNode();
             Resource ree =
-                    vf.createURI("http://example.com/.well-known/genid/" 
+                    vf.createIRI("http://example.com/.well-known/genid/"
                     + re.stringValue().substring(0));
             return ree;
         }
-        return vf.createURI("http://example.com/.well-known/genid/" 
+        return vf.createIRI("http://example.com/.well-known/genid/"
                 + re.stringValue().substring(0));
     }
 }

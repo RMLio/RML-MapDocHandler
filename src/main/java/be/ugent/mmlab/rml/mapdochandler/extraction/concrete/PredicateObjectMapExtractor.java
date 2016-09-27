@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
-import org.eclipse.rdf4j.model.URI;
+import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
@@ -60,7 +60,7 @@ public class PredicateObjectMapExtractor {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
             
-            URI p = vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+            IRI p = vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.PREDICATE_MAP);
             predicate_statements = connection.getStatements(predicateObject, p, null, true);
             log.debug("More Predicate Map statements: " 
@@ -73,7 +73,7 @@ public class PredicateObjectMapExtractor {
                         savedGraphMap, triplesMap);
                 predicateMaps.add(predicateMap);
 
-                URI o = vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                IRI o = vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE
                         + R2RMLVocabulary.R2RMLTerm.OBJECT_MAP);
                 // Extract object maps
                 object_statements = connection.getStatements(predicateObject, o, null, true);
@@ -139,7 +139,7 @@ public class PredicateObjectMapExtractor {
                     //Extract dcterms:type if exists
                     try {
                         RepositoryConnection dcTermsConnection = repository.getConnection();
-                        RepositoryResult<Statement> dcTermsStatements = dcTermsConnection.getStatements(predicateObject, repository.getValueFactory().createURI("http://purl.org/dc/terms/type"), null, false);
+                        RepositoryResult<Statement> dcTermsStatements = dcTermsConnection.getStatements(predicateObject, repository.getValueFactory().createIRI("http://purl.org/dc/terms/type"), null, false);
                         if( dcTermsStatements != null && dcTermsStatements.hasNext()) {
                             predicateObjectMap.setDCTermsType(dcTermsStatements.next().getObject().stringValue());
                         }
@@ -195,7 +195,7 @@ public class PredicateObjectMapExtractor {
             ValueFactory vf = connection.getValueFactory();
             
             if (connection.hasStatement(
-                    predicateObject, vf.createURI(CRMLVocabulary.CRML_NAMESPACE
+                    predicateObject, vf.createIRI(CRMLVocabulary.CRML_NAMESPACE
                     + CRMLVocabulary.cRMLTerm.BOOLEAN_CONDITION), null, true)) {
                 ConditionPredicateObjectMapExtractor preObjMapExtractor =
                         new ConditionPredicateObjectMapExtractor();

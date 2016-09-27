@@ -50,7 +50,7 @@ public class PredicateMapExtractor extends StdTermMapExtractor {
                 log.debug("Found Graph Map for this Predicate Map " + graphMap.getConstantValue());
             
             if (connection.hasStatement(
-                    object, vf.createURI(CRMLVocabulary.CRML_NAMESPACE
+                    object, vf.createIRI(CRMLVocabulary.CRML_NAMESPACE
                     + CRMLVocabulary.cRMLTerm.BOOLEAN_CONDITION), null, true)) {
                 log.debug("Conditional Predicate Map extracted");
                 ConditionPredicateObjectMapExtractor preObjMapExtractor =
