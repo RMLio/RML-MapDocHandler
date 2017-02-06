@@ -95,12 +95,11 @@ public class FunctionTermMapExtractor {
             PredicateMap funPredicate = predicateObjectMap.getPredicateMaps().iterator().next();
             Object executes = FnVocabulary.FNO_NAMESPACE + FnVocabulary.FnTerm.EXECUTES;
             String funPredicateValue = funPredicate.getConstantValue().stringValue();
-
             if(funPredicateValue.equals(executes)){
+                String funObjectValue = predicateObjectMap.getObjectMaps().iterator().next().getConstantValue().stringValue();
                 SimpleValueFactory vf = SimpleValueFactory.getInstance();
-                funPredicateURI = vf.createIRI(funPredicateValue);
+                funPredicateURI = vf.createIRI(funObjectValue);
             }
-
         }
         return funPredicateURI;
     }
