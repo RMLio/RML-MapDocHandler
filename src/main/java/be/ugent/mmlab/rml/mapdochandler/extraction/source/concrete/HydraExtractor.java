@@ -12,16 +12,16 @@ import java.util.Map;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
-import org.openrdf.model.Value;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.RepositoryResult;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
+import org.eclipse.rdf4j.repository.Repository;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.RepositoryException;
+import org.eclipse.rdf4j.repository.RepositoryResult;
 
 /**
  * *************************************************************************
@@ -40,7 +40,7 @@ public class HydraExtractor extends StdSourceExtractor {
             LoggerFactory.getLogger(
             HydraExtractor.class.getSimpleName());
     // Value factory
-    private static ValueFactory vf = new ValueFactoryImpl();
+    private static ValueFactory vf = SimpleValueFactory.getInstance();
 
 
     @Override
@@ -49,7 +49,7 @@ public class HydraExtractor extends StdSourceExtractor {
         try {
             RepositoryConnection connection = repository.getConnection();
             
-            URI predicate = vf.createURI(
+            IRI predicate = vf.createIRI(
                     HydraVocabulary.HYDRA_NAMESPACE + HydraVocabulary.HydraTerm.TEMPLATE);
             RepositoryResult<Statement> statements =
                     connection.getStatements((Resource) resource, predicate, null, true);
@@ -86,8 +86,7 @@ public class HydraExtractor extends StdSourceExtractor {
                 new ArrayList<Map<String,Boolean>>();
         try {
             RepositoryConnection connection = repository.getConnection();
-
-            URI predicate = vf.createURI(
+            IRI predicate = vf.createIRI(
                     HydraVocabulary.HYDRA_NAMESPACE + HydraVocabulary.HydraTerm.MAPPING);
             RepositoryResult<Statement> statements =
                     connection.getStatements((Resource) resource, predicate, null, true);
@@ -117,7 +116,7 @@ public class HydraExtractor extends StdSourceExtractor {
             RepositoryConnection connection = repository.getConnection();
 
             //Extract the variable
-            URI predicate = vf.createURI(
+            IRI predicate = vf.createIRI(
                     HydraVocabulary.HYDRA_NAMESPACE
                     + HydraVocabulary.HydraTerm.VARIABLE);
             RepositoryResult<Statement> statements =
@@ -129,7 +128,7 @@ public class HydraExtractor extends StdSourceExtractor {
             }
 
             //Extract required
-            predicate = vf.createURI(
+            predicate = vf.createIRI(
                     HydraVocabulary.HYDRA_NAMESPACE
                     + HydraVocabulary.HydraTerm.REQUIRED);
             statements =

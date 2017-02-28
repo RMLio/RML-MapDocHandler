@@ -6,15 +6,15 @@ import be.ugent.mmlab.rml.model.source.std.StdApiSource;
 import be.ugent.mmlab.rml.vocabularies.DCATVocabulary;
 import java.util.HashSet;
 import java.util.Set;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
-import org.openrdf.model.Value;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.RepositoryResult;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.repository.Repository;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.RepositoryException;
+import org.eclipse.rdf4j.repository.RepositoryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +44,7 @@ public class DcatExtractor extends StdSourceExtractor {
         try {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
-            URI predicate = vf.createURI(
+            IRI predicate = vf.createIRI(
                     DCATVocabulary.DCAT_NAMESPACE + DCATVocabulary.DcatTerm.DOWNLOADURL);
             
             //Extract DCAT Distribution
@@ -53,14 +53,14 @@ public class DcatExtractor extends StdSourceExtractor {
             log.debug("Distribution statements " + statements.hasNext());
             
             if(!statements.hasNext()){
-                predicate = vf.createURI(
+                predicate = vf.createIRI(
                     DCATVocabulary.DCAT_NAMESPACE + DCATVocabulary.DcatTerm.DISTRIBUTION);
                 statements = connection.getStatements((Resource) value, predicate, null, true);
                 
                 log.debug("Dataset statements " + statements.hasNext());
                 while(statements.hasNext()){
                     Statement statement = statements.next();
-                    predicate = vf.createURI(
+                    predicate = vf.createIRI(
                             DCATVocabulary.DCAT_NAMESPACE + DCATVocabulary.DcatTerm.DOWNLOADURL);
                     RepositoryResult<Statement> distributions = connection.getStatements(
                             (Resource) statement.getObject(), predicate, null, true);

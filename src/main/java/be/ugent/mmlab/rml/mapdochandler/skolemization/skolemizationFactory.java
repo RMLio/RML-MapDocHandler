@@ -2,19 +2,19 @@ package be.ugent.mmlab.rml.mapdochandler.skolemization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.openrdf.model.BNode;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
-import org.openrdf.model.Value;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.model.URI;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.RepositoryResult;
-import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.sail.memory.MemoryStore;
+import org.eclipse.rdf4j.model.BNode;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.repository.Repository;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.RepositoryException;
+import org.eclipse.rdf4j.repository.RepositoryResult;
+import org.eclipse.rdf4j.repository.sail.SailRepository;
+import org.eclipse.rdf4j.sail.memory.MemoryStore;
 
 /**
  * *************************************************************************
@@ -32,7 +32,7 @@ public class skolemizationFactory {
             LoggerFactory.getLogger(
             skolemizationFactory.class.getSimpleName());
     
-    private static ValueFactory vf = new ValueFactoryImpl();
+    private static ValueFactory vf = SimpleValueFactory.getInstance();
 
     public static void skolemSubjectSubsitution(
             Resource resource, Resource skolemizedMap, Repository mapDocRepo) {
@@ -47,12 +47,12 @@ public class skolemizationFactory {
                 if (resource instanceof BNode) {
                     mapDocRepoCon.remove(
                             (BNode) statement.getSubject(),
-                            (URI) statement.getPredicate(),
+                            (IRI) statement.getPredicate(),
                             (Value) statement.getObject());
                 } else {
                     mapDocRepoCon.remove(
                             (Resource) statement.getSubject(),
-                            (URI) statement.getPredicate(),
+                            (IRI) statement.getPredicate(),
                             (Value) statement.getObject());
                 }
 
@@ -78,7 +78,7 @@ public class skolemizationFactory {
                 Statement statement = triplesObject.next();
                 mapDocRepoCon.remove(
                         (Resource) statement.getSubject(),
-                        (URI) statement.getPredicate(),
+                        (IRI) statement.getPredicate(),
                         (Value) statement.getObject());
                 
                 mapDocRepoCon.add(statement.getSubject(), statement.getPredicate(), skolemizedMap);
@@ -112,11 +112,11 @@ public class skolemizationFactory {
         if (re == null) {
             re = vf.createBNode();
             Resource ree =
-                    vf.createURI("http://example.com/.well-known/genid/" 
+                    vf.createIRI("http://example.com/.well-known/genid/"
                     + re.stringValue().substring(0));
             return ree;
         }
-        return vf.createURI("http://example.com/.well-known/genid/" 
+        return vf.createIRI("http://example.com/.well-known/genid/"
                 + re.stringValue().substring(0));
     }
 }

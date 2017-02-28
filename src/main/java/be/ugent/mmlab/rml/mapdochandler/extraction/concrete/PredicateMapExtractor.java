@@ -10,11 +10,11 @@ import be.ugent.mmlab.rml.vocabularies.CRMLVocabulary;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.repository.Repository;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
 
 /**
  * *************************************************************************
@@ -50,13 +50,13 @@ public class PredicateMapExtractor extends StdTermMapExtractor {
                 log.debug("Found Graph Map for this Predicate Map " + graphMap.getConstantValue());
             
             if (connection.hasStatement(
-                    object, vf.createURI(CRMLVocabulary.CRML_NAMESPACE
+                    object, vf.createIRI(CRMLVocabulary.CRML_NAMESPACE
                     + CRMLVocabulary.cRMLTerm.BOOLEAN_CONDITION), null, true)) {
                 log.debug("Conditional Predicate Map extracted");
                 ConditionPredicateObjectMapExtractor preObjMapExtractor =
                         new ConditionPredicateObjectMapExtractor();
                 conditions = preObjMapExtractor.extractConditions(
-                        repository, object);
+                        repository, object, null, triplesMap);
                 result = new StdConditionPredicateMap(triplesMap, null,
                     constantValue, stringTemplate, inverseExpression, 
                         referenceValue, termType, conditions, graphMap);

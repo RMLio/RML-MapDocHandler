@@ -3,11 +3,8 @@ package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
 import be.ugent.mmlab.rml.condition.extractor.FallbackMapExtractor;
 import be.ugent.mmlab.rml.condition.model.Condition;
 import be.ugent.mmlab.rml.mapdochandler.extraction.condition.ConditionPredicateObjectMapExtractor;
-import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
-import be.ugent.mmlab.rml.model.RDFTerm.ObjectMap;
-import be.ugent.mmlab.rml.model.RDFTerm.PredicateMap;
+import be.ugent.mmlab.rml.model.RDFTerm.*;
 import be.ugent.mmlab.rml.model.PredicateObjectMap;
-import be.ugent.mmlab.rml.model.RDFTerm.ReferencingObjectMap;
 import be.ugent.mmlab.rml.model.TriplesMap;
 import be.ugent.mmlab.rml.model.std.StdConditionPredicateObjectMap;
 import be.ugent.mmlab.rml.model.std.StdPredicateObjectMap;
@@ -18,14 +15,14 @@ import java.util.Map;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.RepositoryResult;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.repository.Repository;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.RepositoryException;
+import org.eclipse.rdf4j.repository.RepositoryResult;
 
 /**
  * *************************************************************************
@@ -40,7 +37,7 @@ import org.openrdf.repository.RepositoryResult;
 public class PredicateObjectMapExtractor {
     
     // Log
-    static final Logger log = 
+    static final Logger log =
             LoggerFactory.getLogger(
             PredicateObjectMapExtractor.class.getSimpleName());
     
@@ -57,24 +54,26 @@ public class PredicateObjectMapExtractor {
         Set<PredicateMap> predicateMaps = new HashSet<PredicateMap>();
         Set<ObjectMap> objectMaps = new HashSet<ObjectMap>();
         Set<ReferencingObjectMap> refObjectMaps = new HashSet<ReferencingObjectMap>();
-        
+        Set<FunctionTermMap> funObjectMaps = new HashSet<FunctionTermMap>();
+
         try {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
             
-            URI p = vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+            IRI p = vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.PREDICATE_MAP);
             predicate_statements = connection.getStatements(predicateObject, p, null, true);
             log.debug("More Predicate Map statements: " 
                     + predicate_statements.hasNext());
             while (predicate_statements.hasNext()) {
+                Statement predicate_statement = predicate_statements.next();
                 PredicateMapExtractor predMapExtractor = new PredicateMapExtractor();
                 PredicateMap predicateMap = predMapExtractor.extractPredicateMap(
-                        repository, predicate_statements.next(),
+                        repository, predicate_statement,
                         savedGraphMap, triplesMap);
                 predicateMaps.add(predicateMap);
 
-                URI o = vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+                IRI o = vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE
                         + R2RMLVocabulary.R2RMLTerm.OBJECT_MAP);
                 // Extract object maps
                 object_statements = connection.getStatements(predicateObject, o, null, true);
@@ -82,6 +81,7 @@ public class PredicateObjectMapExtractor {
                 if(object_statements.hasNext())
                 while (object_statements.hasNext()) {
                     Statement object_statement = object_statements.next();
+
                     //Extract Referencing Object Maps
                     log.debug("Extracting Referencing Object Maps..");
                     ReferencingObjectMapExtractor refObjMapExtractor = 
@@ -89,14 +89,43 @@ public class PredicateObjectMapExtractor {
                     refObjectMaps = refObjMapExtractor.processReferencingObjectMap(
                             repository, object_statement, savedGraphMap,
                             triplesMapResources, triplesMap, triplesMapSubject, predicateObject);
-                    if(refObjectMaps != null)
-                    log.debug("Referencing Object Map statements found: " + refObjectMaps.size());
-                    
+                    log.debug("Referencing Object Map statements found: " + refObjectMaps);
+
+                    //Extracting Function Term Map
                     if (refObjectMaps.isEmpty()) {
+                        log.debug("Extracting Function Object Maps..");
+                        FunctionTermMapExtractor funObjMapExtractor =
+                                new FunctionTermMapExtractor();
+                        funObjectMaps = funObjMapExtractor.processFunctionTermMap(
+                                repository, (Resource) object_statement.getObject(),
+                                triplesMapResources, triplesMap, predicateObjectMap, savedGraphMap);
+                        log.debug("Function Object Map statements found: " + funObjectMaps);
+                    }
+
+                    //Extracting Simple Object Map
+                    if (refObjectMaps.isEmpty() && funObjectMaps.isEmpty()) {
                         ObjectMapExtractor objMapExtractor = new ObjectMapExtractor();
 
                         ObjectMap objectMap = objMapExtractor.extractObjectMap(repository,
-                                (Resource) object_statement.getObject(), savedGraphMap, triplesMap);
+                                (Resource) object_statement.getObject(), savedGraphMap, triplesMap, triplesMapResources);
+
+                        //COMBUST specific annotation
+                        CombustExtractor combustExtractor = new CombustExtractor();
+                        boolean valueComplete = combustExtractor.exrtactComplete(
+                                (Resource) object_statement.getObject(), repository);
+                        if (valueComplete) {
+                            objectMap.setCompletion();
+                        }
+                        log.debug("to be completed " + predicateMap.getCompletion());
+
+                        //COMBUST specific annotation to validate an object value
+                        combustExtractor = new CombustExtractor();
+                        boolean valueValidate = combustExtractor.exrtactValidate(
+                                (Resource) object_statement.getObject(), repository);
+                        if (valueValidate) {
+                            objectMap.setValidation();
+                        }
+
                         try {
                             objectMap.setOwnTriplesMap(triplesMapResources.get(triplesMapSubject));
                         } catch (Exception ex) {
@@ -104,11 +133,25 @@ public class PredicateObjectMapExtractor {
                         }
                         objectMaps.add(objectMap);
                     }
+                    predicateObjectMap = new StdPredicateObjectMap(
+                            predicateMaps, objectMaps, refObjectMaps);
+
+                    //Extract dcterms:type if exists
+                    try {
+                        RepositoryConnection dcTermsConnection = repository.getConnection();
+                        RepositoryResult<Statement> dcTermsStatements = dcTermsConnection.getStatements(predicateObject, repository.getValueFactory().createIRI("http://purl.org/dc/terms/type"), null, false);
+                        if( dcTermsStatements != null && dcTermsStatements.hasNext()) {
+                            predicateObjectMap.setDCTermsType(dcTermsStatements.next().getObject().stringValue());
+                        }
+                        dcTermsConnection.close();
+                    } catch (RepositoryException ex) {
+                        log.error("Exception: " + ex);
+                    }
 
                     predicateObjectMap = createPredicateObjectMap(
                             repository, triplesMapSubject,
                             predicateObject, savedGraphMap, triplesMapResources,
-                            triplesMap, objectMaps, refObjectMaps, predicateMaps);
+                            triplesMap, objectMaps, refObjectMaps, predicateMaps,funObjectMaps);
                     
                     /*predicateObjectMap = new StdPredicateObjectMap(
                             predicateMaps, objectMaps, refObjectMaps);*/
@@ -142,7 +185,8 @@ public class PredicateObjectMapExtractor {
             TriplesMap triplesMap,
             Set<ObjectMap> objectMaps,
             Set<ReferencingObjectMap> refObjectMaps,
-            Set<PredicateMap> predicateMaps) {
+            Set<PredicateMap> predicateMaps,
+            Set<FunctionTermMap> functionTermMaps) {
         PredicateObjectMap predicateObjectMap = null;
         Set<PredicateObjectMap> fallbackPOMs = new HashSet();
         
@@ -151,12 +195,12 @@ public class PredicateObjectMapExtractor {
             ValueFactory vf = connection.getValueFactory();
             
             if (connection.hasStatement(
-                    predicateObject, vf.createURI(CRMLVocabulary.CRML_NAMESPACE
+                    predicateObject, vf.createIRI(CRMLVocabulary.CRML_NAMESPACE
                     + CRMLVocabulary.cRMLTerm.BOOLEAN_CONDITION), null, true)) {
                 ConditionPredicateObjectMapExtractor preObjMapExtractor =
                         new ConditionPredicateObjectMapExtractor();
                 Set<Condition> conditions = preObjMapExtractor.extractConditions(
-                        repository, predicateObject);
+                        repository, predicateObject, triplesMapResources, triplesMap);
 
                 //Extracting fallbacks
                 FallbackMapExtractor fallbackExtractor =
@@ -186,12 +230,12 @@ public class PredicateObjectMapExtractor {
                 else{
                     log.debug("Simple POM extracted .");
                     predicateObjectMap = new StdPredicateObjectMap(
-                            predicateMaps, objectMaps, refObjectMaps);
+                            predicateMaps, objectMaps, refObjectMaps, functionTermMaps);
                 }
             } else {
                 log.debug("Simple POM extracted.");
                 predicateObjectMap = new StdPredicateObjectMap(
-                            predicateMaps, objectMaps, refObjectMaps);
+                            predicateMaps, objectMaps, refObjectMaps, functionTermMaps);
             }
             
         } catch (RepositoryException ex) {

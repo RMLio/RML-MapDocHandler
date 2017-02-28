@@ -1,5 +1,7 @@
 package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
 
+import be.ugent.mmlab.rml.extraction.RMLTermExtractor;
+import be.ugent.mmlab.rml.extraction.TermExtractor;
 import be.ugent.mmlab.rml.mapdochandler.extraction.condition.ConditionPredicateObjectMapExtractor;
 import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
 import be.ugent.mmlab.rml.model.RDFTerm.SubjectMap;
@@ -11,14 +13,14 @@ import be.ugent.mmlab.rml.vocabularies.R2RMLVocabulary;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.RepositoryResult;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.repository.Repository;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.RepositoryException;
+import org.eclipse.rdf4j.repository.RepositoryResult;
 
 /**
  * *************************************************************************
@@ -33,7 +35,7 @@ import org.openrdf.repository.RepositoryResult;
 public class SubjectMapExtractor extends StdTermMapExtractor {
     
     // Log
-    static final Logger log = 
+    static final Logger log =
             LoggerFactory.getLogger(
             SubjectMapExtractor.class.getSimpleName());
     
@@ -57,7 +59,7 @@ public class SubjectMapExtractor extends StdTermMapExtractor {
             
             extractProperties(repository, triplesMap, subjectMap);
             
-            Set<URI> classIRIs = TermExtractor.extractURIsFromTermMap(
+            Set<IRI> classIRIs = TermExtractor.extractURIsFromTermMap(
                     repository, subjectMap, R2RMLVocabulary.R2RMLTerm.CLASS);
 
             graphMap = extractGraphMap(repository, triplesMap, graphMap);
@@ -66,13 +68,13 @@ public class SubjectMapExtractor extends StdTermMapExtractor {
 
                 if (connection.hasStatement(
                         (Resource) statement.getObject(),
-                        vf.createURI(CRMLVocabulary.CRML_NAMESPACE
+                        vf.createIRI(CRMLVocabulary.CRML_NAMESPACE
                         + CRMLVocabulary.cRMLTerm.BOOLEAN_CONDITION), null, true)) {
                     log.debug("Condition Subject Map Extractor");
                     ConditionPredicateObjectMapExtractor preObjMapExtractor = 
                             new ConditionPredicateObjectMapExtractor();
                     conditions = preObjMapExtractor.extractConditions(
-                            repository, (Resource) statement.getObject());
+                            repository, (Resource) statement.getObject(), null, triplesMap);
                     log.debug(conditions.size() + " conditions were found");
                     result = new StdConditionSubjectMap(triplesMap, constantValue, 
                             stringTemplate, termType, inverseExpression,

@@ -13,14 +13,14 @@ import be.ugent.mmlab.rml.mapdochandler.extraction.source.concrete.SparqlExtract
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
-import org.openrdf.model.Value;
-import org.openrdf.model.vocabulary.RDF;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.RepositoryResult;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.model.vocabulary.RDF;
+import org.eclipse.rdf4j.repository.Repository;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.RepositoryException;
+import org.eclipse.rdf4j.repository.RepositoryResult;
 
 /**
  * *************************************************************************
@@ -36,7 +36,8 @@ import org.openrdf.repository.RepositoryResult;
 public class ConcreteSourceFactory implements SourceFactory {
     
     // Log
-    private static final Logger log = LoggerFactory.getLogger(
+    private static final Logger log =
+            LoggerFactory.getLogger(
             ConcreteSourceFactory.class.getSimpleName());
     
     public SourceExtractor createSourceExtractor(Repository repository, Value value) {

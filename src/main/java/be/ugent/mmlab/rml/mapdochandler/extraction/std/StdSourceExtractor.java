@@ -7,15 +7,15 @@ import be.ugent.mmlab.rml.vocabularies.R2RMLVocabulary;
 import be.ugent.mmlab.rml.vocabularies.RMLVocabulary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
-import org.openrdf.model.Value;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.RepositoryResult;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.repository.Repository;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.RepositoryException;
+import org.eclipse.rdf4j.repository.RepositoryResult;
 
 
 /**
@@ -39,7 +39,6 @@ public abstract class StdSourceExtractor  implements SourceExtractor {
 
     /**
      *
-     * @param rmlMappingGraph
      * @param term
      * @param resource
      * @param triplesMap
@@ -49,7 +48,7 @@ public abstract class StdSourceExtractor  implements SourceExtractor {
             Repository repository, Enum term, Resource resource, TriplesMap triplesMap) {
         RepositoryResult<Statement> statements = null;
         try {
-            URI p = getTermURI(repository, term);
+            IRI p = getTermURI(repository, term);
             RepositoryConnection connection = repository.getConnection();
             statements = connection.getStatements(resource, p, null, true);
 
@@ -62,11 +61,10 @@ public abstract class StdSourceExtractor  implements SourceExtractor {
 
     /**
      *
-     * @param rmlMappingGraph
      * @param term
      * @return
      */
-    protected static URI getTermURI(Repository repository, Enum term) {
+    protected static IRI getTermURI(Repository repository, Enum term) {
         String namespace = R2RMLVocabulary.R2RML_NAMESPACE;
 
         if (term instanceof RMLVocabulary.RMLTerm) {
@@ -79,11 +77,11 @@ public abstract class StdSourceExtractor  implements SourceExtractor {
         }
 
         RepositoryConnection connection;
-        URI uri = null;
+        IRI uri = null;
         try {
             connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
-            uri = vf.createURI(namespace + term);
+            uri = vf.createIRI(namespace + term);
             connection.close();
         } catch (RepositoryException ex) {
             log.error("RepositoryException " + ex);

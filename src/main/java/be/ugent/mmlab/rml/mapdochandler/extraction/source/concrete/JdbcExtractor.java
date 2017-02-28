@@ -7,15 +7,15 @@ import be.ugent.mmlab.rml.vocabularies.D2RQVocabulary;
 import be.ugent.mmlab.rml.vocabularies.D2RQVocabulary.D2RQTerm;
 import java.util.HashSet;
 import java.util.Set;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
-import org.openrdf.model.Value;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.RepositoryResult;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.repository.Repository;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.RepositoryException;
+import org.eclipse.rdf4j.repository.RepositoryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +65,7 @@ public class JdbcExtractor extends StdSourceExtractor {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
             
-            URI predicate = vf.createURI(
+            IRI predicate = vf.createIRI(
                         D2RQVocabulary.D2RQ_NAMESPACE + term);
             
             RepositoryResult<Statement> statements =

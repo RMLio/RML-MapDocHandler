@@ -11,6 +11,7 @@
 
 package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
 
+import be.ugent.mmlab.rml.extraction.RMLTermExtractor;
 import be.ugent.mmlab.rml.model.TriplesMap;
 import be.ugent.mmlab.rml.vocabularies.QLVocabulary;
 import be.ugent.mmlab.rml.vocabularies.QLVocabulary.QLTerm;
@@ -18,14 +19,14 @@ import be.ugent.mmlab.rml.vocabularies.R2RMLVocabulary;
 import be.ugent.mmlab.rml.vocabularies.RMLVocabulary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.RepositoryResult;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.repository.Repository;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.RepositoryException;
+import org.eclipse.rdf4j.repository.RepositoryResult;
 
 public class LogicalSourceExtractor {
     
@@ -73,7 +74,7 @@ public class LogicalSourceExtractor {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
 
-            URI logicalSource = vf.createURI(
+            IRI logicalSource = vf.createIRI(
                     RMLVocabulary.RML_NAMESPACE + RMLVocabulary.RMLTerm.REFERENCE_FORMULATION);
 
             statements = connection.getStatements(subject, logicalSource, null, true);
@@ -96,7 +97,7 @@ public class LogicalSourceExtractor {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
 
-            URI logicalSource = vf.createURI(
+            IRI logicalSource = vf.createIRI(
                     RMLVocabulary.RML_NAMESPACE + RMLVocabulary.RMLTerm.ITERATOR);
             statements = connection.getStatements(subject, logicalSource, null, true);
             
@@ -120,7 +121,7 @@ public class LogicalSourceExtractor {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
             
-            URI queryURI = vf.createURI(
+            IRI queryURI = vf.createIRI(
                     RMLVocabulary.RML_NAMESPACE + RMLVocabulary.RMLTerm.QUERY);
             statements = 
                     connection.getStatements(subject, queryURI, null, true);
@@ -144,7 +145,7 @@ public class LogicalSourceExtractor {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
             
-            URI queryURI = vf.createURI(
+            IRI queryURI = vf.createIRI(
                     R2RMLVocabulary.R2RML_NAMESPACE + 
                     R2RMLVocabulary.R2RMLTerm.TABLE_NAME);
             statements = 

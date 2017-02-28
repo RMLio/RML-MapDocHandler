@@ -7,15 +7,15 @@ import be.ugent.mmlab.rml.model.source.std.StdSparqlEndpointSource;
 import be.ugent.mmlab.rml.vocabularies.VoIDVocabulary;
 import java.util.HashSet;
 import java.util.Set;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
-import org.openrdf.model.Value;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.RepositoryResult;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.repository.Repository;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.RepositoryException;
+import org.eclipse.rdf4j.repository.RepositoryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +45,7 @@ public class VoidExtractor extends StdSourceExtractor {
         try {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
-            URI predicate = vf.createURI(
+            IRI predicate = vf.createIRI(
                     VoIDVocabulary.VOID_NAMESPACE + VoIDVocabulary.VoIDTerm.SPARQLENDPOINT);
             //TODO: Check the following: sub and obj same value
             RepositoryResult<Statement> statements =
@@ -58,7 +58,7 @@ public class VoidExtractor extends StdSourceExtractor {
             }
 
             if (!statements.hasNext()) {
-                predicate = vf.createURI(
+                predicate = vf.createIRI(
                         VoIDVocabulary.VOID_NAMESPACE + VoIDVocabulary.VoIDTerm.DATADUMP);
                 //TODO: Check the following: sub and obj same value
                 statements = connection.getStatements((Resource) value, predicate, null, true);
