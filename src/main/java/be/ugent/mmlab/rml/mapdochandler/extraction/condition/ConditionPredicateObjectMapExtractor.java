@@ -4,8 +4,11 @@ package be.ugent.mmlab.rml.mapdochandler.extraction.condition;
 import be.ugent.mmlab.rml.condition.extractor.BooleanConditionExtractor;
 import be.ugent.mmlab.rml.condition.extractor.StdConditionExtractor;
 import be.ugent.mmlab.rml.condition.model.Condition;
+import be.ugent.mmlab.rml.condition.model.std.StdBooleanCondition;
+import be.ugent.mmlab.rml.mapdochandler.extraction.concrete.FunctionTermMapExtractor;
 import be.ugent.mmlab.rml.mapdochandler.extraction.concrete.PredicateObjectMapExtractor;
 import be.ugent.mmlab.rml.model.PredicateObjectMap;
+import be.ugent.mmlab.rml.model.RDFTerm.FunctionTermMap;
 import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
 import be.ugent.mmlab.rml.model.TriplesMap;
 import be.ugent.mmlab.rml.model.std.StdConditionPredicateObjectMap;
@@ -15,9 +18,9 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Value;
-import org.openrdf.repository.Repository;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.repository.Repository;
 
 /**
  * RML Processor
@@ -47,7 +50,7 @@ public class ConditionPredicateObjectMapExtractor extends PredicateObjectMapExtr
                 graphMap, triplesMapResources, triplesMap);
         if (pom != null) {
             Set<Condition> conditions =
-                    extractConditions(repository, predicateObject);
+                    extractConditions(repository, predicateObject, triplesMapResources, triplesMap);
             log.debug("Found " + conditions.size() + " conditions.");
             Set<PredicateObjectMap> fallbackPOMs =
                     extractFallback(repository, predicateObject,triplesMapResources,triplesMap);
@@ -68,7 +71,7 @@ public class ConditionPredicateObjectMapExtractor extends PredicateObjectMapExtr
     }
     
     public static Set<Condition> extractConditions(
-            Repository repository, Resource object) {
+            Repository repository, Resource object, Map<Resource, TriplesMap> triplesMapResources, TriplesMap triplesMap) {
         Set<Condition> conditions = new HashSet<Condition>();
 
         try {
@@ -90,6 +93,21 @@ public class ConditionPredicateObjectMapExtractor extends PredicateObjectMapExtr
                             conditionsExtractor.extractBooleanCondition(
                             repository, conditionResource);
 
+                    //Extracting Function Maps as Conditions
+                    FunctionTermMapExtractor funObjMapExtractor =
+                            new FunctionTermMapExtractor();
+                    GraphMap graphMap = null;
+                    Set<FunctionTermMap> funObjectMaps = funObjMapExtractor.processFunctionTermMap(
+                            repository, conditionResource, triplesMapResources, triplesMap, null, graphMap);
+                    if(booleanCondition == null && funObjectMaps != null && funObjectMaps.size() > 0 ){
+                        booleanCondition = new StdBooleanCondition(funObjectMaps);
+                        //booleanCondition.setFunctionTermMaps(funObjectMaps);
+                    }
+                    else{
+                        booleanCondition.setFunctionTermMaps(funObjectMaps);
+                    }
+
+                    //Extracting Fallback Maps
                     log.debug("Extracting Fallback Maps...");
                     List<Value> fallbackTerms = conditionsExtractor.extractFallback(
                             repository, conditionResource);

@@ -1,5 +1,6 @@
 package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
 
+import be.ugent.mmlab.rml.extraction.TermExtractor;
 import be.ugent.mmlab.rml.mapdochandler.extraction.condition.ConditionPredicateObjectMapExtractor;
 import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
 import be.ugent.mmlab.rml.model.RDFTerm.ObjectMap;
@@ -10,11 +11,13 @@ import be.ugent.mmlab.rml.vocabularies.CRMLVocabulary;
 import be.ugent.mmlab.rml.vocabularies.R2RMLVocabulary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.openrdf.model.Resource;
-import org.openrdf.model.URI;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.repository.Repository;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
+
+import java.util.Map;
 
 /**
  * *************************************************************************
@@ -30,12 +33,12 @@ import org.openrdf.repository.RepositoryConnection;
 public class ObjectMapExtractor extends StdTermMapExtractor {
 
     // Log
-    static final Logger log = 
+    static final Logger log =
             LoggerFactory.getLogger(
             ObjectMapExtractor.class.getSimpleName());
     
     public ObjectMap extractObjectMap(Repository repository,
-            Resource object, GraphMap graphMap, TriplesMap triplesMap){
+            Resource object, GraphMap graphMap, TriplesMap triplesMap, Map<Resource, TriplesMap> triplesMapResources){
         ObjectMap result ;
         log.debug("Extracting Object Map..");
         
@@ -48,7 +51,7 @@ public class ObjectMapExtractor extends StdTermMapExtractor {
             //Extract additional properties for Object Map
             String languageTag = TermExtractor.extractLiteralFromTermMap(repository,
                     object, R2RMLVocabulary.R2RMLTerm.LANGUAGE, triplesMap);
-            URI dataType = (URI) TermExtractor.extractValueFromTermMap(repository, object,
+            IRI dataType = (IRI) TermExtractor.extractValueFromTermMap(repository, object,
                     R2RMLVocabulary.R2RMLTerm.DATATYPE, triplesMap);
 
             graphMap = extractGraphMap(repository, triplesMap, graphMap);
@@ -57,13 +60,13 @@ public class ObjectMapExtractor extends StdTermMapExtractor {
 
             log.debug("Extracting conditions...");
             if (connection.hasStatement(
-                    object, vf.createURI(CRMLVocabulary.CRML_NAMESPACE
+                    object, vf.createIRI(CRMLVocabulary.CRML_NAMESPACE
                     + CRMLVocabulary.cRMLTerm.BOOLEAN_CONDITION), null, true)) {
                 log.debug("Conditional Object Map extracted.");
                 ConditionPredicateObjectMapExtractor preObjMapExtractor =
                         new ConditionPredicateObjectMapExtractor();
                 conditions = preObjMapExtractor.extractConditions(
-                        repository, object);
+                        repository, object, triplesMapResources, triplesMap);
                 if (conditions != null)
                     log.debug(conditions.size() + " conditions were found");
                 result = new StdConditionObjectMap(triplesMap, null,

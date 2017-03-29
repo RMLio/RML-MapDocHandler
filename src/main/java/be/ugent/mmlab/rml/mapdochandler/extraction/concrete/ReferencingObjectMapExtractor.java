@@ -3,6 +3,7 @@ package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
 import be.ugent.mmlab.rml.condition.extractor.AbstractConditionExtractor;
 import be.ugent.mmlab.rml.condition.model.Condition;
 import be.ugent.mmlab.rml.condition.model.std.StdJoinConditionMetric;
+import be.ugent.mmlab.rml.extraction.TermExtractor;
 import be.ugent.mmlab.rml.mapdochandler.extraction.condition.ConditionPredicateObjectMapExtractor;
 import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
 import be.ugent.mmlab.rml.model.JoinCondition;
@@ -18,16 +19,15 @@ import java.util.Map;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
-import org.openrdf.model.Value;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.URIImpl;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.RepositoryResult;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.repository.Repository;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.RepositoryException;
+import org.eclipse.rdf4j.repository.RepositoryResult;
 
 /**
  * *************************************************************************
@@ -87,7 +87,7 @@ public class ReferencingObjectMapExtractor {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
             
-            URI parentTriplesMap = (URI) TermExtractor.extractValueFromTermMap(
+            IRI parentTriplesMap = (IRI) TermExtractor.extractValueFromTermMap(
                     repository, object, R2RMLVocabulary.R2RMLTerm.PARENT_TRIPLES_MAP, triplesMap);
             log.debug("Parent Triples Maps were found " + parentTriplesMap);
             
@@ -99,10 +99,10 @@ public class ReferencingObjectMapExtractor {
 
             //TODO: Transfer the following condition implementation to a separate function
             if (connection.hasStatement(
-                    object, vf.createURI(CRMLVocabulary.CRML_NAMESPACE
+                    object, vf.createIRI(CRMLVocabulary.CRML_NAMESPACE
                     + CRMLVocabulary.cRMLTerm.BOOLEAN_CONDITION), null, true) || 
                 connection.hasStatement(
-                    object, vf.createURI(CRMLVocabulary.CRML_NAMESPACE
+                    object, vf.createIRI(CRMLVocabulary.CRML_NAMESPACE
                     + CRMLVocabulary.cRMLTerm.BINDING_CONDITION), null, true)) {
                 //TODO: Clean up the conditions mess - Properly rename classess
                 //ConditionPredicateObjectMapExtractor is for equalCondition
@@ -110,7 +110,7 @@ public class ReferencingObjectMapExtractor {
                 ConditionPredicateObjectMapExtractor preObjMapExtractor =
                         new ConditionPredicateObjectMapExtractor();
                 conditions = preObjMapExtractor.extractConditions(
-                        repository, object);
+                        repository, object, triplesMapResources, triplesMap);
                 AbstractConditionExtractor conditionsExtractor =
                 new AbstractConditionExtractor();
                 Set<Condition> conditions2 = conditionsExtractor.extractConditions(repository, object);
@@ -156,11 +156,11 @@ public class ReferencingObjectMapExtractor {
                 RepositoryResult<Statement> triplesMapStatements = connection.getStatements(
                         null, null, object, true);
                 triplesMapStatements = connection.getStatements(
-                        null, vf.createURI(CRMLVocabulary.CRML_NAMESPACE + CRMLVocabulary.cRMLTerm.FALLBACK),
+                        null, vf.createIRI(CRMLVocabulary.CRML_NAMESPACE + CRMLVocabulary.cRMLTerm.FALLBACK),
                         triplesMapStatements.next().getSubject(), true);
 
                 triplesMapStatements = connection.getStatements(
-                    null, vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE + R2RMLVocabulary.R2RMLTerm.PREDICATE_OBJECT_MAP),
+                    null, vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE + R2RMLVocabulary.R2RMLTerm.PREDICATE_OBJECT_MAP),
                         triplesMapStatements.next().getSubject(), true);
                 Resource tm = triplesMapStatements.next().getSubject();
                 //TODO: Properly handle duplicate code
@@ -223,7 +223,7 @@ public class ReferencingObjectMapExtractor {
             ValueFactory vf = connection.getValueFactory();
 
             // Extract predicate-object maps
-            URI p = vf.createURI(R2RMLVocabulary.R2RML_NAMESPACE
+            IRI p = vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.JOIN_CONDITION);
             statements = connection.getStatements(object, p, null, true);
 
@@ -235,7 +235,7 @@ public class ReferencingObjectMapExtractor {
                     String parent = TermExtractor.extractLiteralFromTermMap(repository,
                             jc, R2RMLVocabulary.R2RMLTerm.PARENT, triplesMap);
                     Value metric = TermExtractor.extractValueFromTermMap(repository, jc, 
-                            new URIImpl(CRMLVocabulary.CRML_NAMESPACE + 
+                            vf.createIRI(CRMLVocabulary.CRML_NAMESPACE +
                             CRMLVocabulary.cRMLTerm.METRIC) , triplesMap);
                     log.debug("Metric " + metric + " was extracted.");
                     if (parent == null || child == null) {
@@ -281,11 +281,11 @@ public class ReferencingObjectMapExtractor {
             ValueFactory vf = connection.getValueFactory();
 
             if (connection.hasStatement(object,
-                    vf.createURI(CRMLVocabulary.CRML_NAMESPACE
+                    vf.createIRI(CRMLVocabulary.CRML_NAMESPACE
                     + CRMLVocabulary.cRMLTerm.FALLBACK),
                     null, true)) {
                 log.debug("Referencing Object Map with fallback ObjMap");
-                URI p = vf.createURI(CRMLVocabulary.CRML_NAMESPACE
+                IRI p = vf.createIRI(CRMLVocabulary.CRML_NAMESPACE
                         + CRMLVocabulary.cRMLTerm.FALLBACK);
                 RepositoryResult<Statement> fallbackStatements =
                         connection.getStatements(object, p, null, true);
