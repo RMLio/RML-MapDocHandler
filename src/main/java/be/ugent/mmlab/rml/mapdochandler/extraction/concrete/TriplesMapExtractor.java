@@ -75,7 +75,7 @@ public class TriplesMapExtractor {
         SubjectMapExtractor sbjMapExtractor = new SubjectMapExtractor();
         SubjectMap subjectMap =
                 sbjMapExtractor.extractSubjectMap(
-                repository, triplesMapSubject, graphMap, result);
+                repository, triplesMapSubject, graphMap, result, triplesMapResources);
 
         try {
             result.setSubjectMap(subjectMap);

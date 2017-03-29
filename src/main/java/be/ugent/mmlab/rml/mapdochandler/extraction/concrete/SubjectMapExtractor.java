@@ -3,6 +3,7 @@ package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
 import be.ugent.mmlab.rml.extraction.RMLTermExtractor;
 import be.ugent.mmlab.rml.extraction.TermExtractor;
 import be.ugent.mmlab.rml.mapdochandler.extraction.condition.ConditionPredicateObjectMapExtractor;
+import be.ugent.mmlab.rml.model.RDFTerm.FunctionTermMap;
 import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
 import be.ugent.mmlab.rml.model.RDFTerm.SubjectMap;
 import be.ugent.mmlab.rml.model.TriplesMap;
@@ -10,6 +11,8 @@ import be.ugent.mmlab.rml.model.std.StdConditionSubjectMap;
 import be.ugent.mmlab.rml.model.std.StdSubjectMap;
 import be.ugent.mmlab.rml.vocabularies.CRMLVocabulary;
 import be.ugent.mmlab.rml.vocabularies.R2RMLVocabulary;
+
+import java.util.Map;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,9 +44,11 @@ public class SubjectMapExtractor extends StdTermMapExtractor {
     
     public SubjectMap extractSubjectMap(
             Repository repository, Resource triplesMapSubject,
-            GraphMap graphMap, TriplesMap triplesMap) {
+            GraphMap graphMap, TriplesMap triplesMap,
+            Map<Resource, TriplesMap> triplesMapResources) {
         SubjectMap result = null;
         RepositoryResult<Statement> statements;
+        FunctionTermMap funSubjectMap = null;
         log.debug("Extracting Subject Map...");
         
         try {
@@ -80,10 +85,20 @@ public class SubjectMapExtractor extends StdTermMapExtractor {
                             stringTemplate, termType, inverseExpression,
                             referenceValue, classIRIs, graphMap, conditions);
                 } else {
+                    FunctionTermMapExtractor funSubjMapExtractor =
+                            new FunctionTermMapExtractor();
+                    Set<FunctionTermMap> fnMaps = funSubjMapExtractor.processFunctionTermMap(
+                            repository, subjectMap,
+                            triplesMapResources, triplesMap, null, graphMap);
+
+                    if (fnMaps.size() > 0) {
+                        funSubjectMap = (FunctionTermMap) fnMaps.toArray()[0];
+                    }
+
                     log.debug("Simple Subject Map Extractor");
                     result = new StdSubjectMap(triplesMap, constantValue,
-                            stringTemplate, termType, inverseExpression, 
-                            referenceValue, classIRIs, graphMap);
+                            stringTemplate, termType, inverseExpression,
+                            referenceValue, classIRIs, graphMap, funSubjectMap);
                 }
             } catch (Exception ex) {
                 log.error("Exception: " + ex);
