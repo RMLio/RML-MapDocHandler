@@ -72,11 +72,19 @@ public class ObjectMapExtractor extends StdTermMapExtractor {
                 result = new StdConditionObjectMap(triplesMap, null,
                     constantValue, dataType, languageTag, stringTemplate, 
                     termType, inverseExpression, referenceValue, conditions, graphMap);
+                StdConditionObjectMap currentConditionObjectMap = (StdConditionObjectMap) result;
+                currentConditionObjectMap.setConstants(TermExtractor.extractValuesFromTermMap(repository,
+                        object, R2RMLVocabulary.R2RMLTerm.CONSTANT, triplesMap));
             } else {
                 log.debug("Simple Object Map extracted.");
                 result = new StdObjectMap(triplesMap, null, 
                     constantValue, dataType, languageTag, stringTemplate, 
                     termType, inverseExpression, referenceValue, graphMap);
+
+                //added for multiple constants
+                StdObjectMap currentObjectMap = (StdObjectMap) result;
+                currentObjectMap.setConstants(TermExtractor.extractValuesFromTermMap(repository,
+                        object, R2RMLVocabulary.R2RMLTerm.CONSTANT, triplesMap));
             }
             connection.close();
             return result;

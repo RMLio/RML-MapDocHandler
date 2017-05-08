@@ -35,6 +35,8 @@ import org.eclipse.rdf4j.repository.RepositoryResult;
  ***************************************************************************
  */
 public class PredicateObjectMapExtractor {
+
+    public static int counter = 0;
     
     // Log
     static final Logger log =
@@ -63,6 +65,7 @@ public class PredicateObjectMapExtractor {
             IRI p = vf.createIRI(R2RMLVocabulary.R2RML_NAMESPACE
                     + R2RMLVocabulary.R2RMLTerm.PREDICATE_MAP);
             predicate_statements = connection.getStatements(predicateObject, p, null, true);
+            log.debug("Extracting predicate maps: " + predicateObject.stringValue() + " " + p);
             log.debug("More Predicate Map statements: " 
                     + predicate_statements.hasNext());
             while (predicate_statements.hasNext()) {
@@ -77,11 +80,22 @@ public class PredicateObjectMapExtractor {
                         + R2RMLVocabulary.R2RMLTerm.OBJECT_MAP);
                 // Extract object maps
                 object_statements = connection.getStatements(predicateObject, o, null, true);
+                log.debug("Extracting Object Statements: " + predicateObject.toString() + ", " + o.stringValue());
+
+                int counter = 0;
+                while(object_statements.hasNext()) {
+                    log.debug(object_statements.next().getSubject().stringValue());
+                    counter += 1;
+                }
+
+
+                object_statements = connection.getStatements(predicateObject, o, null, true);
 
                 if(object_statements.hasNext())
                 while (object_statements.hasNext()) {
-                    Statement object_statement = object_statements.next();
 
+                    Statement object_statement = object_statements.next();
+                    log.debug("Object_statement= " + object_statement.getSubject() + " " + object_statement.getPredicate() + " " + object_statement.getObject());
                     //Extract Referencing Object Maps
                     log.debug("Extracting Referencing Object Maps..");
                     ReferencingObjectMapExtractor refObjMapExtractor = 
@@ -196,7 +210,11 @@ public class PredicateObjectMapExtractor {
         try {
             RepositoryConnection connection = repository.getConnection();
             ValueFactory vf = connection.getValueFactory();
-            
+
+            counter += 1;
+            log.debug("Counter: " + counter);
+            log.debug("Create POM statement: " + predicateObject.stringValue() + ", " + vf.createIRI(CRMLVocabulary.CRML_NAMESPACE
+                    + CRMLVocabulary.cRMLTerm.BOOLEAN_CONDITION + ", " +  true));
             if (connection.hasStatement(
                     predicateObject, vf.createIRI(CRMLVocabulary.CRML_NAMESPACE
                     + CRMLVocabulary.cRMLTerm.BOOLEAN_CONDITION), null, true)) {
@@ -244,6 +262,7 @@ public class PredicateObjectMapExtractor {
         } catch (RepositoryException ex) {
             log.error("Repository Exception " + ex);
         } finally {
+            counter--;
             return predicateObjectMap;
         }
     }
