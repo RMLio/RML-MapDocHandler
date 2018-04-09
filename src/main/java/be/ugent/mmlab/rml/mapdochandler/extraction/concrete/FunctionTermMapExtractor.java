@@ -56,7 +56,7 @@ public class FunctionTermMapExtractor {
             if(functionValue != null) {
                 TriplesMapExtractor triplesMapExtractor = new TriplesMapExtractor();
                 TriplesMap functionTriplesMap =
-                        triplesMapExtractor.extractAndReturnTriplesMap(repository, functionValue, triplesMapResources);
+                        triplesMapExtractor.extractAndReturnTriplesMap(repository, functionValue, triplesMapResources, false);
 
                 function = getFunction(functionTriplesMap);
                 parameters = getParameters(functionTriplesMap);
@@ -121,8 +121,11 @@ public class FunctionTermMapExtractor {
                 parameter = predicateObjectMap.getObjectMaps().iterator().next();
                 if(parameter.getReferenceMap() != null)
                     parameterValue = parameter.getReferenceMap().getReference();
-                else
+                else if(parameter.getConstantValue() != null) {
                     parameterValue = parameter.getConstantValue().stringValue();
+                } else {
+		    parameterValue = parameter.getStringTemplate();
+                }
                 if(funPredicateValue != null && parameterValue != null)
                     parameters.put(funPredicateValue, parameterValue);
             }

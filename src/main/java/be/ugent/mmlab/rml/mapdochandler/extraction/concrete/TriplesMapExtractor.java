@@ -12,12 +12,15 @@ import be.ugent.mmlab.rml.model.Source;
 import be.ugent.mmlab.rml.model.TriplesMap;
 import be.ugent.mmlab.rml.model.std.StdLogicalSource;
 import be.ugent.mmlab.rml.vocabularies.CRMLVocabulary;
+import be.ugent.mmlab.rml.vocabularies.FnVocabulary;
 import be.ugent.mmlab.rml.vocabularies.QLVocabulary.QLTerm;
 import be.ugent.mmlab.rml.vocabularies.R2RMLVocabulary;
 import be.ugent.mmlab.rml.vocabularies.RMLVocabulary;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.eclipse.rdf4j.model.Resource;
@@ -49,12 +52,24 @@ public class TriplesMapExtractor {
     public void extractTriplesMap(
             Repository repository, Resource triplesMapSubject,
             Map<Resource, TriplesMap> triplesMapResources){
-        TriplesMap result = extractAndReturnTriplesMap(repository, triplesMapSubject, triplesMapResources);
+
+        ValueFactory vf = SimpleValueFactory.getInstance();
+        RepositoryConnection connection = repository.getConnection();
+        RepositoryResult<Statement> statements = connection.getStatements(null, vf.createIRI(FnVocabulary.FnML_NAMESPACE
+                + FnVocabulary.FnTerm.FUNCTION_VALUE), triplesMapSubject, true);
+
+        TriplesMap result = extractAndReturnTriplesMap(repository, triplesMapSubject, triplesMapResources, !statements.hasNext());
+    }
+
+    public TriplesMap extractAndReturnTriplesMap(
+            Repository repository, Resource triplesMapSubject,
+            Map<Resource, TriplesMap> triplesMapResources) {
+                return extractAndReturnTriplesMap(repository, triplesMapSubject, triplesMapResources, true);
     }
        
     public TriplesMap extractAndReturnTriplesMap(
             Repository repository, Resource triplesMapSubject,
-            Map<Resource, TriplesMap> triplesMapResources) {
+            Map<Resource, TriplesMap> triplesMapResources, boolean requiredSubjectMap) {
         log.debug("Extract TriplesMap subject : "
                 + triplesMapSubject.stringValue());
         TriplesMap result = triplesMapResources.get(triplesMapSubject);
@@ -69,18 +84,20 @@ public class TriplesMapExtractor {
         // Create a graph maps storage to save all met graph uri during parsing.
         GraphMap graphMap = null;
 
-        // Extract exactly one SubjectMap
-        //SubjectMap subjectMap = extractSubjectMap(
-        //rmlMappingGraph, triplesMapSubject, graphMaps, result);
-        SubjectMapExtractor sbjMapExtractor = new SubjectMapExtractor();
-        SubjectMap subjectMap =
-                sbjMapExtractor.extractSubjectMap(
-                repository, triplesMapSubject, graphMap, result, triplesMapResources);
+        if (requiredSubjectMap) {
+            // Extract exactly one SubjectMap
+            //SubjectMap subjectMap = extractSubjectMap(
+            //rmlMappingGraph, triplesMapSubject, graphMaps, result);
+            SubjectMapExtractor sbjMapExtractor = new SubjectMapExtractor();
+            SubjectMap subjectMap =
+                    sbjMapExtractor.extractSubjectMap(
+                            repository, triplesMapSubject, graphMap, result, triplesMapResources);
 
-        try {
-            result.setSubjectMap(subjectMap);
+            try {
+                result.setSubjectMap(subjectMap);
             } catch (Exception ex) {
                 log.error("Exception: " + ex);
+            }
         }
 
         // Extract PredicateObjectMaps
