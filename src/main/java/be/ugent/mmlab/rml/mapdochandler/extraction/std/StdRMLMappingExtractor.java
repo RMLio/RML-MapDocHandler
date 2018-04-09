@@ -4,6 +4,7 @@ import be.ugent.mmlab.rml.mapdochandler.extraction.RMLMappingExtractor;
 import be.ugent.mmlab.rml.mapdochandler.skolemization.skolemizationFactory;
 import be.ugent.mmlab.rml.model.TriplesMap;
 import be.ugent.mmlab.rml.model.std.StdTriplesMap;
+import be.ugent.mmlab.rml.vocabularies.FnVocabulary;
 import be.ugent.mmlab.rml.vocabularies.R2RMLVocabulary;
 import be.ugent.mmlab.rml.vocabularies.RMLVocabulary;
 import java.util.ArrayList;
@@ -62,7 +63,7 @@ public class StdRMLMappingExtractor implements RMLMappingExtractor{
     public Map<Resource, TriplesMap> extractTriplesMapResources(Repository repo) {
         Map<Resource, TriplesMap> triplesMapResources = new HashMap<Resource, TriplesMap>();
 
-        RepositoryResult<Statement> statements = getTriplesMapResources(repo);
+        ArrayList<Statement> statements = getTriplesMapResources(repo);
 
         triplesMapResources = putTriplesMapResources(statements, triplesMapResources);
 
@@ -73,8 +74,9 @@ public class StdRMLMappingExtractor implements RMLMappingExtractor{
      *
      * @return
      */
-    protected RepositoryResult<Statement> getTriplesMapResources(Repository repo) {
+    protected ArrayList<Statement> getTriplesMapResources(Repository repo) {
         RepositoryResult<Statement> statements = null;
+        ArrayList<Statement> results = new ArrayList<>();
 
         try {
             RepositoryConnection connection = repo.getConnection();
@@ -85,11 +87,16 @@ public class StdRMLMappingExtractor implements RMLMappingExtractor{
                     + RMLVocabulary.RMLTerm.LOGICAL_SOURCE);
 
             statements = connection.getStatements(null, p, null, true);
+
+            while (statements.hasNext()) {
+                results.add(statements.next());
+            }
+
             log.debug("Triples Map statements were retrieved: " + statements.hasNext());
         } catch (RepositoryException ex) {
             log.error("RepositoryException " + ex);
         }
-        return statements;
+        return results;
     }
 
     /**
@@ -99,10 +106,9 @@ public class StdRMLMappingExtractor implements RMLMappingExtractor{
      * @return
      */
     protected Map<Resource, TriplesMap> putTriplesMapResources(
-            RepositoryResult<Statement> statements, Map<Resource, TriplesMap> triplesMapResources) {
+            ArrayList<Statement> statements, Map<Resource, TriplesMap> triplesMapResources) {
         try {
-            while (statements.hasNext()) {
-                Statement statement = statements.next();
+            for (Statement statement : statements) {
                 triplesMapResources.put(statement.getSubject(),
                         new StdTriplesMap(null, null, null, statement.getSubject().stringValue()));
             }
