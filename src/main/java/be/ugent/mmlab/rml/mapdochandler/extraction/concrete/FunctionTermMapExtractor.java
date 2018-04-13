@@ -1,11 +1,13 @@
 package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
 
+import be.ugent.mmlab.rml.extraction.TermExtractor;
 import be.ugent.mmlab.rml.model.PredicateObjectMap;
 import be.ugent.mmlab.rml.model.RDFTerm.*;
 import be.ugent.mmlab.rml.model.TriplesMap;
 import be.ugent.mmlab.rml.model.std.StdFunctionTermMap;
 import be.ugent.mmlab.rml.model.termMap.ReferenceMap;
 import be.ugent.mmlab.rml.vocabularies.FnVocabulary;
+import be.ugent.mmlab.rml.vocabularies.R2RMLVocabulary;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Value;
@@ -64,7 +66,8 @@ public class FunctionTermMapExtractor {
                 Map<String,String> parametersRefs = getFunRefPairs(functionTriplesMap);
 
                 Value constantValue = null;
-                IRI dataType = null;
+                IRI dataType = (IRI) TermExtractor.extractValueFromTermMap(repository, object,
+                        R2RMLVocabulary.R2RMLTerm.DATATYPE, triplesMap);
                 String languageTag = null;
                 String stringTemplate = null;
                 IRI termType = null;
@@ -91,7 +94,7 @@ public class FunctionTermMapExtractor {
         IRI funPredicateURI = null;
 
         for(PredicateObjectMap predicateObjectMap : predObjMaps){
-            log.debug("Retrieving the function...");
+            log.debug("Retrieving the function..." + predObjMaps.size());
             PredicateMap funPredicate = predicateObjectMap.getPredicateMaps().iterator().next();
             Object executes = FnVocabulary.FNO_NAMESPACE + FnVocabulary.FnTerm.EXECUTES;
             String funPredicateValue = funPredicate.getConstantValue().stringValue();
