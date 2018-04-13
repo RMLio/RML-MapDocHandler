@@ -1,5 +1,6 @@
 package be.ugent.mmlab.rml.mapdochandler.extraction.concrete;
 
+import be.ugent.mmlab.rml.extraction.TermExtractor;
 import be.ugent.mmlab.rml.model.RDFTerm.GraphMap;
 import be.ugent.mmlab.rml.model.PredicateObjectMap;
 import be.ugent.mmlab.rml.model.TriplesMap;
@@ -9,11 +10,11 @@ import java.util.HashSet;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Value;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.repository.Repository;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.RepositoryException;
 
 /**
  * *************************************************************************
@@ -29,14 +30,16 @@ import org.openrdf.repository.RepositoryException;
 public class GraphMapExtractor extends StdTermMapExtractor {
     
     // Log
-    static final Logger log = LoggerFactory.getLogger(GraphMapExtractor.class);
+    static final Logger log =
+            LoggerFactory.getLogger(
+            GraphMapExtractor.class.getSimpleName());
     
     public Set<GraphMap> extractGraphMapValues(
-            Repository repository, Set<Value> graphMapValues,
-            Set<GraphMap> savedGraphMaps, TriplesMap triplesMap) {
+            Repository repository, Set<Value> graphMapValues, TriplesMap triplesMap) {
 
         Set<GraphMap> graphMaps = new HashSet<GraphMap>();
 
+        if(graphMapValues != null)
         for (Value graphMap : graphMapValues) {
             // Create associated graphMap if it has not already created
             boolean found = false;
@@ -48,7 +51,6 @@ public class GraphMapExtractor extends StdTermMapExtractor {
                 GraphMap newGraphMap = null;
                 newGraphMap = extractGraphMap(repository, (Resource) graphMap, triplesMap);
 
-                savedGraphMaps.add(newGraphMap);
                 graphMaps.add(newGraphMap);
             }
         }
@@ -82,7 +84,7 @@ public class GraphMapExtractor extends StdTermMapExtractor {
     
     public PredicateObjectMap processGraphMaps(
             Repository repository, Resource predicateObject, TriplesMap triplesMap, 
-            PredicateObjectMap predicateObjectMap, Set<GraphMap> savedGraphMaps) {
+            PredicateObjectMap predicateObjectMap, GraphMap savedGraphMap) {
         // Add graphMaps
         Set<GraphMap> graphMaps = new HashSet<GraphMap>();
         Set<Value> graphMapValues = TermExtractor.extractValuesFromResource(
@@ -90,10 +92,8 @@ public class GraphMapExtractor extends StdTermMapExtractor {
 
         if (graphMapValues != null) {
             graphMaps = extractGraphMapValues(
-                    repository, graphMapValues, savedGraphMaps, triplesMap);
-            log.debug("Gtraph Maps returned " + graphMaps);
+                    repository, graphMapValues, triplesMap);
         }
-
         predicateObjectMap.setGraphMaps(graphMaps);
         return predicateObjectMap;
     }

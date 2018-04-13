@@ -7,8 +7,8 @@ import java.util.HashSet;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.openrdf.model.Value;
-import org.openrdf.repository.Repository;
+import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.repository.Repository;
 
 /**
  * *************************************************************************
@@ -23,7 +23,9 @@ import org.openrdf.repository.Repository;
 public class LocalFileExtractor extends StdSourceExtractor {
     
     // Log
-    private static final Logger log = LoggerFactory.getLogger(LocalFileExtractor.class);
+    private static final Logger log = 
+            LoggerFactory.getLogger(
+            LocalFileExtractor.class.getSimpleName());
     
     //TODO: Change extractInput to Value instead of Resource
     public Set<Source> extractInput(Repository repository, String source) {

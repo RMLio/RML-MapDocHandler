@@ -13,14 +13,14 @@ import be.ugent.mmlab.rml.mapdochandler.extraction.source.concrete.SparqlExtract
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
-import org.openrdf.model.Value;
-import org.openrdf.model.vocabulary.RDF;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.RepositoryResult;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.model.vocabulary.RDF;
+import org.eclipse.rdf4j.repository.Repository;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.RepositoryException;
+import org.eclipse.rdf4j.repository.RepositoryResult;
 
 /**
  * *************************************************************************
@@ -36,7 +36,9 @@ import org.openrdf.repository.RepositoryResult;
 public class ConcreteSourceFactory implements SourceFactory {
     
     // Log
-    private static final Logger log = LoggerFactory.getLogger(ConcreteSourceFactory.class);
+    private static final Logger log =
+            LoggerFactory.getLogger(
+            ConcreteSourceFactory.class.getSimpleName());
     
     public SourceExtractor createSourceExtractor(Repository repository, Value value) {
         SourceExtractor sourceExtractor = null;
@@ -52,6 +54,8 @@ public class ConcreteSourceFactory implements SourceFactory {
                 RepositoryResult<Statement> inputStatements =
                         connection.getStatements(
                         (Resource) value, RDF.TYPE, null, true);
+                if(inputStatements == null)
+                    log.error("no input statement found");
 
                 String sourceType = 
                         inputStatements.next().getObject().stringValue().toString();
@@ -71,6 +75,7 @@ public class ConcreteSourceFactory implements SourceFactory {
                         sourceExtractor = new CsvwExtractor();
                         break;
                     case ("http://www.w3.org/ns/dcat#Distribution"):
+                    case ("http://www.w3.org/ns/dcat#Dataset"):    
                         log.debug("Source described with DCAT vocabulary.");
                         sourceExtractor = new DcatExtractor();
                         break;

@@ -5,10 +5,17 @@ import be.ugent.mmlab.rml.mapdochandler.extraction.RMLMappingFactory;
 import be.ugent.mmlab.rml.mapdochandler.extraction.concrete.TriplesMapExtractor;
 import be.ugent.mmlab.rml.model.RMLMapping;
 import be.ugent.mmlab.rml.model.TriplesMap;
+import be.ugent.mmlab.rml.vocabularies.FnVocabulary;
 import be.ugent.mmlab.rml.vocabularies.R2RMLVocabulary;
 import java.util.Map;
-import org.openrdf.model.Resource;
-import org.openrdf.repository.Repository;
+
+import be.ugent.mmlab.rml.vocabularies.RMLVocabulary;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
+import org.eclipse.rdf4j.repository.Repository;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +33,8 @@ public class StdRMLMappingFactory {
     
     // Log
     private static final Logger log = 
-            LoggerFactory.getLogger(RMLMappingFactory.class);
+            LoggerFactory.getLogger(
+            RMLMappingFactory.class.getSimpleName());
     
     private RMLMappingExtractor extractor;
     private boolean skolemization = false;
